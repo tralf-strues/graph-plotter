@@ -34,20 +34,20 @@ struct Graph
     //! @addtogroup GRAPH_AXES_SPECS
     //! @{
 
-    Vec2d originOffset; ///< Origin's offset in the Graph's frame, must be in 
-                        ///< the range [0, 1], where (0, 0) corresponds to the 
-                        ///< bottom-left corner and (1, 1) corresponds to the 
-                        ///< upper-right corner.
+    Vec2f64 originOffset; ///< Origin's offset in the Graph's frame, must be in 
+                          ///< the range [0, 1], where (0, 0) corresponds to the 
+                          ///< bottom-left corner and (1, 1) corresponds to the 
+                          ///< upper-right corner.
 
-    Vec2d axesMax;      ///< Max values of x and y axes.
+    Vec2f64 axesMax;      ///< Max values of x and y axes.
 
     //! @}
     //--------------------------------------------------------------------------
 };
 
 void createGraph(Window* window, Vec2u32 windowPos, size_t width, size_t height);
-void setGraphOriginOffset(Graph* graph, Vec2d originOffset);
-void setGraphAxesMax(Graph* graph, Vec2d axesMax);
+void setGraphOriginOffset(Graph* graph, Vec2f64 originOffset);
+void setGraphAxesMax(Graph* graph, Vec2f64 axesMax);
 
 void graphPlotFunction(Graph* graph, Function function, double xStep);
 

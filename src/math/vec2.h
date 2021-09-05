@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 // Vector 2D with type double
-#define VEC2_NAME Vec2d
+#define VEC2_NAME Vec2f64
 #define VEC2_TYPE double
 #include "vec2Builder.h"
 
