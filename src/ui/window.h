@@ -16,15 +16,14 @@
 #include <SDL.h>
 
 #include "color.h"
+#include "../math/vec2.h"
 
 #define ASSERT_WINDOW(window) assert(window);              \
                               assert(window->width);       \
                               assert(window->height);      \
                               assert(window->title);       \
-                              assert(window->pixels);      \
                               assert(window->sdlWindow);   \
-                              assert(window->sdlRenderer); \
-                              assert(window->sdlTexture);  
+                              assert(window->sdlRenderer); 
 
 enum WindowError
 {
@@ -41,11 +40,8 @@ struct Window
     size_t        height;
     const char*   title;
 
-    uint32_t*     pixels; // TODO: make a typedef RGBA
-
     SDL_Window*   sdlWindow;
     SDL_Renderer* sdlRenderer;
-    SDL_Texture*  sdlTexture;
 };
 
 static const char* WINDOW_DEFAULT_TITLE = "Untitled";
@@ -59,8 +55,8 @@ void closeWindow(Window* window);
 void updateTitle(Window* window, const char* title);
 WindowError resizeWindow(Window* window, size_t width, size_t height);
 
-void setDrawColor(Window* window, ColorRGBA color);
-void clearWindow(Window* window);
-void updateWindow(Window* window);
+void setDrawColor(SDL_Renderer* renderer, ColorRGBA color);
+
+void renderTexture(SDL_Renderer* renderer, SDL_Texture* texture, Vec2u32 pos, Vec2u32 size);
 
 #endif // WINDOW_H

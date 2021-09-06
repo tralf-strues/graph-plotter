@@ -1,7 +1,13 @@
 #include <math.h>
 #include "graph.h"
 
+const float  STEP_PIXELS      = 0.25f;
+const size_t LABEL_MAX_LENGTH = 32;
+
+Vec2f32 toPixels(const Graph* graph, const SDL_Rect* rect, Vec2f32 point);
 void renderVector(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rect, Vector vector);
+void renderFunction(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rect, 
+                    Function function);
 
 void createGraph(Graph* graph, const Vec2f32* axesMin, const Vec2f32* axesMax)
 {
@@ -52,13 +58,15 @@ void renderGraph(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rec
 
     SDL_RenderSetClipRect(renderer, rect);
 
-    SDL_SetRenderDrawColor(renderer, 0xc0, 0xc0, 0x00, 0xff);
+    // ================ Render frame ================
+    setDrawColor(renderer, GRAPH_FRAME_COLOR);
     SDL_RenderDrawRect(renderer, rect);
 
     float relativeHeight = graph->axesMax.y - graph->axesMin.y;
     float relativeWidth  = graph->axesMax.x - graph->axesMin.x;
 
-    SDL_SetRenderDrawColor(renderer, 0xb0, 0xb0, 0x00, 0xff);
+    // ================ Render axes ================
+    setDrawColor(renderer, GRAPH_AXES_COLOR);
 
     // y axis
     if (graph->axesMin.x <= 0 && graph->axesMax.x >= 0)
@@ -72,28 +80,50 @@ void renderGraph(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rec
         renderVector(renderer, graph, rect, {{graph->axesMin.x, 0}, {relativeWidth, 0}});
     }
 
-    // vectors
+    // ================ Render vectors ================
+    setDrawColor(renderer, GRAPH_VEC_COLOR);
+
     for (size_t vector = 0; vector < graph->vectorsCount; vector++)
     {
         renderVector(renderer, graph, rect, *graph->vectors[vector]);
     }
 
+    // ================ Render functions ================
+    setDrawColor(renderer, GRAPH_FUNC_COLOR);
+
+    for (size_t function = 0; function < graph->functionsCount; function++)
+    {
+        renderFunction(renderer, graph, rect, *graph->functions[function]);
+    }
+
     SDL_RenderSetClipRect(renderer, nullptr);
+}
+
+Vec2f32 toPixels(const Graph* graph, const SDL_Rect* rect, Vec2f32 point)
+{
+    assert(graph);
+    assert(rect);
+
+    float relativeWidth  = graph->axesMax.x - graph->axesMin.x;
+    float relativeHeight = graph->axesMax.y - graph->axesMin.y;
+
+    float x = rect->x + (float) rect->w / relativeWidth  * (point.x - graph->axesMin.x);
+    float y = rect->y - (float) rect->h / relativeHeight * (point.y - graph->axesMax.y);
+
+    return {x, y};
 }
 
 void renderVector(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rect, Vector vector)
 {
     assert(renderer);
     assert(graph);
+    assert(rect);
 
     float relativeHeight = graph->axesMax.y - graph->axesMin.y;
     float relativeWidth  = graph->axesMax.x - graph->axesMin.x;
 
-    Vec2f32 from = {rect->x + (float) rect->w / relativeWidth  * (vector.origin.x - graph->axesMin.x), 
-                    rect->y - (float) rect->h / relativeHeight * (vector.origin.y - graph->axesMax.y)};
-
-    Vec2f32 to = {rect->x + (float) rect->w / relativeWidth  * (vector.origin.x + vector.disp.x - graph->axesMin.x), 
-                  rect->y - (float) rect->h / relativeHeight * (vector.origin.y + vector.disp.y - graph->axesMax.y)};
+    Vec2f32 from = toPixels(graph, rect, vector.origin);
+    Vec2f32 to   = toPixels(graph, rect, add(&vector.origin, &vector.disp));
 
     Vec2f32 vectorWindowCoords = sub(&to, &from);
 
@@ -111,4 +141,23 @@ void renderVector(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* re
     SDL_RenderDrawLineF(renderer, from.x, from.y, to.x, to.y);
     SDL_RenderDrawLineF(renderer, to.x, to.y, to.x + head1.x, to.y + head1.y);
     SDL_RenderDrawLineF(renderer, to.x, to.y, to.x + head2.x, to.y + head2.y);
+}
+
+void renderFunction(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rect, 
+                    Function function)
+{
+    assert(renderer);
+    assert(graph);
+    assert(rect);
+    assert(function);
+
+    float   dx        = STEP_PIXELS * (graph->axesMax.x - graph->axesMin.x) / rect->w;
+    Vec2f32 prevPoint = toPixels(graph, rect, {graph->axesMin.x, function(graph->axesMin.x)});
+
+    for (float x = graph->axesMin.x; x <= graph->axesMax.x; x += dx)
+    {
+        Vec2f32 point = toPixels(graph, rect, {x, function(x)});
+        SDL_RenderDrawLineF(renderer, prevPoint.x, prevPoint.y, point.x, point.y);
+        prevPoint = point;
+    }
 }

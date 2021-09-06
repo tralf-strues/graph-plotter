@@ -10,10 +10,15 @@
 #include "ui/elements/primitives.h"
 #include "ui/elements/graph.h"
 
-const size_t WINDOW_WIDTH            = 800;
-const size_t WINDOW_HEIGHT           = 600;
-const char*  WINDOW_TITLE            = "Graph plotter";
-const size_t MAX_WINDOW_TITLE_LENGTH = 128;
+const size_t    WINDOW_WIDTH            = 800;
+const size_t    WINDOW_HEIGHT           = 600;
+const char*     WINDOW_TITLE            = "Graph plotter";
+const size_t    MAX_WINDOW_TITLE_LENGTH = 128;
+const ColorRGBA BACKGROUND_COLOR        = 0x1e'23'28'ff; 
+
+void updateFpsTitle(Window* window, uint32_t frameTime);
+float parabola(float x);
+float sinus(float x);
 
 int main()
 {
@@ -29,23 +34,24 @@ int main()
     bool running = true;
     SDL_Event event = {};
 
-    char windowTitle[MAX_WINDOW_TITLE_LENGTH] = {};
-
     Graph graph = {};
     createGraph(&graph, nullptr, nullptr);
 
     SDL_Rect graphFrame1 = {50, 50, 300, 300};
 
-    Vector original = {{1, 1}, {2, -0.5}};
+    Vector original = {{1, 2}, {1.5, -0.5}};
     Vector vector   = original;
     addVector(&graph, &vector);
     float angle = 0;
+
+    addFunction(&graph, parabola);
+    addFunction(&graph, sinus);
 
     while (running)
     {
         uint32_t frameStartTime = SDL_GetTicks();
 
-        // Process events
+        /* ================ Process events ================ */
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -63,23 +69,40 @@ int main()
         angle += 0.01f;
         vector.disp = rot(&original.disp, angle);
 
-        // Update visuals
-        setDrawColor(&window, COLOR_BLACK);
-        clearWindow(&window);
-
-        // setDrawColor(&window, COLOR_YELLOW);
-        // drawLine(&window, {10u, 10u}, {100u, 460u});
+        /* ================ Update visuals ================ */
+        setDrawColor(window.sdlRenderer, BACKGROUND_COLOR);
+        SDL_RenderClear(window.sdlRenderer);
 
         renderGraph(window.sdlRenderer, &graph, &graphFrame1);
 
-        updateWindow(&window);
+        SDL_RenderPresent(window.sdlRenderer);
 
-        // Update fps (time is in milliseconds, that's why use 1e3 - to convert into seconds)
-        uint32_t fps = 1e3 / (SDL_GetTicks() - frameStartTime);
-        snprintf(windowTitle, MAX_WINDOW_TITLE_LENGTH, "%s [%" PRIu32 " fps]", WINDOW_TITLE, fps);
-
-        updateTitle(&window, windowTitle);
+        /* ================ Update fps title ================ */
+        updateFpsTitle(&window, SDL_GetTicks() - frameStartTime);
     }
 
+    closeWindow(&window);
+
     return 0;
+}
+
+void updateFpsTitle(Window* window, uint32_t frameTime)
+{
+    static char windowTitle[MAX_WINDOW_TITLE_LENGTH] = {};
+
+    // Time is in milliseconds, that's why use 1e3 - to convert into seconds
+    uint32_t fps = 1e3 / frameTime;
+    snprintf(windowTitle, MAX_WINDOW_TITLE_LENGTH, "%s [%" PRIu32 " fps]", WINDOW_TITLE, fps);
+
+    updateTitle(window, windowTitle);
+}
+
+float parabola(float x)
+{
+    return 0.25 * x * x + 1;
+}
+
+float sinus(float x)
+{
+    return sinf(4 * x);
 }

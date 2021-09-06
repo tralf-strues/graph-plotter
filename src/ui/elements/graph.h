@@ -12,13 +12,18 @@
 #include "../../math/vec2.h"
 #include "../window.h"
 
-typedef double (*Function) (double x);
+typedef float (*Function) (float x);
 
 static const size_t GRAPH_MAX_FUNCTIONS = 8u;
 static const size_t GRAPH_MAX_VECTORS   = 8u;
 
 static const Vec2f32 GRAPH_DEFAULT_AXES_MIN = {-1, -1};
 static const Vec2f32 GRAPH_DEFAULT_AXES_MAX = { 5,  5};
+
+static const ColorRGBA GRAPH_FRAME_COLOR = 0x74'72'6b'ff;
+static const ColorRGBA GRAPH_AXES_COLOR  = 0xfe'fd'e5'ff;
+static const ColorRGBA GRAPH_FUNC_COLOR  = 0xf4'e6'64'ff;
+static const ColorRGBA GRAPH_VEC_COLOR   = 0xca'a9'71'ff;
 
 static const float GRAPH_ARROWHEAD_ANGLE     = M_PI / 6;
 static const float GRAPH_ARROWHEAD_COS_ANGLE = cosf(GRAPH_ARROWHEAD_ANGLE);
@@ -63,7 +68,6 @@ void createGraph(Graph* graph, const Vec2f32* axesMin, const Vec2f32* axesMax);
 bool addFunction(Graph* graph, Function function);
 bool addVector(Graph* graph, Vector* vector);
 
-void renderGraph(SDL_Renderer* renderer, const Graph* graph, 
-                 const SDL_Rect* clipRect);
+void renderGraph(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rect);
 
 #endif // GRAPH_H
