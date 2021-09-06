@@ -8,6 +8,7 @@
 
 #include "ui/window.h"
 #include "ui/elements/primitives.h"
+#include "ui/elements/graph.h"
 
 const size_t WINDOW_WIDTH            = 800;
 const size_t WINDOW_HEIGHT           = 600;
@@ -30,6 +31,16 @@ int main()
 
     char windowTitle[MAX_WINDOW_TITLE_LENGTH] = {};
 
+    Graph graph = {};
+    createGraph(&graph, nullptr, nullptr);
+
+    SDL_Rect graphFrame1 = {50, 50, 300, 300};
+
+    Vector original = {{1, 1}, {2, -0.5}};
+    Vector vector   = original;
+    addVector(&graph, &vector);
+    float angle = 0;
+
     while (running)
     {
         uint32_t frameStartTime = SDL_GetTicks();
@@ -49,12 +60,17 @@ int main()
             }
         }
 
+        angle += 0.01f;
+        vector.disp = rot(&original.disp, angle);
+
         // Update visuals
         setDrawColor(&window, COLOR_BLACK);
         clearWindow(&window);
 
-        setDrawColor(&window, COLOR_YELLOW);
-        drawLine(&window, {10u, 10u}, {100u, 460u});
+        // setDrawColor(&window, COLOR_YELLOW);
+        // drawLine(&window, {10u, 10u}, {100u, 460u});
+
+        renderGraph(window.sdlRenderer, &graph, &graphFrame1);
 
         updateWindow(&window);
 

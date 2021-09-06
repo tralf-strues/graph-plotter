@@ -14,5 +14,9 @@ struct VEC2_NAME
     VEC2_TYPE y;
 };
 
-VEC2_NAME add(VEC2_NAME vector1, VEC2_NAME vector2);
-VEC2_NAME sub(VEC2_NAME vector1, VEC2_NAME vector2);
+VEC2_NAME add(const VEC2_NAME* vector1, const VEC2_NAME* vector2);
+VEC2_NAME sub(const VEC2_NAME* vector1, const VEC2_NAME* vector2);
+VEC2_NAME mul(const VEC2_NAME* vector, VEC2_TYPE scalar);
+
+VEC2_TYPE len(const VEC2_NAME* vector);
+VEC2_NAME rot(const VEC2_NAME* vector, float angle);

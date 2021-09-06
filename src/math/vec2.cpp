@@ -1,29 +1,26 @@
 //------------------------------------------------------------------------------
 //! @author Nikita Mochalov (github.com/tralf-strues)
-//! @file vec2.h
-//! @date 2021-09-04
+//! @file vec2.cpp
+//! @date 2021-09-06
 //! 
 //! @copyright Copyright (c) 2021
 //------------------------------------------------------------------------------
 
-#ifndef VEC2_H
-#define VEC2_H
-
-#include <stdint.h>
+#include <assert.h>
+#include <math.h>
+#include "vec2.h"
 
 // Vector 2D with type float
 #define VEC2_NAME Vec2f32
 #define VEC2_TYPE float
-#include "vec2BuilderDecl.h"
+#include "vec2BuilderDef.h"
 
 // Vector 2D with type int32_t
 #define VEC2_NAME Vec2i32
 #define VEC2_TYPE int32_t
-#include "vec2BuilderDecl.h"
+#include "vec2BuilderDef.h"
 
 // Vector 2D with type uint32_t
 #define VEC2_NAME Vec2u32
 #define VEC2_TYPE uint32_t
-#include "vec2BuilderDecl.h"
-
-#endif // VEC2_H
+#include "vec2BuilderDef.h"
