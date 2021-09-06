@@ -20,10 +20,10 @@ static const size_t GRAPH_MAX_VECTORS   = 8u;
 static const Vec2f32 GRAPH_DEFAULT_AXES_MIN = {-1, -1};
 static const Vec2f32 GRAPH_DEFAULT_AXES_MAX = { 5,  5};
 
-static const ColorRGBA GRAPH_FRAME_COLOR = 0x74'72'6b'ff;
-static const ColorRGBA GRAPH_AXES_COLOR  = 0xfe'fd'e5'ff;
-static const ColorRGBA GRAPH_FUNC_COLOR  = 0xf4'e6'64'ff;
-static const ColorRGBA GRAPH_VEC_COLOR   = 0xca'a9'71'ff;
+static const SDL_Color GRAPH_FRAME_COLOR = {0x74, 0x72, 0x6b, 0xff};
+static const SDL_Color GRAPH_AXES_COLOR  = {0xfe, 0xfd, 0xe5, 0xff};
+static const SDL_Color GRAPH_FUNC_COLOR  = {0xf4, 0xe6, 0x64, 0xff};
+static const SDL_Color GRAPH_VEC_COLOR   = {0xca, 0xa9, 0x71, 0xff};
 
 static const float GRAPH_ARROWHEAD_ANGLE     = M_PI / 6;
 static const float GRAPH_ARROWHEAD_COS_ANGLE = cosf(GRAPH_ARROWHEAD_ANGLE);

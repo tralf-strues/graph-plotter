@@ -1,7 +1,7 @@
 #include <math.h>
 #include "graph.h"
 
-const float  STEP_PIXELS      = 0.25f;
+const float  STEP_PIXELS      = 0.1f;
 const size_t LABEL_MAX_LENGTH = 32;
 
 Vec2f32 toPixels(const Graph* graph, const SDL_Rect* rect, Vec2f32 point);
@@ -15,6 +15,9 @@ void createGraph(Graph* graph, const Vec2f32* axesMin, const Vec2f32* axesMax)
 
     graph->axesMin = (axesMin != nullptr) ? *axesMin : GRAPH_DEFAULT_AXES_MIN;
     graph->axesMax = (axesMax != nullptr) ? *axesMax : GRAPH_DEFAULT_AXES_MAX;
+
+    graph->functionsCount = 0;
+    graph->vectorsCount = 0;
 
     assert(graph->axesMin.x < graph->axesMax.x);
     assert(graph->axesMin.y < graph->axesMax.y);
@@ -73,7 +76,7 @@ void renderGraph(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rec
     {
         renderVector(renderer, graph, rect, {{0, graph->axesMin.y}, {0, relativeHeight}});
     }
-
+    
     // x axis
     if (graph->axesMin.y <= 0 && graph->axesMax.y >= 0)
     {
@@ -87,10 +90,10 @@ void renderGraph(SDL_Renderer* renderer, const Graph* graph, const SDL_Rect* rec
     {
         renderVector(renderer, graph, rect, *graph->vectors[vector]);
     }
-
+    
     // ================ Render functions ================
     setDrawColor(renderer, GRAPH_FUNC_COLOR);
-
+    
     for (size_t function = 0; function < graph->functionsCount; function++)
     {
         renderFunction(renderer, graph, rect, *graph->functions[function]);

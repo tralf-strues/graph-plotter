@@ -85,12 +85,12 @@ WindowError resizeWindow(Window* window, size_t width, size_t height)
     return WINDOW_NO_ERROR;
 }
 
-void setDrawColor(SDL_Renderer* renderer, ColorRGBA color)
-{
-    assert(renderer);
+// void setDrawColor(SDL_Renderer* renderer, ColorRGBA color)
+// {
+//     assert(renderer);
 
-    SDL_SetRenderDrawColor(renderer, getR(color), getG(color), getB(color), getA(color));
-}
+//     SDL_SetRenderDrawColor(renderer, getR(color), getG(color), getB(color), getA(color));
+// }
 
 void renderTexture(SDL_Renderer* renderer, SDL_Texture* texture, Vec2i32 pos, Vec2i32 size)
 {

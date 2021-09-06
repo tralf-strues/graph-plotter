@@ -55,8 +55,6 @@ void closeWindow(Window* window);
 void updateTitle(Window* window, const char* title);
 WindowError resizeWindow(Window* window, size_t width, size_t height);
 
-void setDrawColor(SDL_Renderer* renderer, ColorRGBA color);
-
 void renderTexture(SDL_Renderer* renderer, SDL_Texture* texture, Vec2u32 pos, Vec2u32 size);
 
 #endif // WINDOW_H
