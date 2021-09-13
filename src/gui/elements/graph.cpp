@@ -141,10 +141,10 @@ void renderVector(Renderer& renderer, const Graph& graph, const Rectangle& regio
     float ysin = vectorWindowCoords.y * sinf(GRAPH_ARROWHEAD_ANGLE);
 
     Vec2<float> head1(xcos - ysin, ycos + xsin);
-    head1 *= -GRAPH_ARROWHEAD_LEN / head1.getLength();
+    head1 *= -GRAPH_ARROWHEAD_LEN / length(head1);
 
     Vec2<float> head2(xcos + ysin, ycos - xsin);
-    head2 *= -GRAPH_ARROWHEAD_LEN / head2.getLength();
+    head2 *= -GRAPH_ARROWHEAD_LEN / length(head2);
 
     renderLine(renderer, from, to);
     renderLine(renderer, to, to + head1);

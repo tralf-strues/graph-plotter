@@ -44,23 +44,6 @@ struct Vec2
 
         return *this;
     }
-
-    float getLength() const
-    {
-        return sqrtf(x * x + y * y);
-    }
-
-    void rotate(float angle)
-    {
-        float sina = sinf(angle);
-        float cosa = cosf(angle);
-
-        float old_x = x;
-        float old_y = y;
-
-        x = old_x * cosa - old_y * sina;
-        y = old_x * sina + old_y * cosa;
-    }
 };
 
 template <typename T>
@@ -91,12 +74,29 @@ Vec2<T> operator*(const Vec2<T>& vector, float scalar)
 }
 
 template <typename T>
+float length(const Vec2<T>& vector)
+{
+    return sqrtf(vector.x * vector.x + vector.y * vector.y);
+}
+
+template <typename T>
 Vec2<T> rotate(const Vec2<T>& vector, float angle)
 {
-    Vec2<T> rotated(vector);
-    rotated.rotate(angle);
+    float sina = sinf(angle);
+    float cosa = cosf(angle);
 
-    return rotated;
+    float x = vector.x * cosa - vector.y * sina;
+    float y = vector.x * sina + vector.y * cosa;
+
+    return {x, y};
+}
+
+template <typename T>
+Vec2<T> normalize(const Vec2<T>& vector)
+{
+    float len = length(vector);
+
+    return {vector.x / len, vector.y / len};
 }
 
 #endif // VEC2_H
