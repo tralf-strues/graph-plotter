@@ -9,8 +9,13 @@
 #include "app.h"
 
 int main()
-{
-    App app;
+{   
+    initGraphics();
 
-    return app.run();
+    App app;
+    app.run();
+
+    quitGraphics();
+
+    return 0;
 }
