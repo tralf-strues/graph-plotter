@@ -94,10 +94,9 @@ public:
     //! @note If the point is outside rendering target's region, then it is 
     //!       simply ignored. 
     //! 
-    //! @param renderer
     //! @param pos Position of a point.
     //--------------------------------------------------------------------------
-    friend void renderPoint(Renderer& renderer, const Vec2<int32_t>& pos);
+    void renderPoint(const Vec2<int32_t>& pos);
 
     //--------------------------------------------------------------------------
     //! @brief Render a line from start to end.
@@ -105,12 +104,10 @@ public:
     //! @note If a part of the line is outside rendering target's region, then 
     //!       this part is simply ignored.
     //! 
-    //! @param renderer
     //! @param start Position of line's start point.
     //! @param end   Position of line's end point.
     //--------------------------------------------------------------------------
-    friend void renderLine(Renderer& renderer, const Vec2<int32_t>& start, 
-                           const Vec2<int32_t>& end);
+    void renderLine(const Vec2<int32_t>& start, const Vec2<int32_t>& end);
 
 private:
     Window&       window;
@@ -128,5 +125,22 @@ private:
     //--------------------------------------------------------------------------
     void setError(uint32_t error);
 };
+
+//------------------------------------------------------------------------------
+//! @brief See @ref Renderer::renderPoint().
+//! 
+//! @param renderer 
+//! @param pos 
+//------------------------------------------------------------------------------
+void renderPoint(Renderer& renderer, const Vec2<int32_t>& pos);
+
+//------------------------------------------------------------------------------
+//! @brief See @ref Renderer::renderLine().
+//! 
+//! @param renderer 
+//! @param start 
+//! @param end 
+//------------------------------------------------------------------------------
+void renderLine(Renderer& renderer, const Vec2<int32_t>& start, const Vec2<int32_t>& end);
 
 #endif // RENDERER_H

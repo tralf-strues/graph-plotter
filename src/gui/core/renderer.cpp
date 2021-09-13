@@ -70,12 +70,22 @@ void Renderer::resetClipRegion() const
     SDL_RenderSetClipRect(nativeRenderer, nullptr);
 }
 
+void Renderer::renderPoint(const Vec2<int32_t>& pos)
+{
+    SDL_RenderDrawPoint(nativeRenderer, pos.x, pos.y);
+}
+
+void Renderer::renderLine(const Vec2<int32_t>& start, const Vec2<int32_t>& end)
+{
+    SDL_RenderDrawLine(nativeRenderer, start.x, start.y, end.x, end.y);
+}
+
 void renderPoint(Renderer& renderer, const Vec2<int32_t>& pos)
 {
-    SDL_RenderDrawPoint(renderer.nativeRenderer, pos.x, pos.y);
+    renderer.renderPoint(pos);
 }
 
 void renderLine(Renderer& renderer, const Vec2<int32_t>& start, const Vec2<int32_t>& end)
 {
-    SDL_RenderDrawLine(renderer.nativeRenderer, start.x, start.y, end.x, end.y);
+    renderer.renderLine(start, end);
 }
