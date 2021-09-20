@@ -114,9 +114,14 @@ bool Sphere::intersect(const Ray& ray, Hit* hit)
     hit->rayParameter = rayParameter1;
 
     // FIXME: What if camera's inside a sphere?
-    if (solutions == 2 && rayParameter2 < rayParameter1)
+    if (solutions == 2 && rayParameter2 < rayParameter1 && cmpFloat(rayParameter2, 0) >= 0)
     {
         hit->rayParameter = rayParameter2;
+    }
+
+    if (cmpFloat(hit->rayParameter, 0) < 0)
+    {
+        return false;
     }
 
     hit->pos      = ray.at(hit->rayParameter);

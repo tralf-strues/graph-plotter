@@ -5,7 +5,7 @@ LittleWarnings = -Wall
 NoWarnings     = 
 # -----------------------------------Constants----------------------------------
 
-Mode = RELEASE_MODE 
+Mode = DEBUG_MODE
 # ----------------------------------Debug-mode----------------------------------
 ifeq ($(Mode), DEBUG_MODE)
 	ModeLinkerOptions   = -g

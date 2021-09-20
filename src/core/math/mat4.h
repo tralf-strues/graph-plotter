@@ -135,25 +135,20 @@ Mat4<T> operator*(const Mat4<T>& first, const Mat4<T>& second)
 template <typename T>
 Vec3<T> operator*(const Mat4<T>& matrix, const Vec3<T>& vector)
 {
-    Vec3<T> product;
+    T arrHomogenous[MAT4_SIZE] = {vector.x, vector.y, vector.z, 1};
+    T arrProduct[MAT4_SIZE]    = {};
     
-    for (size_t row = 0; row < MAT4_SIZE - 1; row++)
+    for (size_t row = 0; row < MAT4_SIZE; row++)
     {
-        for (size_t col = 0; col < MAT4_SIZE - 1; col++)
+        for (size_t col = 0; col < MAT4_SIZE; col++)
         {
-            product.getCoord(row) += matrix[row][col] * vector.getCoord(col);
+            arrProduct[row] += matrix[row][col] * arrHomogenous[col];
         }
     }
 
-    T w = matrix[MAT4_SIZE - 1][MAT4_SIZE - 1];
-    for (size_t col = 0; col < MAT4_SIZE - 1; col++)
-    {
-        w += matrix[MAT4_SIZE - 1][col] * vector.getCoord(col);
-    }
+    Vec3<T> product = {arrProduct[0], arrProduct[1], arrProduct[2]};
 
-    product /= w;
-
-    return product;
+    return product / arrProduct[3];
 }
 
 template <typename T>

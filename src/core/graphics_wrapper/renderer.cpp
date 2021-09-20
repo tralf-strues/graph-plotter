@@ -11,7 +11,7 @@
 
 Renderer::Renderer(Window& window) : window(window)
 {
-    nativeRenderer = SDL_CreateRenderer(window.nativeWindow, -1, SDL_RENDERER_ACCELERATED);
+    nativeRenderer = SDL_CreateRenderer(window.getNativeWindow(), -1, SDL_RENDERER_ACCELERATED);
     if (nativeRenderer == nullptr)
     {
         setError(Renderer::CREATE_ERROR);

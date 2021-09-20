@@ -112,6 +112,7 @@ void renderSceneRayTracing(Renderer& renderer, Scene& scene)
             for (size_t i = 0; i < entitiesCount; i++)
             {
                 if (scene.entities[i]->intersect(ray, &hit) && 
+                    dotProduct(hit.pos - scene.camera.getPos().worldSpace, hit.normal) <= 0 &&
                     (!intersected || (intersected && hit.rayParameter < nearestRayParam)))
                 {
                     color           = calculateColor(scene, hit);

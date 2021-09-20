@@ -50,6 +50,11 @@ uint32_t Window::getError() const
     return errorStatus; 
 }
 
+SDL_Window* Window::getNativeWindow() const
+{
+    return nativeWindow;
+}
+
 void Window::updateTitle(const char* title)
 {
     this->title  = (title == nullptr) ? WINDOW_DEFAULT_TITLE : title;

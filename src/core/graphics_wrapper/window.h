@@ -17,11 +17,8 @@
 
 static const char* WINDOW_DEFAULT_TITLE = "Untitled";
 
-class Renderer;
 class Window
 {
-    friend Renderer; // TODO: ?get rid of?
-
 public:
     enum Error
     {
@@ -67,6 +64,11 @@ public:
     //! @return Window's error status.
     //--------------------------------------------------------------------------
     uint32_t getError() const;
+
+    //--------------------------------------------------------------------------
+    //! @return Low-level native window. 
+    //--------------------------------------------------------------------------
+    SDL_Window* getNativeWindow() const;
 
     //--------------------------------------------------------------------------
     //! @brief Update Window's title.

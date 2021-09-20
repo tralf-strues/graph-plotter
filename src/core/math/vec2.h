@@ -101,6 +101,12 @@ Vec2<T> operator/(const Vec2<T>& vector, T scalar)
 }
 
 template <typename T>
+Vec2<T> operator-(const Vec2<T>& vector)
+{
+    return vector * (-1.0f);
+}
+
+template <typename T>
 Vec2<T> componentMultiply(const Vec2<T>& first, const Vec2<T>& second)
 {
     return {first.x * second.x, first.y * second.y};

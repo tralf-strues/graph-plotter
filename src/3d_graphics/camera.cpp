@@ -50,9 +50,8 @@ const SpaceDepValue<Vec3<float>>& Camera::getForward() const
 void Camera::setForward(const Vec3<float>& forward)
 {
     this->forward.worldSpace = normalize(forward);
-    updateViewMatrix();
-
     updateVerticalAngle();
+    updateViewMatrix();
 }
 
 float Camera::getVerticalAngle() const
