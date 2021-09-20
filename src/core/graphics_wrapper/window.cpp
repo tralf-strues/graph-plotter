@@ -14,9 +14,7 @@ Window::Window(size_t width, size_t height, const char* title) : width(width), h
     assert(width);
     assert(height);
 
-    updateTitle(title);
-
-    nativeWindow = SDL_CreateWindow(this->title, 
+    nativeWindow = SDL_CreateWindow(title, 
                                     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                     width, height, 0);
 
@@ -54,7 +52,7 @@ uint32_t Window::getError() const
 
 void Window::updateTitle(const char* title)
 {
-    this->title  = (title == nullptr) ? DEFAULT_TITLE : title;
+    this->title  = (title == nullptr) ? WINDOW_DEFAULT_TITLE : title;
 
     SDL_SetWindowTitle(nativeWindow, this->title);
 }

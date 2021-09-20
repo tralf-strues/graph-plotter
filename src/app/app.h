@@ -9,8 +9,7 @@
 #ifndef APP_H
 #define APP_H
 
-#include "../gui/core/core.h"
-#include "../gui/elements/graph.h"
+#include "../gui/graph.h"
 
 static const size_t        WINDOW_WIDTH            = 1200;
 static const size_t        WINDOW_HEIGHT           = 800;

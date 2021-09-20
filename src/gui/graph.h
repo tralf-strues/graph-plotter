@@ -9,8 +9,8 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include "../../math/vec2.h"
-#include "../core/core.h"
+#include "../core/math/_core_math.h"
+#include "../core/graphics_wrapper/_core_graphics_wrapper.h"
 
 static const size_t GRAPH_MAX_FUNCTIONS = 8u;
 static const size_t GRAPH_MAX_VECTORS   = 8u;

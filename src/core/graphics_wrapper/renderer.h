@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include "window.h"
 #include "color.h"
-#include "../../math/vec2.h"
+#include "../math/_core_math.h"
 
 struct Rectangle
 {
@@ -57,12 +57,17 @@ public:
     void setColor(Color color);
 
     //--------------------------------------------------------------------------
-    //! Get renderer's error status, which is represented as bit-mask of all 
+    //! @brief Get renderer's error status, which is represented as bit-mask of all 
     //! possible Error codes.
     //! 
     //! @return Renderer's error status.
     //--------------------------------------------------------------------------
     uint32_t getError() const;
+
+    //------------------------------------------------------------------------------
+    //! @return Renderer's target window. 
+    //------------------------------------------------------------------------------
+    Window& getWindow() const;
 
     //--------------------------------------------------------------------------
     //! @brief Present all rendered elements onto the renderer's target window.

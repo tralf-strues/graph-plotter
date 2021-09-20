@@ -1,19 +1,22 @@
 //------------------------------------------------------------------------------
-//! @brief Contains all header files in the gui's core directory.
-//! 
 //! @author Nikita Mochalov (github.com/tralf-strues)
-//! @file core.h
-//! @date 2021-09-12
+//! @file ray.h
+//! @date 2021-09-16
 //! 
 //! @copyright Copyright (c) 2021
 //------------------------------------------------------------------------------
 
-#ifndef CORE_H
-#define CORE_H
+#ifndef RAY_H
+#define RAY_H
 
-#include "color.h"
-#include "window.h"
-#include "renderer.h"
-#include "primitives.h"
+#include "vec3.h"
 
-#endif // CORE_H
+struct Ray
+{
+    Vec3<float> from;
+    Vec3<float> direction;
+
+    Vec3<float> at(float rayParameter) const;
+};
+
+#endif // RAY_H

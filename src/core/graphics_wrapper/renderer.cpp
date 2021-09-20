@@ -43,6 +43,11 @@ uint32_t Renderer::getError() const
     return errorStatus;  
 }
 
+Window& Renderer::getWindow() const
+{
+    return window;
+}
+
 void Renderer::setError(uint32_t error)
 {
     errorStatus |= error;

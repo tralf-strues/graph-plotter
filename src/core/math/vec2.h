@@ -9,6 +9,10 @@
 #ifndef VEC2_H
 #define VEC2_H
 
+#include <assert.h>
+#include <inttypes.h>
+#include <math.h>
+
 template <typename T>
 struct Vec2
 {
@@ -44,6 +48,14 @@ struct Vec2
 
         return *this;
     }
+
+    Vec2& operator/=(float scalar)
+    {
+        x /= scalar;
+        y /= scalar;
+
+        return *this;
+    }
 };
 
 template <typename T>
@@ -65,12 +77,33 @@ Vec2<T> operator-(const Vec2<T>& first, const Vec2<T>& second)
 }
 
 template <typename T>
-Vec2<T> operator*(const Vec2<T>& vector, float scalar)
+Vec2<T> operator*(const Vec2<T>& vector, T scalar)
 {
     Vec2<T> mul(vector);
     mul *= scalar;
 
     return mul;
+}
+
+template <typename T>
+Vec2<T> operator*(T scalar, const Vec2<T>& vector)
+{
+    return vector * scalar;
+}
+
+template <typename T>
+Vec2<T> operator/(const Vec2<T>& vector, T scalar)
+{
+    Vec2<T> ratio(vector);
+    ratio /= scalar;
+
+    return ratio;
+}
+
+template <typename T>
+Vec2<T> componentMultiply(const Vec2<T>& first, const Vec2<T>& second)
+{
+    return {first.x * second.x, first.y * second.y};
 }
 
 template <typename T>
@@ -80,23 +113,32 @@ float length(const Vec2<T>& vector)
 }
 
 template <typename T>
-Vec2<T> rotate(const Vec2<T>& vector, float angle)
+void rotate(Vec2<T>& vector, float angle)
 {
     float sina = sinf(angle);
     float cosa = cosf(angle);
 
-    float x = vector.x * cosa - vector.y * sina;
-    float y = vector.x * sina + vector.y * cosa;
+    float x = vector.x;
+    float y = vector.y;
 
-    return {x, y};
+    vector.x = x * cosa - y * sina;
+    vector.y = x * sina + y * cosa;
 }
 
 template <typename T>
 Vec2<T> normalize(const Vec2<T>& vector)
 {
     float len = length(vector);
+    assert(len != 0);
 
-    return {vector.x / len, vector.y / len};
+    return vector / len;
+}
+
+template <typename T>
+T dotProduct(const Vec2<T>& first, const Vec2<T>& second)
+{
+    return first.x * second.x + 
+           first.y * second.y;
 }
 
 #endif // VEC2_H

@@ -15,8 +15,9 @@
 #include <stdio.h>
 #include <SDL.h>
 
-class Renderer;
+static const char* WINDOW_DEFAULT_TITLE = "Untitled";
 
+class Renderer;
 class Window
 {
     friend Renderer; // TODO: ?get rid of?
@@ -28,8 +29,6 @@ public:
         CREATE_ERROR = (1u << 0),
         RESIZE_ERROR = (1u << 1)
     };
-
-    const char* DEFAULT_TITLE = "Untitled";
 
 public:
     //--------------------------------------------------------------------------
