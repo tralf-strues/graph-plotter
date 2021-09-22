@@ -34,14 +34,6 @@ struct Mat4
 
     Mat4& operator+=(const Mat4& second)
     {
-        // for (size_t row = 0; row < MAT4_SIZE; row++)
-        // {
-        //     for (size_t col = 0; col < MAT4_SIZE; col++)
-        //     {
-        //         elements[row][col] += second[row][col];
-        //     }
-        // }
-
         for (size_t i = 0; i < MAT4_SIZE * MAT4_SIZE; i++)
         {
             elements[i] += second.elements[i];
@@ -52,14 +44,6 @@ struct Mat4
 
     Mat4& operator-=(const Mat4& second)
     {
-        // for (size_t row = 0; row < MAT4_SIZE; row++)
-        // {
-        //     for (size_t col = 0; col < MAT4_SIZE; col++)
-        //     {
-        //         elements[row][col] -= second[row][col];
-        //     }
-        // }
-
         for (size_t i = 0; i < MAT4_SIZE * MAT4_SIZE; i++)
         {
             elements[i] -= second.elements[i];

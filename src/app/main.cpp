@@ -6,7 +6,6 @@
 //! @copyright Copyright (c) 2021
 //------------------------------------------------------------------------------
 
-// #include "app.h"
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
 #include "../3d_graphics/ray_tracer.h"
 
@@ -49,6 +48,7 @@ int main()
 
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
+    Texture texture(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     /* ================ Entities ================ */
     Sphere sphere(&SPHERE_MATERIAL);
@@ -117,8 +117,10 @@ int main()
         scene.updateWorldSpaceValues();
         scene.updateCameraSpaceValues();
 
-        renderSceneRayTracing(renderer, scene);
+        renderSceneRayTracing(texture, scene);
+        texture.update();
 
+        renderer.renderTexture(texture, {0, 0});
         renderer.present();
 
         /* ================ Update fps title ================ */
@@ -136,27 +138,27 @@ void processKeyboard(const Window& window, Scene& scene, uint32_t deltaTime)
     const uint8_t* keystate = SDL_GetKeyboardState(nullptr);
     assert(keystate);
 
-    Vec3<float> velocityDirection = {};
+    Vec3<float> velocityDirection = {0};
 
     if (keystate[SDL_SCANCODE_W])
     {
-        velocityDirection = normalize(scene.camera.getForward().worldSpace);
+        velocityDirection += normalize(scene.camera.getForward().worldSpace);
     } 
     
     if (keystate[SDL_SCANCODE_S])
     {
-        velocityDirection = -normalize(scene.camera.getForward().worldSpace);
+        velocityDirection -= normalize(scene.camera.getForward().worldSpace);
     }
 
     if (keystate[SDL_SCANCODE_D])
     {
-        velocityDirection = crossProduct(Vec3<float>{0, 1, 0}, 
-                                         normalize(scene.camera.getForward().worldSpace));
+        velocityDirection += crossProduct(Vec3<float>{0, 1, 0}, 
+                                          normalize(scene.camera.getForward().worldSpace));
     }
 
     if (keystate[SDL_SCANCODE_A])
     {
-        velocityDirection = -crossProduct(Vec3<float>{0, 1, 0}, 
+        velocityDirection -= crossProduct(Vec3<float>{0, 1, 0}, 
                                           normalize(scene.camera.getForward().worldSpace));
     }
 

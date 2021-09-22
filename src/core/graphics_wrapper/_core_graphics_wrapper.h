@@ -13,6 +13,7 @@
 
 #include "color.h"
 #include "window.h"
+#include "texture.h"
 #include "renderer.h"
 #include "primitives.h"
 

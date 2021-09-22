@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include "window.h"
+#include "texture.h"
 #include "color.h"
 #include "../math/_core_math.h"
 
@@ -57,17 +58,22 @@ public:
     void setColor(Color color);
 
     //--------------------------------------------------------------------------
-    //! @brief Get renderer's error status, which is represented as bit-mask of all 
-    //! possible Error codes.
+    //! @brief Get renderer's error status, which is represented as bit-mask of
+    //!        all possible Error codes.
     //! 
     //! @return Renderer's error status.
     //--------------------------------------------------------------------------
     uint32_t getError() const;
 
-    //------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //! @return Renderer's target window. 
-    //------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     Window& getWindow() const;
+
+    //--------------------------------------------------------------------------
+    //! @return Renderer's native renderer. 
+    //--------------------------------------------------------------------------
+    SDL_Renderer* getNativeRenderer() const;
 
     //--------------------------------------------------------------------------
     //! @brief Present all rendered elements onto the renderer's target window.
@@ -114,6 +120,14 @@ public:
     //--------------------------------------------------------------------------
     void renderLine(const Vec2<int32_t>& start, const Vec2<int32_t>& end);
 
+    //--------------------------------------------------------------------------
+    //! @brief Render texture to target window at position pos.
+    //! 
+    //! @param texture 
+    //! @param pos 
+    //--------------------------------------------------------------------------
+    void renderTexture(const Texture& texture, const Vec2<int32_t>& pos);
+
 private:
     Window&       window;
     Color         color;
@@ -147,5 +161,13 @@ void renderPoint(Renderer& renderer, const Vec2<int32_t>& pos);
 //! @param end 
 //------------------------------------------------------------------------------
 void renderLine(Renderer& renderer, const Vec2<int32_t>& start, const Vec2<int32_t>& end);
+
+//------------------------------------------------------------------------------
+//! @brief See @ref Renderer::renderTexture().
+//! 
+//! @param texture 
+//! @param pos 
+//------------------------------------------------------------------------------
+void renderTexture(Renderer& renderer, const Texture& texture, const Vec2<int32_t>& pos);
 
 #endif // RENDERER_H

@@ -14,6 +14,6 @@
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
 #include "scene.h"
 
-void renderSceneRayTracing(Renderer& renderer, Scene& scene);
+void renderSceneRayTracing(Texture& texture, Scene& scene);
 
 #endif // RAY_TRACER_H

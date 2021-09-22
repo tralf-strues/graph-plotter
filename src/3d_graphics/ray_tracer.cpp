@@ -82,10 +82,12 @@ Vec3<float> calculateColor(Scene& scene, const Hit& hit)
     return color;
 }
 
-void renderSceneRayTracing(Renderer& renderer, Scene& scene)
+void renderSceneRayTracing(Texture& texture, Scene& scene)
 {
-    size_t             width         = renderer.getWindow().getWidth();
-    size_t             height        = renderer.getWindow().getHeight();
+    texture.clear(COLOR_BLACK);
+
+    size_t             width         = texture.getWidth();
+    size_t             height        = texture.getHeight();
 
     float              fwidth        = (float) width;
     float              fheight       = (float) height;
@@ -124,8 +126,7 @@ void renderSceneRayTracing(Renderer& renderer, Scene& scene)
 
             if (intersected)
             {
-                renderer.setColor(convertToRgba(color));
-                renderPoint(renderer, {xScreen, yScreen});
+                texture[yScreen][xScreen] = convertToRgba(color);
             }
         }
     }
