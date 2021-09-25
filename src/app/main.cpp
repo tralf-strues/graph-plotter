@@ -54,6 +54,7 @@ int main()
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
     Texture texture(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    ZBuffer zbuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     /* ================ Entities ================ */
     Sphere sphere1(&SPHERE_MATERIAL);
@@ -61,7 +62,7 @@ int main()
     sphere1.setScale(5);
 
     Sphere sphere2(&SPHERE_MATERIAL);
-    sphere2.setPos({25, 3, 5});
+    sphere2.setPos({25, 3, 10});
     sphere2.setScale(3);
 
     /* ================ Scene ================ */
@@ -132,7 +133,8 @@ int main()
         scene.updateWorldSpaceValues();
         scene.updateCameraSpaceValues();
 
-        renderSceneRayTracing(texture, scene);
+        zbuffer.reset();
+        renderSceneRayTracing(texture, zbuffer, scene);
         texture.update();
 
         renderer.renderTexture(texture, {0, 0});

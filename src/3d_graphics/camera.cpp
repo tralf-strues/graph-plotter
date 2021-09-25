@@ -49,7 +49,7 @@ float Camera::getPitchVertical() const
     return pitchVertical;
 }
 
-float Camera::setPitchVertical(float pitchVertical)
+void Camera::setPitchVertical(float pitchVertical)
 {
     this->pitchVertical = pitchVertical;
     updateViewMatrix();
@@ -60,7 +60,7 @@ float Camera::getYawHorizontal() const
     return yawHorizontal;
 }
 
-float Camera::setYawHorizontal(float yawHorizontal)
+void Camera::setYawHorizontal(float yawHorizontal)
 {
     this->yawHorizontal = yawHorizontal;
     updateViewMatrix();
@@ -111,8 +111,8 @@ Vec3<float> toViewFrustumPoint(const Vec2<float>& pixel,
 {
     Vec3<float> point{};
 
-    point.x = frustum.left + (frustum.right - frustum.left) * pixel.x / width;
-    point.y = frustum.bottom + (frustum.top - frustum.bottom) * (height - pixel.y) / height;
+    point.x = frustum.left   + (frustum.right - frustum.left)   * pixel.x            / width;
+    point.y = frustum.bottom + (frustum.top   - frustum.bottom) * (height - pixel.y) / height;
     point.z = frustum.near;
 
     return point; 

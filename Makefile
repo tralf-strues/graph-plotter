@@ -59,7 +59,7 @@ CppSrc = $(notdir $(wildcard $(SrcDir)/*.cpp))        \
 		 $(notdir $(wildcard $(GUIDir)/*.cpp))        
 
 Objs   = $(addprefix $(IntDir)/, $(CppSrc:.cpp=.o))
-Exec   = $(BinDir)/graph-plotter
+Exec   = $(BinDir)/ray-tracer.out
 # -------------------------------------Files------------------------------------
 
 # ----------------------------------Make rules----------------------------------

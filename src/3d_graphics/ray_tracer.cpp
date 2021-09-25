@@ -85,7 +85,7 @@ Vec3<float> calculateColor(Scene& scene, const Hit& hit)
     return color;
 }
 
-void renderSceneRayTracing(Texture& texture, Scene& scene)
+void renderSceneRayTracing(Texture& texture, ZBuffer& zbuffer, Scene& scene)
 {
     texture.clear(COLOR_BLACK);
 
@@ -109,25 +109,20 @@ void renderSceneRayTracing(Texture& texture, Scene& scene)
             Ray ray = {};
             ray.direction = curPoint;
 
-            Vec3<float> color           = {0};
-            float       nearestRayParam = 0;
-            bool        intersected     = false;
+            Vec3<float> color = {0};
 
             Hit hit = {};
             for (size_t i = 0; i < entitiesCount; i++)
             {
                 if (scene.entities[i]->intersect(ray, &hit) && 
-                    dotProduct(hit.pos - scene.camera.getPos().worldSpace, hit.normal) <= 0 &&
-                    (!intersected || (intersected && hit.rayParameter < nearestRayParam)))
+                    dotProduct(hit.pos - scene.camera.getPos().cameraSpace, hit.normal) <= 0 &&
+                    zbuffer.setDepth(xScreen, yScreen, hit.pos.z))
                 {
-                    color           = calculateColor(scene, hit);
-                    nearestRayParam = hit.rayParameter;
-
-                    intersected = true;
+                    color = calculateColor(scene, hit);
                 }
             }
 
-            if (intersected)
+            if (zbuffer.isFilled(xScreen, yScreen))
             {
                 texture[yScreen][xScreen] = convertToRgba(color);
             }

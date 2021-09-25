@@ -1,4 +1,4 @@
 make $1
 cd bin
-./graph-plotter
+./ray-tracer.out
 cd ..

@@ -62,10 +62,10 @@ public:
     void                              setPos(const Vec3<float>& pos);
 
     float                             getPitchVertical() const;
-    float                             setPitchVertical(float pitchVertical);
+    void                              setPitchVertical(float pitchVertical);
 
     float                             getYawHorizontal() const;
-    float                             setYawHorizontal(float yawHorizontal);
+    void                              setYawHorizontal(float yawHorizontal);
 
     const Mat4<float>&                getViewMatrix() const;
 

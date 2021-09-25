@@ -13,7 +13,8 @@
 
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
 #include "scene.h"
+#include "zbuffer.h"
 
-void renderSceneRayTracing(Texture& texture, Scene& scene);
+void renderSceneRayTracing(Texture& texture, ZBuffer& zbuffer, Scene& scene);
 
 #endif // RAY_TRACER_H
