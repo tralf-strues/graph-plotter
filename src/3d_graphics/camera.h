@@ -54,17 +54,18 @@ class Camera
 {
 public:
     Camera(const ViewFrustum& viewFrustum,
-           const Vec3<float>& pos     = CAMERA_DEFAULT_POS, 
-           const Vec3<float>& forward = CAMERA_DEFAULT_FORWARD);
+           const Vec3<float>& pos = CAMERA_DEFAULT_POS, 
+           float pitchVertical    = 0,
+           float yawHorizontal    = 0);
 
     const SpaceDepValue<Vec3<float>>& getPos() const;
     void                              setPos(const Vec3<float>& pos);
 
-    const SpaceDepValue<Vec3<float>>& getForward() const;
-    void                              setForward(const Vec3<float>& forward);
+    float                             getPitchVertical() const;
+    float                             setPitchVertical(float pitchVertical);
 
-    float                             getVerticalAngle() const;
-    void                              setVerticalAngle(float verticalAngle);
+    float                             getYawHorizontal() const;
+    float                             setYawHorizontal(float yawHorizontal);
 
     const Mat4<float>&                getViewMatrix() const;
 
@@ -75,14 +76,11 @@ private:
     /** Position in model/world/camera spaces. */
     SpaceDepValue<Vec3<float>> pos;
     
-    /** Forward vector, specifying where Camera is directed. */
-    SpaceDepValue<Vec3<float>> forward;
+    /** Pitch angle around Z axis (around X-Y plane). */
+    float pitchVertical;
 
-    /** 
-     * The angle between forward vector and XZ plane. Needed for easier and faster computation of 
-     * camera movement. 
-     */
-    float verticalAngle;
+    /** Yaw angle around Y axis (around Z-X plane). */
+    float yawHorizontal;
 
     /** View matrix for converting vertices from world to camera space. */
     Mat4<float> viewMatrix;
@@ -94,11 +92,6 @@ private:
     //! @brief Update forward vector based on verticalAngle.
     //--------------------------------------------------------------------------
     void updateForward();
-
-    //--------------------------------------------------------------------------
-    //! @brief Update verticalAngle based on forward vector.
-    //--------------------------------------------------------------------------
-    void updateVerticalAngle();
 
     //--------------------------------------------------------------------------
     //! @brief Update viewMatrix based on pos and forward vectors.

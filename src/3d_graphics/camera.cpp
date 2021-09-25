@@ -24,10 +24,12 @@ ViewFrustum::ViewFrustum(float verticalFOV, float aspect, float near, float far)
     left   = -right; 
 }
 
-Camera::Camera(const ViewFrustum& viewFrustum,const Vec3<float>& pos, const Vec3<float>& forward) : 
+Camera::Camera(const ViewFrustum& viewFrustum, const Vec3<float>& pos, 
+               float pitchVertical, float yawHorizontal) :
                viewFrustum(viewFrustum)
 {
-    setForward(forward);
+    setPitchVertical(pitchVertical);
+    setYawHorizontal(yawHorizontal);
     setPos(pos);
 }
 
@@ -42,27 +44,26 @@ void Camera::setPos(const Vec3<float>& pos)
     updateViewMatrix();
 }
 
-const SpaceDepValue<Vec3<float>>& Camera::getForward() const
+float Camera::getPitchVertical() const
 {
-    return forward;
+    return pitchVertical;
 }
 
-void Camera::setForward(const Vec3<float>& forward)
+float Camera::setPitchVertical(float pitchVertical)
 {
-    this->forward.worldSpace = normalize(forward);
-    updateVerticalAngle();
+    this->pitchVertical = pitchVertical;
     updateViewMatrix();
 }
 
-float Camera::getVerticalAngle() const
+float Camera::getYawHorizontal() const
 {
-    return verticalAngle;
+    return yawHorizontal;
 }
 
-void Camera::setVerticalAngle(float verticalAngle)
+float Camera::setYawHorizontal(float yawHorizontal)
 {
-    this->verticalAngle = verticalAngle;
-    updateForward();
+    this->yawHorizontal = yawHorizontal;
+    updateViewMatrix();
 }
 
 const Mat4<float>& Camera::getViewMatrix() const
@@ -80,26 +81,14 @@ void Camera::setViewFrustum(const ViewFrustum& viewFrustum)
     this->viewFrustum = viewFrustum;
 }
 
-void Camera::updateForward()
-{
-    Vec3<float> newForward(forward.worldSpace.x, 0, forward.worldSpace.z);
-    newForward.y = tanf(verticalAngle) * length(newForward);
-    normalize(newForward);
-    
-    forward.worldSpace = newForward;
-}
-
-void Camera::updateVerticalAngle()
-{
-    Vec3<float> forwardXZ(forward.worldSpace.x, 0, forward.worldSpace.z);
-    normalize(forwardXZ);
-
-    verticalAngle = acosf(dotProduct(forward.worldSpace, forwardXZ));
-}
-
 void Camera::updateViewMatrix()
 {
-    viewMatrix = lookAt(pos.worldSpace, forward.worldSpace);
+    static const Vec3<float> originalDirection = {1.0f, 0.0f, 0.0f};
+    Mat4<float> rotationMatrix = createRotationMatrix(pitchVertical, yawHorizontal, 0);
+
+    Vec3<float> direction = rotationMatrix * originalDirection;
+
+    viewMatrix = lookAt(pos.worldSpace, direction);
 }
 
 Vec2<float> toPixel(const Vec3<float>& point,

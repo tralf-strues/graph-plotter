@@ -17,7 +17,7 @@ static const Color       BACKGROUND_COLOR          = 0x2F'69'AA'FF;
 
 static const float       FOV                       = 0.78f; // Approx 45 degrees
 static const float       ASPECT                    = (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT;
-static const float       NEAR                      = 5;
+static const float       NEAR                      = 1;
 static const float       FAR                       = 600;
 static const ViewFrustum VIEW_FRUSTUM              = {FOV, ASPECT, NEAR, FAR};
 
@@ -35,29 +35,37 @@ static const Material    SPHERE_MATERIAL           = {{0.3f, 0.1f, 0.1f},
                                                       50};
 
 static const float       CAMERA_VELOCITY           = 10.0f;
-static const float       MOUSE_SENSITIVITY         = 1e-6f;
-static const float       CAMERA_VERTICAL_ANGLE_MAX = 1.56f;
+static const float       MOUSE_SENSITIVITY         = 1e-2f;
+static const float       CAMERA_VERTICAL_ANGLE_MAX = 1.2f;
 
 void processKeyboard(const Window& window, Scene& scene, uint32_t deltaTime);
-void processMouse(const Window& window, Scene& scene, uint32_t deltaTime);
+void processMouse(const SDL_Event& event, Scene& scene, uint32_t deltaTime);
 void updateFpsTitle(Window& window, uint32_t frameTime);
 
 int main()
 {
     initGraphics();
 
+    if (SDL_SetRelativeMouseMode(SDL_TRUE) != 0)
+    {
+        return -1;
+    }
+
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
     Texture texture(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     /* ================ Entities ================ */
-    Sphere sphere(&SPHERE_MATERIAL);
-    sphere.setPos({25, 0, 0});
-    sphere.setScale(5);
+    Sphere sphere1(&SPHERE_MATERIAL);
+    sphere1.setPos({25, 0, 0});
+    sphere1.setScale(5);
+
+    Sphere sphere2(&SPHERE_MATERIAL);
+    sphere2.setPos({25, 3, 5});
+    sphere2.setScale(3);
 
     /* ================ Scene ================ */
     Camera camera(VIEW_FRUSTUM);
-    camera.setForward({1, 0, 0});
     
     Light light1;
     light1.pos.worldSpace = {0, 50, 10};
@@ -76,7 +84,8 @@ int main()
     Scene scene(camera);
     scene.lightSources.insert(&light1);
     scene.lightSources.insert(&light2);
-    scene.entities.insert(&sphere);
+    scene.entities.insert(&sphere1);
+    scene.entities.insert(&sphere2);
     scene.ambientColor = AMBIENT_COLOR;
 
     /* ================ Main loop ================ */
@@ -86,11 +95,11 @@ int main()
 
     while (running)
     {
+        // SDL_WarpMouseInWindow(window.getNativeWindow(), WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
         uint32_t frameStartTime = SDL_GetTicks();
 
         /* ================ Process events ================ */
         processKeyboard(window, scene, deltaTime);
-        // processMouse(window, scene, deltaTime);
 
         while (SDL_PollEvent(&event))
         {
@@ -100,6 +109,12 @@ int main()
                 { 
                     running = false; 
                     break; 
+                }
+
+                case SDL_MOUSEMOTION:
+                {
+                    processMouse(event, scene, deltaTime);
+                    break;
                 }
 
                 default: { break; }
@@ -139,76 +154,58 @@ void processKeyboard(const Window& window, Scene& scene, uint32_t deltaTime)
     assert(keystate);
 
     Vec3<float> velocityDirection = {0};
+    Vec3<float> forward = createRotationMatrix(scene.camera.getPitchVertical(), 
+                                               scene.camera.getYawHorizontal(), 
+                                               0) * 
+                          Vec3{1.0f, 0.0f, 0.0f};
 
     if (keystate[SDL_SCANCODE_W])
     {
-        velocityDirection += normalize(scene.camera.getForward().worldSpace);
+        velocityDirection += normalize(forward);
     } 
     
     if (keystate[SDL_SCANCODE_S])
     {
-        velocityDirection -= normalize(scene.camera.getForward().worldSpace);
+        velocityDirection -= normalize(forward);
     }
 
     if (keystate[SDL_SCANCODE_D])
     {
         velocityDirection += crossProduct(Vec3<float>{0, 1, 0}, 
-                                          normalize(scene.camera.getForward().worldSpace));
+                                          normalize(forward));
     }
 
     if (keystate[SDL_SCANCODE_A])
     {
         velocityDirection -= crossProduct(Vec3<float>{0, 1, 0}, 
-                                          normalize(scene.camera.getForward().worldSpace));
+                                          normalize(forward));
     }
 
     scene.camera.setPos(scene.camera.getPos().worldSpace + 
                         velocityDirection * ((float) deltaTime / 1e3f) * CAMERA_VELOCITY);
 }
 
-void processMouse(const Window& window, Scene& scene, uint32_t deltaTime)
+void processMouse(const SDL_Event& event, Scene& scene, uint32_t deltaTime)
 {
     Camera& camera = scene.camera;
 
-    Vec2<int32_t> mouse = {};
-    SDL_GetMouseState(&mouse.x, &mouse.y);
+    Vec2<float> mouseDelta = {event.motion.xrel, -event.motion.yrel};
+    mouseDelta *= MOUSE_SENSITIVITY * ((float) deltaTime / 1e3f);
 
-    Vec2<float> mouseDelta = {mouse.x - WINDOW_WIDTH / 2, mouse.y - WINDOW_HEIGHT / 2};
-    SDL_WarpMouseInWindow(window.getNativeWindow(), WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    float newPitch = camera.getPitchVertical() + mouseDelta.y;
+    float newYaw   = camera.getYawHorizontal() + mouseDelta.x;
 
-    float yawZX = -mouseDelta.x * MOUSE_SENSITIVITY * ((float) deltaTime / 1e3);
-
-    float angleYDelta = mouseDelta.y * MOUSE_SENSITIVITY * ((float) deltaTime / 1e3);
-    Vec3<float> forwardZX = camera.getForward().worldSpace;
-    forwardZX.y = 0;
-
-    forwardZX = createRotationMatrixZX(yawZX) * forwardZX;
-    
-    Vec3<float> forwardY = {0, 0, 0};
-    float verticalAngle = camera.getVerticalAngle();
-    float newVerticalAngle = verticalAngle + angleYDelta;
-
-    if (cmpFloat(verticalAngle, 0) == 0)
+    if (newPitch > CAMERA_VERTICAL_ANGLE_MAX)
     {
-        forwardY.y = length(camera.getForward().worldSpace) * sinf(newVerticalAngle);
+        newPitch = CAMERA_VERTICAL_ANGLE_MAX;
     }
-    else
+    else if (newPitch < -CAMERA_VERTICAL_ANGLE_MAX)
     {
-        if (cmpFloat(newVerticalAngle, CAMERA_VERTICAL_ANGLE_MAX) > 0)
-        {
-            newVerticalAngle = CAMERA_VERTICAL_ANGLE_MAX;
-        }
-        else if (cmpFloat(newVerticalAngle, -CAMERA_VERTICAL_ANGLE_MAX) < 0)
-        {
-            newVerticalAngle = -CAMERA_VERTICAL_ANGLE_MAX;
-        }
-        
-        forwardY.y = camera.getForward().worldSpace.y * 
-                     sinf(newVerticalAngle) /
-                     sinf(verticalAngle);
+        newPitch = -CAMERA_VERTICAL_ANGLE_MAX;
     }
 
-    camera.setForward(forwardZX + forwardY);
+    camera.setPitchVertical(newPitch);
+    camera.setYawHorizontal(newYaw);
 }
 
 void updateFpsTitle(Window& window, uint32_t frameTime)

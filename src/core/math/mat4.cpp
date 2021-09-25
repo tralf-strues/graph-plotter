@@ -44,7 +44,8 @@ Mat4<float> createRotationMatrixYZ(float rollYZ)
 Mat4<float> createRotationMatrix(float pitchXY, float yawZX, float rollYZ)
 {
     return createRotationMatrixYZ(rollYZ) * 
-           (createRotationMatrixZX(yawZX) * createRotationMatrixXY(pitchXY));
+           createRotationMatrixZX(yawZX)  * 
+           createRotationMatrixXY(pitchXY);
 }
 
 Mat4<float> lookAt(const Vec3<float>& from, const Vec3<float>& direction)

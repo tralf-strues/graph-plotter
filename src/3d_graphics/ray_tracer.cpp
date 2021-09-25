@@ -48,8 +48,8 @@ Vec3<float> calculateColor(Scene& scene, const Hit& hit)
         Vec3<float> toLight = normalize(scene.lightSources[i]->pos.cameraSpace - hit.pos);
 
         /* Diffuse component */
+        Vec3<float> diffuse = {0};
         float dotNormalLight = dotProduct(hit.normal, toLight);
-        Vec3<float> diffuse;
         if (dotNormalLight > 0)
         {
             diffuse = dotNormalLight * componentMultiply(scene.lightSources[i]->diffuse, 
@@ -58,18 +58,21 @@ Vec3<float> calculateColor(Scene& scene, const Hit& hit)
         capNormalized(diffuse);
 
         /* Specular component */
-        Vec3<float> halfway          = normalize(toCamera + toLight);
-        float       dotNormalHalfway = dotProduct(hit.normal, halfway);
-
-        Vec3<float> specular;
-
-        if (dotNormalHalfway)
+        Vec3<float> specular = {0};
+        Vec3<float> halfway  = toCamera + toLight;
+        
+        if (length(halfway) != 0)
         {
-            specular = powf(dotNormalHalfway, hit.material->shiness) * 
-                       componentMultiply(scene.lightSources[i]->specular, 
-                                         hit.material->specular);
+            float dotNormalHalfway = dotProduct(hit.normal, normalize(halfway));
+
+            if (dotNormalHalfway)
+            {
+                specular = powf(dotNormalHalfway, hit.material->shiness) * 
+                           componentMultiply(scene.lightSources[i]->specular, 
+                                             hit.material->specular);
+            }
+            capNormalized(specular);
         }
-        capNormalized(specular);
 
         color += diffuse + specular;
 

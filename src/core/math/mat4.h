@@ -54,6 +54,12 @@ struct Mat4
 
     Mat4& operator*=(const Mat4& second)
     {
+        T oldElements[MAT4_SIZE * MAT4_SIZE] = {};
+        for (size_t i = 0; i < MAT4_SIZE * MAT4_SIZE; i++)
+        {
+            oldElements[i] = elements[i];
+        }
+
         for (size_t row = 0; row < MAT4_SIZE; row++)
         {
             for (size_t col = 0; col < MAT4_SIZE; col++)
@@ -62,10 +68,11 @@ struct Mat4
 
                 for (size_t i = 0; i < MAT4_SIZE; i++)
                 {
-                    result += elements[row * MAT4_SIZE + i] * second.elements[i * MAT4_SIZE + col];
+                    result += oldElements[row * MAT4_SIZE + i] * 
+                              second.elements[i * MAT4_SIZE + col];
                 }
 
-                elements[row * MAT4_SIZE + col] *= result;
+                elements[row * MAT4_SIZE + col] = result;
             }
         }
 

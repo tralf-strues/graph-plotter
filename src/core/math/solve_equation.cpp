@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------
 
 #include <assert.h>
+#include <stdio.h> // FIXME: remove
 #include <math.h>
 
 #include "solve_equation.h"
@@ -29,6 +30,11 @@ int32_t solveLinearEquation(float a, float b, float *solution)
 
 int32_t solveQuadraticEquation(float a, float b, float c, float *solution1, float* solution2)
 {
+    if (!isfinite(b))
+    {
+        printf("WTF?\n");
+    }
+
     assert(isfinite(a));
     assert(isfinite(b));
     assert(isfinite(c));

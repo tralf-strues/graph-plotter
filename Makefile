@@ -16,7 +16,7 @@ endif
 # ---------------------------------Release-mode---------------------------------
 ifeq ($(Mode), RELEASE_MODE)
 	ModeLinkerOptions   = 
-	ModeCompilerOptions = -O3 -DNDEBUG
+	ModeCompilerOptions = -O3
 endif
 # ---------------------------------Release-mode---------------------------------
 

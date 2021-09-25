@@ -10,6 +10,7 @@
 #define VEC3_H
 
 #include <assert.h>
+#include <stdio.h> // FIXME: remove
 #include <math.h>
 #include "vec2.h"
 
@@ -159,6 +160,12 @@ template <typename T>
 Vec3<T> normalize(const Vec3<T>& vector)
 {
     float len = length(vector);
+
+    if (len == 0)
+    {
+        printf("WTF?\n");
+    }
+
     assert(len != 0);
 
     return vector / len;
