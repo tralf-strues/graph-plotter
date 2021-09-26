@@ -9,6 +9,8 @@
 #include "texture.h"
 #include "renderer.h"
 
+Texture::Texture() : width(0), height(0), pixels(nullptr), nativeTexture(nullptr) {}
+
 Texture::Texture(Renderer& renderer, size_t width, size_t height) : width(width), height(height) 
 {
     assert(width);
@@ -48,12 +50,9 @@ SDL_Texture* Texture::getNativeTexture() const
 
 Color* Texture::operator[](size_t row)
 {
-    if (row >= height)
-    {
-        assert(row < height);
-    }
+    assert(row < height);
+
     return &pixels[row * width];    
-    // return const_cast<Color*>((*(const Texture*)this)[row]); 
 }
 
 const Color* Texture::operator[](size_t row) const
@@ -76,4 +75,64 @@ void Texture::clear(Color color)
 void Texture::update()
 {
     SDL_UpdateTexture(nativeTexture, nullptr, (void*) pixels, width * sizeof(Color));
+}
+
+bool Texture::writeToBMP(const char* filename) const
+{
+    assert(filename);
+
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+    for (size_t i = 0; i < width * height; i++)
+    {
+        ((uint8_t*)surface->pixels)[i * sizeof(Color) + 0] = colorGetB(pixels[i]);
+        ((uint8_t*)surface->pixels)[i * sizeof(Color) + 1] = colorGetG(pixels[i]);
+        ((uint8_t*)surface->pixels)[i * sizeof(Color) + 2] = colorGetR(pixels[i]);
+    }
+
+    if (SDL_SaveBMP(surface, filename) != 0)
+    {
+        return false;
+    }
+
+    SDL_FreeSurface(surface);
+
+    return true;
+}
+
+bool Texture::loadFromBMP(Renderer& renderer, const char* filename)
+{
+    assert(filename);
+
+    SDL_Surface* surface = SDL_LoadBMP(filename);
+    if (surface == nullptr)
+    {
+        return false;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer.getNativeRenderer(), surface);
+    if (texture == nullptr)
+    {
+        return false;
+    }
+
+    if (pixels != nullptr)
+    {
+        delete[] pixels;
+    }
+
+    width         = surface->w;
+    height        = surface->h;
+    nativeTexture = texture;
+
+    pixels = new Color[width * height];
+
+    for (size_t i = 0; i < width * height; i++)
+    {
+        pixels[i] = rgbaColor(((uint8_t*)surface->pixels)[i * 3 + 2],
+                              ((uint8_t*)surface->pixels)[i * 3 + 1],
+                              ((uint8_t*)surface->pixels)[i * 3 + 0],
+                              0xFF);
+    }
+
+    return true;
 }

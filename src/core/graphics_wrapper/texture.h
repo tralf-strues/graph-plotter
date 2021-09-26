@@ -20,6 +20,7 @@ class Renderer;
 class Texture
 {
 public:
+    Texture();
     Texture(Renderer& renderer, size_t width, size_t height);
     ~Texture();
 
@@ -33,6 +34,9 @@ public:
 
     void clear(Color color);
     void update();
+
+    bool writeToBMP(const char* filename) const;
+    bool loadFromBMP(Renderer& renderer, const char* filename);
 
 private:
     size_t       width;

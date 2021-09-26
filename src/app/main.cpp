@@ -112,6 +112,16 @@ int main()
                     break; 
                 }
 
+                case SDL_KEYDOWN:
+                {
+                    if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                    {
+                        running = false;
+                    }
+
+                    break;
+                }
+
                 case SDL_MOUSEMOTION:
                 {
                     processMouse(event, scene, deltaTime);
