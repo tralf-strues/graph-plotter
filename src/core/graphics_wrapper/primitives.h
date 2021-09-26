@@ -11,6 +11,13 @@
 
 #include "renderer.h"
 
+struct Circle
+{
+    Vec2<int32_t> center;
+    int32_t       radius;
+};
+
 void renderRect(Renderer& renderer, const Rectangle& rect);
+void renderCircle(Renderer& renderer, const Circle& circle);
 
 #endif // PRIMITIVES_H
