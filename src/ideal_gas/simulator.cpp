@@ -131,8 +131,21 @@ void collisionRespondMolMol(Collision& collision)
     Molecule* firstMolecule  = (Molecule*) *(collision.first);
     Molecule* secondMolecule = (Molecule*) *(collision.second);
 
-    firstMolecule->setVelocity(-firstMolecule->getVelocity());
-    secondMolecule->setVelocity(-secondMolecule->getVelocity());
+    Vec2<float> along = normalize(secondMolecule->getPos() - firstMolecule->getPos());
+    
+    float v1 = dotProduct(along, firstMolecule->getVelocity());
+    float v2 = dotProduct(along, secondMolecule->getVelocity());
+    float m1 = firstMolecule->getMass();
+    float m2 = secondMolecule->getMass();
+
+    float newV1 = (2 * m2 * v2 + v1 * (m1 - m2)) / (m1 + m2);
+    float newV2 = (2 * m1 * v1 + v2 * (m2 - m1)) / (m1 + m2);
+
+    Vec2<float> perpendicularVelocity1 = firstMolecule->getVelocity()  - v1 * along;
+    Vec2<float> perpendicularVelocity2 = secondMolecule->getVelocity() - v2 * along;
+
+    firstMolecule->setVelocity(perpendicularVelocity1  + newV1 * along);
+    secondMolecule->setVelocity(perpendicularVelocity2 + newV2 * along);
 }
 
 void collisionRespondMolWal(Collision& collision)

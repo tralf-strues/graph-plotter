@@ -26,7 +26,7 @@ public:
 public:
     const Type type;
 
-    PhysEntity(Type type, float mass = 0, const Vec2<float>& pos = {0.0f, 0.0f}, 
+    PhysEntity(Type type, float mass = 1, const Vec2<float>& pos = {0.0f, 0.0f}, 
                const Vec2<float>& velocity = {0.0f, 0.0f});
 
     void setPos(const Vec2<float> pos);
