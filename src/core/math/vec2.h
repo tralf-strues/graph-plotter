@@ -113,9 +113,15 @@ Vec2<T> componentMultiply(const Vec2<T>& first, const Vec2<T>& second)
 }
 
 template <typename T>
+float lengthSquare(const Vec2<T>& vector)
+{
+    return vector.x * vector.x + vector.y * vector.y;
+}
+
+template <typename T>
 float length(const Vec2<T>& vector)
 {
-    return sqrtf(vector.x * vector.x + vector.y * vector.y);
+    return sqrtf(lengthSquare(vector));
 }
 
 template <typename T>

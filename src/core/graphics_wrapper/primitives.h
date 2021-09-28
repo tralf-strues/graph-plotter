@@ -17,7 +17,14 @@ struct Circle
     int32_t       radius;
 };
 
+struct InfLine
+{
+    Vec2<float> from;
+    Vec2<float> direction;
+};
+
 void renderRect(Renderer& renderer, const Rectangle& rect);
 void renderCircle(Renderer& renderer, const Circle& circle);
+void renderInfLine(Renderer& renderer, const InfLine& infLine);
 
 #endif // PRIMITIVES_H

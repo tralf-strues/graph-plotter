@@ -14,7 +14,8 @@ static const size_t   WINDOW_HEIGHT           = 800;
 static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
 static const Color    BACKGROUND_COLOR        = 0x2F'69'AA'FF; 
-static const Viewport VIEWPORT                = {{0, 0}, {10, 10}};
+static const Viewport VIEWPORT                = {{0, 0}, {30, 20}};
+static const float    DELTA_TIME              = 1e-3;
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
 
@@ -25,8 +26,22 @@ int main()
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
 
+    Simulator simulator;
+
     /* ================ Entities ================ */
-    Molecule molecule{1, 1, {3, 3}, {1, 1}};
+    Molecule molecule1{1};
+    molecule1.setPos(Vec2<float>{0, 0});
+    molecule1.setVelocity(Vec2<float>{6, 12});
+
+    Molecule molecule2{0.5};
+    molecule2.setPos(Vec2<float>{0, 5});
+    molecule2.setVelocity(Vec2<float>{3, -6});
+
+    Wall wall;
+
+    simulator.entities.pushBack(&molecule1);
+    simulator.entities.pushBack(&molecule2);
+    simulator.entities.pushBack(&wall);
 
     /* ================ Main loop ================ */
     SDL_Event event   = {};
@@ -52,14 +67,14 @@ int main()
         }
 
         /* ================ Update objects ================ */
-        
+        simulator.simulate(DELTA_TIME);
 
         /* ================ Rendering ================ */
         renderer.setColor(COLOR_BLACK);
         renderer.clear();
 
         renderer.setColor(COLOR_RED);
-        drawMolecule(renderer, VIEWPORT, molecule);
+        simulator.updateGraphics(renderer, VIEWPORT);
 
         renderer.present();
 

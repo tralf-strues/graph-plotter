@@ -10,51 +10,89 @@
 #define SIMULATOR_H
 
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
-#include "../core/containers/dynamic_array.h"
+#include "../core/containers/list.h"
 #include "../core/math/_core_math.h"
+#include "phys_entity.h"
 
-struct Molecule
+typedef List<PhysEntity*>::Iterator EntitiesIterator;
+
+struct Collision
 {
-    Molecule(float radius = 1, float mass = 1, 
-             Vec2<float> pos = {0, 0}, Vec2<float> velocity = {0, 0});
+    EntitiesIterator first;
+    EntitiesIterator second;
 
-    float       radius;
-    float       mass;
-    Vec2<float> pos;
-    Vec2<float> velocity;
+    Collision(const EntitiesIterator& first, const EntitiesIterator& second);
 };
 
-//------------------------------------------------------------------------------
-//! @brief Line given by the equation ax + by + c = 0.
-//------------------------------------------------------------------------------
-struct Line
+class Simulator
 {
-    Vec2<float> from;
-    Vec2<float> direction;
+public:
+    List<PhysEntity*> entities;
 
-    Vec2<float> calculateNormal() const;
+    void simulate(float deltaTime);
+    void updateGraphics(Renderer& renderer, const Viewport& viewport);
+
+private:
+    bool collisionDetect(EntitiesIterator first, EntitiesIterator second, 
+                         float deltaTime, Collision* collision);
+
+    void collisionRespond(Collision& collision);
+
+    bool chemicalReaction(Collision& collision);
 };
 
-struct Viewport
-{
-    Vec2<float> axesMin;
-    Vec2<float> axesMax;
+bool collisionDetectMolMol(EntitiesIterator first, EntitiesIterator second, 
+                           float deltaTime, Collision* collision); 
 
-    float getRelativeWidth()  const;
-    float getRelativeHeight() const;
-};
+bool collisionDetectMolWal(EntitiesIterator first, EntitiesIterator second, 
+                           float deltaTime, Collision* collision);
 
-struct Simulator
-{
-    DynamicArray<Molecule*> molecules;
-    DynamicArray<Line*>     lines;
+void collisionRespondMolMol(Collision& collision);
+void collisionRespondMolWal(Collision& collision);
 
-    void processObjects();
-};
-
-bool collide(const Molecule& molecule, const Line& line, float deltaTime, float* collisionTime);
-void collisionRespond(Molecule& molecule, Line& line, float collisionTime);
-
-void drawMolecule(Renderer& renderer, const Viewport& viewport, const Molecule& molecule);
+bool chemicalReactionMolMol(Collision& collision);
 
 #endif // SIMULATOR_H
+
+
+
+
+
+// for it1 {
+//     for it2 {
+//         tcol = ColDetection(it1, it2);
+//         collisions.push(it1, it2, tcol);
+//         col = min(col, tclol);
+//     }
+// }
+
+
+// //sort(collisions);
+// for (elem : collisions) {
+//     if (!is_proc[elem.ptr1] && !is_proc[elem.ptr2]) {
+//         if (!IsEnergyEnough(elem.ptr1, elem.ptr2)) {
+//             elem.ptr1.move(elem.tcol);
+//             elem.ptr2.move(elem.tcol);
+//         }
+//     }
+// }
+
+// FINALE
+// std::vector<std::pair<llu, llu> > vec;
+
+// for it1 {
+//     for it2 {
+//         if (Collided(it1, it2)) {
+//             vec.pb(it1, it2);
+//         }
+//     }
+// }
+
+// for (it : vec) {
+//     if (!IsEnergyEnough(it.ptr1, it.ptr2)) {
+//         VelocitiesUpdate(ptr1, ptr2);
+//         Move(ptr1, ptr2);
+//     } else {
+//         DoChemistry(ptr1, ptr2);
+//     }
+// }
