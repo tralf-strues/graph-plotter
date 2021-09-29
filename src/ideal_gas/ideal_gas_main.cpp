@@ -15,9 +15,11 @@ static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
 static const Color    BACKGROUND_COLOR        = 0x2F'69'AA'FF; 
 static const Viewport VIEWPORT                = {{0, 0}, {30, 20}};
-static const float    DELTA_TIME              = 2e-3;
+static const float    DELTA_TIME              = 1e-2;
+static const size_t   ELECTRONS_COUNT         = 4;
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
+void generateParticles(Simulator& simulator, size_t count);
 
 int main()
 {
@@ -29,14 +31,6 @@ int main()
     Simulator simulator;
 
     /* ================ Entities ================ */
-    Molecule molecule1{1};
-    molecule1.setPos(Vec2<float>{10, 10});
-    molecule1.setVelocity(Vec2<float>{12, 24});
-
-    Molecule molecule2{0.5};
-    molecule2.setPos(Vec2<float>{20, 5});
-    molecule2.setVelocity(Vec2<float>{3, -6});
-
     Wall wallTop;
     wallTop.setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y});
     wallTop.setDirection(Vec2<float>{1, 0});
@@ -53,12 +47,12 @@ int main()
     wallRight.setPos(Vec2<float>{VIEWPORT.axesMax.x, VIEWPORT.axesMin.y});
     wallRight.setDirection(Vec2<float>{0, 1});
 
-    simulator.entities.pushBack(&molecule1);
-    simulator.entities.pushBack(&molecule2);
     simulator.entities.pushBack(&wallTop);
     simulator.entities.pushBack(&wallBottom);
     simulator.entities.pushBack(&wallLeft);
     simulator.entities.pushBack(&wallRight);
+
+    generateParticles(simulator, ELECTRONS_COUNT);
 
     /* ================ Main loop ================ */
     SDL_Event event   = {};
@@ -113,4 +107,25 @@ void updateFpsTitle(Window& window, uint32_t frameTime)
     snprintf(windowTitle, MAX_WINDOW_TITLE_LENGTH, "%s [%" PRIu32 " fps]", WINDOW_TITLE, fps);
 
     window.updateTitle(windowTitle);
+}
+
+void generateParticles(Simulator& simulator, size_t count)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        float radius = (50.0f + (rand() % 100)) / 100.0f;
+        float volume = 4 / 3 * 3.14f * radius * radius * radius;
+        Vec2<float> pos{radius + (VIEWPORT.getRelativeWidth()  - radius) * (rand() % 100) / 100.0f,
+                        radius + (VIEWPORT.getRelativeHeight() - radius) * (rand() % 100) / 100.0f};
+
+        Vec2<float> velocity{30.0f * (rand() % 100) / 100.0f,
+                             30.0f * (rand() % 100) / 100.0f};
+
+        Electron* electron = new Electron{radius};
+        electron->setMass(volume * 100.0f);
+        electron->setPos(pos);
+        electron->setVelocity(velocity);
+
+        simulator.entities.pushBack(electron);
+    }
 }

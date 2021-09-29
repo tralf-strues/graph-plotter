@@ -23,12 +23,12 @@ struct EntityPairInteraction
 
 const EntityPairInteraction INTERACTIONS[PhysEntity::TOTAL_TYPES][PhysEntity::TOTAL_TYPES] = {
     {
-        {collisionDetectMolMol, collisionRespondMolMol, chemicalReactionMolMol},
-        {collisionDetectMolWal, collisionRespondMolWal, nullptr}
+        {collisionDetectEleEle, collisionRespondEleEle, chemicalReactionEleEle},
+        {collisionDetectEleWal, collisionRespondEleWal, nullptr}
     },
 
     {
-        {collisionDetectMolWal, collisionRespondMolWal, nullptr},
+        {collisionDetectEleWal, collisionRespondEleWal, nullptr},
         {nullptr,               nullptr,                nullptr}
     }
 };
@@ -93,14 +93,14 @@ bool Simulator::collisionDetect(EntitiesIterator first, EntitiesIterator second,
     return function(first, second, deltaTime, collision);
 }
 
-bool collisionDetectMolMol(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectEleEle(EntitiesIterator first, EntitiesIterator second, 
                            float deltaTime, Collision* collision)
 {
-    Molecule* firstMolecule  = (Molecule*) *first;
-    Molecule* secondMolecule = (Molecule*) *second;
+    Electron* firstElectron  = (Electron*) *first;
+    Electron* secondElectron = (Electron*) *second;
 
-    float distanceSquare  = lengthSquare(firstMolecule->getPos() - secondMolecule->getPos());
-    float sumRadiusSquare = firstMolecule->getRadius() + secondMolecule->getRadius();
+    float distanceSquare  = lengthSquare(firstElectron->getPos() - secondElectron->getPos());
+    float sumRadiusSquare = firstElectron->getRadius() + secondElectron->getRadius();
     sumRadiusSquare *= sumRadiusSquare;
 
     if (cmpFloat(distanceSquare, sumRadiusSquare) <= 0)
@@ -113,10 +113,10 @@ bool collisionDetectMolMol(EntitiesIterator first, EntitiesIterator second,
     return false;
 }
 
-bool collisionDetectMolWal(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectEleWal(EntitiesIterator first, EntitiesIterator second, 
                            float deltaTime, Collision* collision)
 {
-    Molecule* molecule  = (Molecule*) *first;
+    Electron* molecule  = (Electron*) *first;
     Wall*     wall      = (Wall*)     *second;
 
     Vec2<float> point    = molecule->getPos();
@@ -155,31 +155,31 @@ void Simulator::collisionRespond(Collision& collision)
     }
 }
 
-void collisionRespondMolMol(Collision& collision)
+void collisionRespondEleEle(Collision& collision)
 {
-    Molecule* firstMolecule  = (Molecule*) *(collision.first);
-    Molecule* secondMolecule = (Molecule*) *(collision.second);
+    Electron* firstElectron  = (Electron*) *(collision.first);
+    Electron* secondElectron = (Electron*) *(collision.second);
 
-    Vec2<float> along = normalize(secondMolecule->getPos() - firstMolecule->getPos());
+    Vec2<float> along = normalize(secondElectron->getPos() - firstElectron->getPos());
     
-    float v1 = dotProduct(along, firstMolecule->getVelocity());
-    float v2 = dotProduct(along, secondMolecule->getVelocity());
-    float m1 = firstMolecule->getMass();
-    float m2 = secondMolecule->getMass();
+    float v1 = dotProduct(along, firstElectron->getVelocity());
+    float v2 = dotProduct(along, secondElectron->getVelocity());
+    float m1 = firstElectron->getMass();
+    float m2 = secondElectron->getMass();
 
     float newV1 = (2 * m2 * v2 + v1 * (m1 - m2)) / (m1 + m2);
     float newV2 = (2 * m1 * v1 + v2 * (m2 - m1)) / (m1 + m2);
 
-    Vec2<float> perpendicularVelocity1 = firstMolecule->getVelocity()  - v1 * along;
-    Vec2<float> perpendicularVelocity2 = secondMolecule->getVelocity() - v2 * along;
+    Vec2<float> perpendicularVelocity1 = firstElectron->getVelocity()  - v1 * along;
+    Vec2<float> perpendicularVelocity2 = secondElectron->getVelocity() - v2 * along;
 
-    firstMolecule->setVelocity(perpendicularVelocity1  + newV1 * along);
-    secondMolecule->setVelocity(perpendicularVelocity2 + newV2 * along);
+    firstElectron->setVelocity(perpendicularVelocity1  + newV1 * along);
+    secondElectron->setVelocity(perpendicularVelocity2 + newV2 * along);
 }
 
-void collisionRespondMolWal(Collision& collision)
+void collisionRespondEleWal(Collision& collision)
 {
-    Molecule* molecule = (Molecule*) *(collision.first);
+    Electron* molecule = (Electron*) *(collision.first);
     Wall*     wall     = (Wall*)     *(collision.second);
 
     Vec2<float> along = normalize(wall->getDirection());
@@ -211,25 +211,25 @@ bool Simulator::chemicalReaction(Collision& collision)
     return function(entities, collision); 
 }
 
-bool chemicalReactionMolMol(List<PhysEntity*>& entities, Collision& collision)
+bool chemicalReactionEleEle(List<PhysEntity*>& entities, Collision& collision)
 {
-    Molecule* firstMolecule  = (Molecule*) *(collision.first);
-    Molecule* secondMolecule = (Molecule*) *(collision.second);
+    Electron* firstElectron  = (Electron*) *(collision.first);
+    Electron* secondElectron = (Electron*) *(collision.second);
 
-    Molecule* newMolecule = new Molecule(firstMolecule->getRadius() + secondMolecule->getRadius());
-    newMolecule->setPos(firstMolecule->getPos());
-    newMolecule->setMass(firstMolecule->getMass() + secondMolecule->getMass());
-    newMolecule->setVelocity(firstMolecule->getVelocity() + secondMolecule->getVelocity());
+    Electron* newElectron = new Electron(firstElectron->getRadius() + secondElectron->getRadius());
+    newElectron->setPos(firstElectron->getPos());
+    newElectron->setMass(firstElectron->getMass() + secondElectron->getMass());
+    newElectron->setVelocity(firstElectron->getVelocity() + secondElectron->getVelocity());
 
-    entities.pushBack(newMolecule);
     entities.remove(collision.first);
     entities.remove(collision.second);
+    entities.pushBack(newElectron);
 
     return true;
 }
 //------------------------------------------------------------------------------
 
-// bool collide(const Molecule& molecule, const Line& line, float deltaTime, float* collisionTime)
+// bool collide(const Electron& molecule, const Line& line, float deltaTime, float* collisionTime)
 // {
 //     assert(collisionTime);
 
@@ -258,7 +258,7 @@ bool chemicalReactionMolMol(List<PhysEntity*>& entities, Collision& collision)
 //     return cmpFloat(*collisionTime, deltaTime) <= 0;
 // }
 
-// void collisionRespond(Molecule& molecule, Line& line, float collisionTime)
+// void collisionRespond(Electron& molecule, Line& line, float collisionTime)
 // {
 //     Vec2<float> normal = line.calculateNormal();
 
@@ -269,7 +269,7 @@ bool chemicalReactionMolMol(List<PhysEntity*>& entities, Collision& collision)
 //     molecule.velocity = velocityAlong * normalize(line.direction) - velocityPerpendicular * normal;
 // }
 
-// void drawMolecule(Renderer& renderer, const Viewport& viewport, const Molecule& molecule)
+// void drawElectron(Renderer& renderer, const Viewport& viewport, const Electron& molecule)
 // {
 //     Vec2<float> center = toPixels(renderer, viewport, molecule.pos);
 //     float       radius = molecule.radius * 

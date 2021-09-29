@@ -41,16 +41,16 @@ private:
     bool chemicalReaction(Collision& collision);
 };
 
-bool collisionDetectMolMol(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectEleEle(EntitiesIterator first, EntitiesIterator second, 
                            float deltaTime, Collision* collision); 
 
-bool collisionDetectMolWal(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectEleWal(EntitiesIterator first, EntitiesIterator second, 
                            float deltaTime, Collision* collision);
 
-void collisionRespondMolMol(Collision& collision);
-void collisionRespondMolWal(Collision& collision);
+void collisionRespondEleEle(Collision& collision);
+void collisionRespondEleWal(Collision& collision);
 
-bool chemicalReactionMolMol(List<PhysEntity*>& entities, Collision& collision);
+bool chemicalReactionEleEle(List<PhysEntity*>& entities, Collision& collision);
 
 #endif // SIMULATOR_H
 

@@ -12,15 +12,19 @@
 #include "graphics_object.h"
 #include "viewport.h"
 
+static const Color COLOR_ELECTRON = COLOR_BLUE;
+static const Color COLOR_WALL     = COLOR_RED;
+
 //----------------------------------PhysEntity----------------------------------
 class PhysEntity
 {
 public:
     enum Type
     {
-        MOLECULE,
+        ELECTRON,
         WALL,
-        TOTAL_TYPES
+        TOTAL_TYPES,
+        ATOM
     };
 
 public:
@@ -48,11 +52,11 @@ protected:
 };
 //------------------------------------------------------------------------------
 
-//-----------------------------------Molecule-----------------------------------
-class Molecule : public PhysEntity
+//-----------------------------------Electron-----------------------------------
+class Electron : public PhysEntity
 {
 public:
-    Molecule(float radius = 1);
+    Electron(float radius = 1);
 
     virtual void move(float deltaTime) override;
     virtual void updateGraphics(Renderer& renderer, const Viewport& viewport) override;

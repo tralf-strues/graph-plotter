@@ -197,6 +197,7 @@ private:
         memcpy(newNodes, nodes, capacity * sizeof(ListNode<T>));
         
         nodes = newNodes;
+        capacity = newCapacity;
     }
     
     void updateFreeList(int32_t begin = 1)
@@ -226,7 +227,7 @@ private:
     {
         if (size == capacity - 1)
         {
-            resize(capacity * LIST_EXPAND_MULTIPLIER);
+            resize((double) capacity * LIST_EXPAND_MULTIPLIER);
         }
 
         int32_t newFree = nodes[free].next;

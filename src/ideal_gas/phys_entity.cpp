@@ -43,28 +43,30 @@ float PhysEntity::getMass() const
 }
 //------------------------------------------------------------------------------
 
-//-----------------------------------Molecule-----------------------------------
-Molecule::Molecule(float radius) : PhysEntity(MOLECULE), radius(radius) {}
+//-----------------------------------Electron-----------------------------------
+Electron::Electron(float radius) : PhysEntity(ELECTRON), radius(radius) {}
 
-void Molecule::move(float deltaTime)
+void Electron::move(float deltaTime)
 {
     pos += velocity * deltaTime;
 }
 
-void Molecule::updateGraphics(Renderer& renderer, const Viewport& viewport)
+void Electron::updateGraphics(Renderer& renderer, const Viewport& viewport)
 {
+    renderer.setColor(COLOR_ELECTRON);
+
     Vec2<int32_t> circlePos    = viewport.toPixels(renderer, pos);
     int32_t       circleRadius = viewport.toPixels(renderer, radius);
 
     renderCircle(renderer, {circlePos, circleRadius});
 }
 
-void Molecule::setRadius(float radius)
+void Electron::setRadius(float radius)
 {
     this->radius = radius;
 }
 
-float Molecule::getRadius() const
+float Electron::getRadius() const
 {
     return radius;
 }
@@ -80,6 +82,8 @@ void Wall::move(float deltaTime)
 
 void Wall::updateGraphics(Renderer& renderer, const Viewport& viewport)
 {
+    renderer.setColor(COLOR_WALL);
+
     InfLine line;
     line.from      = viewport.toPixels(renderer, pos);
     line.direction = viewport.toPixels(renderer, direction);
