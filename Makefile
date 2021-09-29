@@ -24,7 +24,7 @@ endif
 LIBS = sdl2 sdl2_ttf sdl2_image
 
 LXXFLAGS = $(shell pkg-config --libs $(LIBS)) $(ModeLinkerOptions)
-CXXFLAGS = $(shell pkg-config --cflags $(LIBS)) $(ModeCompilerOptions) $(AllWarnings) -std=c++2a 
+CXXFLAGS = $(shell pkg-config --cflags $(LIBS)) $(ModeCompilerOptions) $(NoWarnings) -std=c++2a 
 # ------------------------------------Options-----------------------------------
 
 # -------------------------------------Files------------------------------------

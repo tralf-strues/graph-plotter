@@ -75,18 +75,16 @@ bool intersectInfLines(const InfLine& line1, const InfLine& line2, Vec2<float>* 
     const Vec2<float>& firstDirection  = line1.direction;
     const Vec2<float>& secondDirection = line2.direction;
 
-    float d = firstDirection.x * secondDirection.y - firstDirection.y * secondDirection.x;
-    if (cmpFloat(d, 0) == 0)
+    float det = firstDirection.y * secondDirection.x - firstDirection.x * secondDirection.y;
+    if (cmpFloat(det, 0) == 0)
     {
         return false;
     }
 
-    float t = secondFrom.x * secondDirection.y - 
-              firstFrom.x  * secondDirection.x  -
-              secondFrom.y * secondDirection.x + 
-              firstFrom.y  * secondDirection.x;
+    float t = secondDirection.x * (secondFrom.y - firstFrom.y) - 
+              secondDirection.y * (secondFrom.x - firstFrom.x);
 
-    t /= d;
+    t /= det;
     *intersection = firstFrom + t * firstDirection;
 
     return true;

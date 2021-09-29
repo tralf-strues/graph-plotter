@@ -12,7 +12,7 @@
 typedef bool (*FCollisionDetect) (EntitiesIterator first, EntitiesIterator second, 
                                  float deltaTime, Collision* collision);
 typedef void (*FCollisionRespond) (Collision& collision);
-typedef bool (*FChemicalReaction) (Collision& collision);
+typedef bool (*FChemicalReaction) (List<PhysEntity*>& entities, Collision& collision);
 
 struct EntityPairInteraction
 {
@@ -85,6 +85,11 @@ bool Simulator::collisionDetect(EntitiesIterator first, EntitiesIterator second,
         return false;
     }
 
+    if ((*first)->type > (*second)->type)
+    {
+        return function(second, first, deltaTime, collision);
+    }
+
     return function(first, second, deltaTime, collision);
 }
 
@@ -111,6 +116,23 @@ bool collisionDetectMolMol(EntitiesIterator first, EntitiesIterator second,
 bool collisionDetectMolWal(EntitiesIterator first, EntitiesIterator second, 
                            float deltaTime, Collision* collision)
 {
+    Molecule* molecule  = (Molecule*) *first;
+    Wall*     wall      = (Wall*)     *second;
+
+    Vec2<float> point    = molecule->getPos();
+    Vec2<float> lineFrom = wall->getPos();
+    Vec2<float> along    = normalize(wall->getDirection());
+
+    float distance = length((point - lineFrom) - (dotProduct(point - lineFrom, along) * along));
+
+    if (cmpFloat(distance, molecule->getRadius()) <= 0)
+    {
+        collision->first  = first;
+        collision->second = second;
+
+        return true;
+    }
+
     return false;
 }
 //------------------------------------------------------------------------------
@@ -118,10 +140,17 @@ bool collisionDetectMolWal(EntitiesIterator first, EntitiesIterator second,
 //-------------------------------Collision respond------------------------------
 void Simulator::collisionRespond(Collision& collision)
 {
-    FCollisionRespond function = INTERACTIONS[(*collision.first)->type][(*collision.first)->type]
+    FCollisionRespond function = INTERACTIONS[(*collision.first)->type][(*collision.second)->type]
                                              .collisionRespond;
     if (function != nullptr)
     {
+        if ((*collision.first)->type > (*collision.second)->type)
+        {
+            EntitiesIterator tmp = collision.first;
+            collision.first = collision.second;
+            collision.second = tmp;
+        }
+
         function(collision);
     }
 }
@@ -150,26 +179,53 @@ void collisionRespondMolMol(Collision& collision)
 
 void collisionRespondMolWal(Collision& collision)
 {
-    
+    Molecule* molecule = (Molecule*) *(collision.first);
+    Wall*     wall     = (Wall*)     *(collision.second);
+
+    Vec2<float> along = normalize(wall->getDirection());
+
+    float       vAlong         = dotProduct(molecule->getVelocity(), along);
+    Vec2<float> vPerpendicular = molecule->getVelocity() - vAlong * along;
+
+    molecule->setVelocity(vAlong * along - vPerpendicular);
 }
 //------------------------------------------------------------------------------
 
 //-------------------------------Chemical reaction------------------------------
 bool Simulator::chemicalReaction(Collision& collision)
 {
-    FChemicalReaction function = INTERACTIONS[(*collision.first)->type][(*collision.first)->type]
+    FChemicalReaction function = INTERACTIONS[(*collision.first)->type][(*collision.second)->type]
                                              .chemicalReaction;
     if (function == nullptr)
     {
         return false;
     }
 
-    return function(collision); 
+    if ((*collision.first)->type > (*collision.second)->type)
+    {
+        EntitiesIterator tmp = collision.first;
+        collision.first = collision.second;
+        collision.second = tmp;
+    }
+
+    return function(entities, collision); 
 }
 
-bool chemicalReactionMolMol(Collision& collision)
+bool chemicalReactionMolMol(List<PhysEntity*>& entities, Collision& collision)
 {
-    return false;
+    Molecule* firstMolecule  = (Molecule*) *(collision.first);
+    Molecule* secondMolecule = (Molecule*) *(collision.second);
+
+    Molecule* newMolecule = new Molecule(firstMolecule->getRadius() + secondMolecule->getRadius());
+    newMolecule->setPos(firstMolecule->getPos());
+    newMolecule->setMass(firstMolecule->getMass() + secondMolecule->getMass());
+    newMolecule->setVelocity(firstMolecule->getVelocity() + secondMolecule->getVelocity());
+
+    entities.pushBack(newMolecule);
+    entities.remove(collision.first);
+    entities.remove(collision.second);
+
+    return true;
 }
 //------------------------------------------------------------------------------
 

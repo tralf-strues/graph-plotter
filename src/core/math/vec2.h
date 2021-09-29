@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <math.h>
+#include "float_compare.h"
 
 template <typename T>
 struct Vec2
@@ -135,6 +136,18 @@ void rotate(Vec2<T>& vector, float angle)
 
     vector.x = x * cosa - y * sina;
     vector.y = x * sina + y * cosa;
+}
+
+template <typename T>
+Vec2<T> getNormal(const Vec2<T>& vector)
+{
+    float length = length(vector);
+    if (cmpFloat(length, 0) == 0)
+    {
+        return Vec2<T>{0, 0};
+    }
+
+    return normalize(Vec2<T>{-vector.y / length, vector.x / length});
 }
 
 template <typename T>

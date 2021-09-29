@@ -50,7 +50,7 @@ bool collisionDetectMolWal(EntitiesIterator first, EntitiesIterator second,
 void collisionRespondMolMol(Collision& collision);
 void collisionRespondMolWal(Collision& collision);
 
-bool chemicalReactionMolMol(Collision& collision);
+bool chemicalReactionMolMol(List<PhysEntity*>& entities, Collision& collision);
 
 #endif // SIMULATOR_H
 

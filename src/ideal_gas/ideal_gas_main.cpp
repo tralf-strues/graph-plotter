@@ -15,7 +15,7 @@ static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
 static const Color    BACKGROUND_COLOR        = 0x2F'69'AA'FF; 
 static const Viewport VIEWPORT                = {{0, 0}, {30, 20}};
-static const float    DELTA_TIME              = 1e-3;
+static const float    DELTA_TIME              = 2e-3;
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
 
@@ -30,18 +30,35 @@ int main()
 
     /* ================ Entities ================ */
     Molecule molecule1{1};
-    molecule1.setPos(Vec2<float>{0, 0});
-    molecule1.setVelocity(Vec2<float>{6, 12});
+    molecule1.setPos(Vec2<float>{10, 10});
+    molecule1.setVelocity(Vec2<float>{12, 24});
 
     Molecule molecule2{0.5};
-    molecule2.setPos(Vec2<float>{0, 5});
+    molecule2.setPos(Vec2<float>{20, 5});
     molecule2.setVelocity(Vec2<float>{3, -6});
 
-    Wall wall;
+    Wall wallTop;
+    wallTop.setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y});
+    wallTop.setDirection(Vec2<float>{1, 0});
+
+    Wall wallBottom;
+    wallBottom.setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
+    wallBottom.setDirection(Vec2<float>{1, 0});
+
+    Wall wallLeft;
+    wallLeft.setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
+    wallLeft.setDirection(Vec2<float>{0, 1});
+
+    Wall wallRight;
+    wallRight.setPos(Vec2<float>{VIEWPORT.axesMax.x, VIEWPORT.axesMin.y});
+    wallRight.setDirection(Vec2<float>{0, 1});
 
     simulator.entities.pushBack(&molecule1);
     simulator.entities.pushBack(&molecule2);
-    simulator.entities.pushBack(&wall);
+    simulator.entities.pushBack(&wallTop);
+    simulator.entities.pushBack(&wallBottom);
+    simulator.entities.pushBack(&wallLeft);
+    simulator.entities.pushBack(&wallRight);
 
     /* ================ Main loop ================ */
     SDL_Event event   = {};

@@ -86,6 +86,11 @@ public:
         return !(*this == second);
     }
 
+    int32_t getId() const
+    {
+        return id;
+    }
+
 private:
     NodePointer nodes;
     int32_t     id;
@@ -133,7 +138,7 @@ public:
 
     void remove(Iterator iterator)
     {
-        remove(iterator.id);
+        remove(iterator.getId());
     }
 
     void popBack()
