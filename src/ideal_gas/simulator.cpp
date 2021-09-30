@@ -36,6 +36,14 @@ const EntityPairInteraction INTERACTIONS[PhysEntity::TOTAL_TYPES][PhysEntity::TO
 Collision::Collision(const EntitiesIterator& first, const EntitiesIterator& second) : 
                      first(first), second(second) {}
 
+Simulator::~Simulator()
+{
+    for (auto entity : entities)
+    {
+        delete entity;
+    }
+}
+
 void Simulator::simulate(float deltaTime)
 {
     DynamicArray<Collision> collisions = {};
@@ -228,54 +236,3 @@ bool chemicalReactionEleEle(List<PhysEntity*>& entities, Collision& collision)
     return true;
 }
 //------------------------------------------------------------------------------
-
-// bool collide(const Electron& molecule, const Line& line, float deltaTime, float* collisionTime)
-// {
-//     assert(collisionTime);
-
-//     Vec2<float> normal = line.calculateNormal();
-
-//     float dotVelocityNormal = dotProduct(molecule.velocity, normal);
-//     float dotCenterNormal   = dotProduct(molecule.pos,      normal);
-//     float dotFromNormal     = dotProduct(line.from,         normal);
-//     float radiusSquared     = molecule.radius * molecule.radius;
-
-//     float a = dotVelocityNormal * dotVelocityNormal;
-//     float b = -2 * dotFromNormal * dotVelocityNormal;
-//     float c = dotFromNormal * dotFromNormal - 2 * dotFromNormal * dotCenterNormal - radiusSquared;
-
-//     float time1 = 0;
-//     float time2 = 0;
-
-//     int32_t solutions = solveQuadraticEquation(a, b, c, &time1, &time2);
-
-//     if (solutions != 1 && solutions != 2)
-//     {
-//         return false;
-//     }
-
-//     *collisionTime = (solutions == 2 && time2 < time1) ? time2 : time1;
-//     return cmpFloat(*collisionTime, deltaTime) <= 0;
-// }
-
-// void collisionRespond(Electron& molecule, Line& line, float collisionTime)
-// {
-//     Vec2<float> normal = line.calculateNormal();
-
-//     float velocityPerpendicular = dotProduct(molecule.velocity, normal);
-//     float velocityAlong         = dotProduct(molecule.velocity, normalize(line.direction));
-
-//     molecule.pos      = collisionTime * molecule.velocity;
-//     molecule.velocity = velocityAlong * normalize(line.direction) - velocityPerpendicular * normal;
-// }
-
-// void drawElectron(Renderer& renderer, const Viewport& viewport, const Electron& molecule)
-// {
-//     Vec2<float> center = toPixels(renderer, viewport, molecule.pos);
-//     float       radius = molecule.radius * 
-//                          renderer.getWindow().getWidth() /
-//                          viewport.getRelativeWidth();
-
-//     Circle circle = {center, (int32_t) radius};
-//     renderCircle(renderer, circle);
-// }
