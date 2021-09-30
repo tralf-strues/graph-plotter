@@ -81,14 +81,6 @@ struct Mat4
 
     Mat4& operator*=(T scalar)
     {
-        // for (size_t row = 0; row < MAT4_SIZE; row++)
-        // {
-        //     for (size_t col = 0; col < MAT4_SIZE; col++)
-        //     {
-        //         elements[row][col] *= scalar;
-        //     }
-        // }
-
         for (size_t i = 0; i < MAT4_SIZE * MAT4_SIZE; i++)
         {
             elements[i] *= scalar;
@@ -204,6 +196,24 @@ Mat4<float> createRotationMatrixYZ(float rollYZ);
 //! @return Rotation matrix.
 //------------------------------------------------------------------------------
 Mat4<float> createRotationMatrix(float pitchXY, float yawZX, float rollYZ);
+
+//------------------------------------------------------------------------------
+//! @brief Create a scaling matrix.
+//! 
+//! @param scale 
+//!
+//! @return Scale matrix. 
+//------------------------------------------------------------------------------
+Mat4<float> createScaleMatrix(Vec3<float> scale);
+
+//------------------------------------------------------------------------------
+//! @brief Create a translation matrix (to translate vertices by dx, dy, dz).
+//! 
+//! @param translation 
+//!
+//! @return Translation matrix.
+//------------------------------------------------------------------------------
+Mat4<float> createTranslationMatrix(Vec3<float> translation);
 
 //------------------------------------------------------------------------------
 //! @brief Creates a view matrix for translating from world to camera space.

@@ -48,6 +48,22 @@ Mat4<float> createRotationMatrix(float pitchXY, float yawZX, float rollYZ)
            createRotationMatrixXY(pitchXY);
 }
 
+Mat4<float> createScaleMatrix(Vec3<float> scale)
+{
+    return {{scale.x, 0,       0,       0,
+             0,       scale.y, 0,       0,
+             0,       0,       scale.z, 0,
+             0,       0,       0,       1}};
+}
+
+Mat4<float> createTranslationMatrix(Vec3<float> translation)
+{
+    return {{1, 0, 0, translation.x,
+             0, 1, 0, translation.y,
+             0, 0, 1, translation.z,
+             0, 0, 0, 1}};
+}
+
 Mat4<float> lookAt(const Vec3<float>& from, const Vec3<float>& direction)
 {
     static const Vec3<float> tmp = {0, 1, 0};

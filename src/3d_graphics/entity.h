@@ -10,6 +10,7 @@
 #define ENTITY_H
 
 #include "../core/math/_core_math.h"
+#include "../core/containers/_core_containers.h"
 #include "space_dep_value.h"
 #include "hit.h"
 #include "material.h"
@@ -57,6 +58,31 @@ public:
 private:
     SpaceDepValue<float>       radius;
     SpaceDepValue<Vec3<float>> center;
+};
+
+class Mesh : public Entity
+{
+public:
+    Mesh(const Material* material, size_t verticesCount = 1);
+
+    void setVertices(const Vec3<float>* vertices, size_t count);
+    const Array<SpaceDepValue<Vec3<float>>>& getVerticies() const;
+
+    void setRotation(const Vec3<float>& rotation);
+    const Vec3<float>& getRotation() const;
+
+    /* SpaceDependent */
+    virtual void toWorldSpace() override;
+    virtual void toCameraSpace(const Camera& camera) override;
+
+    /* Hittable */
+    virtual bool intersect(const Ray& ray, Hit* hit) override;
+
+private:
+    Array<SpaceDepValue<Vec3<float>>> vertices;
+
+    /** pitchXY, yawZX, rollYZ */
+    Vec3<float> rotation;
 };
 
 #endif // ENTITY_H

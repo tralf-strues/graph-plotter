@@ -23,6 +23,12 @@ template<typename T>
 struct SpaceDepValue
 {
     SpaceDepValue() = default;
+    SpaceDepValue(const T& modelSpaceValue) : modelSpace(modelSpaceValue);
+
+    void setValue(const T& modelSpaceValue)
+    {
+        modelSpace = modelSpaceValue;
+    }
 
     T modelSpace;
     T worldSpace;

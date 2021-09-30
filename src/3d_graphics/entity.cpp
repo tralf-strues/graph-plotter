@@ -44,10 +44,7 @@ void Entity::setMaterial(const Material* material)
 //------------------------------------------------------------------------------
 
 //------------------------------------Sphere------------------------------------
-Sphere::Sphere(const Material* material, float radius) : Entity(material)
-{
-    setRadius(radius);
-}
+Sphere::Sphere(const Material* material, float radius) : Entity(material), radius(radius) {}
 
 const SpaceDepValue<float>& Sphere::getRadius() const
 {
@@ -128,5 +125,53 @@ bool Sphere::intersect(const Ray& ray, Hit* hit)
     hit->material = material;
 
     return true;
+}
+//------------------------------------------------------------------------------
+
+//-------------------------------------Mesh-------------------------------------
+Mesh::Mesh(const Material* material, size_t verticesCount) : 
+           Entity(material), vertices(verticesCount) {}
+
+void Mesh::setVertices(const Vec3<float>* vertices, size_t count)
+{
+    assert(vertices);
+
+    this->vertices.~Array();
+    this->vertices = Array<SpaceDepValue<Vec3<float>>>(count);
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        this->vertices[i].modelSpace = vertices[i];
+    }
+}
+
+const Array<SpaceDepValue<Vec3<float>>>& Mesh::getVerticies() const
+{
+    return vertices;
+}
+
+void Mesh::toWorldSpace()
+{
+    Mat4<float> worldMatrix = createTranslationMatrix(pos) *
+                              createRotationMatrix(rotation.x, rotation.y, rotation.z) *
+                              createScaleMatrix(scale * Vec3<float>{1, 1, 1});
+
+    for (size_t i = 0; i < vertices.getSize(); ++i)
+    {
+        vertices[i].worldSpace = worldMatrix * vertices[i].worldSpace;
+    }
+}
+
+void Mesh::toCameraSpace(const Camera& camera)
+{
+    for (size_t i = 0; i < vertices.getSize(); ++i)
+    {
+        vertices[i].worldSpace = camera.getViewMatrix() * vertices[i].worldSpace;
+    }
+}
+
+bool Mesh::intersect(const Ray& ray, Hit* hit)
+{
+
 }
 //------------------------------------------------------------------------------
