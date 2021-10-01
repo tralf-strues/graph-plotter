@@ -160,6 +160,15 @@ Mat4<T> createIdentityMatrix(T diagonal)
 }
 
 //------------------------------------------------------------------------------
+//! @brief Calculate the determinant of the square matrix [0][0]--[0][2]
+//!                                                         ||      ||
+//!                                                       [2][0]--[2][2]
+//! @param matrix
+//! @return Determinant.
+//------------------------------------------------------------------------------
+float determinant3x3(const Mat4<float>& matrix);
+
+//------------------------------------------------------------------------------
 //! @brief Create a rotation matrix around Z axis using Euler's angles.
 //! 
 //! @param pitchXY Angle around Z axis (in the X-Y plane).
@@ -214,6 +223,7 @@ Mat4<float> createScaleMatrix(Vec3<float> scale);
 //! @return Translation matrix.
 //------------------------------------------------------------------------------
 Mat4<float> createTranslationMatrix(Vec3<float> translation);
+
 
 //------------------------------------------------------------------------------
 //! @brief Creates a view matrix for translating from world to camera space.

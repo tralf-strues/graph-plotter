@@ -89,11 +89,6 @@ private:
     ViewFrustum viewFrustum;
 
     //--------------------------------------------------------------------------
-    //! @brief Update forward vector based on verticalAngle.
-    //--------------------------------------------------------------------------
-    void updateForward();
-
-    //--------------------------------------------------------------------------
     //! @brief Update viewMatrix based on pos and forward vectors.
     //--------------------------------------------------------------------------
     void updateViewMatrix();

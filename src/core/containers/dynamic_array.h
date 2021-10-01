@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include "array.h"
 
 static const double DYNAMIC_ARRAY_EXPAND_MULT      = 1.8; ///< Expand multiplier for data realloc.
 static const size_t DYNAMIC_ARRAY_DEFAULT_CAPACITY = 4;   ///< Default capacity (when unspecified).
@@ -21,6 +22,8 @@ template<typename T>
 class DynamicArray
 {
 public:
+    typedef ArrayIterator<T> Iterator;
+
     DynamicArray(size_t capacity = DYNAMIC_ARRAY_DEFAULT_CAPACITY) : capacity(capacity), size(0)
     {
         assert(capacity != 0);
@@ -43,6 +46,9 @@ public:
 
         return data[i];
     }
+
+    Iterator begin() { return Iterator{data};        }
+    Iterator end  () { return Iterator{data + size}; }
 
     void insert(T element)
     {

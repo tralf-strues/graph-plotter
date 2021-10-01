@@ -12,10 +12,69 @@
 #include <assert.h>
 #include <stdlib.h>
 
+template <typename T>
+class ArrayIterator
+{
+public:
+    typedef T* Pointer; 
+    typedef T& Reference; 
+
+    ArrayIterator(Pointer ptr) : ptr(ptr) {}
+
+    // Prefix
+    ArrayIterator<T>& operator++()
+    {
+        return *(++ptr);
+    }
+
+    // Postfix
+    ArrayIterator<T> operator++(int)
+    {
+        return *(ptr++);
+    }
+
+    // Prefix
+    ArrayIterator<T>& operator--()
+    {
+        return *(--ptr);
+    }
+
+    // Postfix
+    ArrayIterator<T> operator--(int)
+    {
+        return *(ptr--);
+    }
+
+    Reference operator*()
+    {
+        return *(ptr);
+    }
+
+    Pointer operator->()
+    {
+        return ptr;
+    }
+
+    bool operator==(const ArrayIterator<T>& second)
+    {
+        return ptr == second.ptr;
+    }
+
+    bool operator!=(const ArrayIterator<T>& second)
+    {
+        return ptr != second.ptr;
+    }
+
+private:
+    Pointer ptr;
+};
+
 template<typename T>
 class Array
 {
 public:
+    typedef ArrayIterator<T> Iterator;
+
     Array(size_t size) : size(size)
     {
         assert(size != 0);
@@ -38,6 +97,8 @@ public:
         return data[i];
     }
 
+    Iterator begin() { return Iterator{data};        }
+    Iterator end  () { return Iterator{data + size}; }
 
     T* getData() const
     {

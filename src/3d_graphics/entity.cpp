@@ -156,21 +156,29 @@ void Mesh::toWorldSpace()
                               createRotationMatrix(rotation.x, rotation.y, rotation.z) *
                               createScaleMatrix(scale * Vec3<float>{1, 1, 1});
 
-    for (size_t i = 0; i < vertices.getSize(); ++i)
+    for (auto vertex : vertices)
     {
-        vertices[i].worldSpace = worldMatrix * vertices[i].worldSpace;
+        vertex.worldSpace = worldMatrix * vertex.worldSpace;
     }
 }
 
 void Mesh::toCameraSpace(const Camera& camera)
 {
-    for (size_t i = 0; i < vertices.getSize(); ++i)
+    for (auto vertex : vertices)
     {
-        vertices[i].worldSpace = camera.getViewMatrix() * vertices[i].worldSpace;
+        vertex.worldSpace = camera.getViewMatrix() * vertex.worldSpace;
     }
 }
 
 bool Mesh::intersect(const Ray& ray, Hit* hit)
+{
+    for (auto vertex : vertices)
+    {
+
+    }
+}
+
+bool intersectTriangle(const Ray& ray, Hit* hit)
 {
 
 }
