@@ -10,26 +10,26 @@
 
 void Scene::updateWorldSpaceValues()
 {
-    for (size_t i = 0; i < lightSources.getSize(); i++)
+    for (auto light : lightSources)
     {
-        lightSources[i]->toWorldSpace();
+        light->toWorldSpace();
     }
 
-    for (size_t i = 0; i < entities.getSize(); i++)
+    for (auto primitive : primitives)
     {
-        entities[i]->toWorldSpace();
+        primitive->toWorldSpace();
     }
 }
 
 void Scene::updateCameraSpaceValues()
 {
-    for (size_t i = 0; i < lightSources.getSize(); i++)
+    for (auto light : lightSources)
     {
-        lightSources[i]->toCameraSpace(camera);
+        light->toCameraSpace(camera);
     }
 
-    for (size_t i = 0; i < entities.getSize(); i++)
+    for (auto primitive : primitives)
     {
-        entities[i]->toCameraSpace(camera);
+        primitive->toCameraSpace(camera);
     }
 }

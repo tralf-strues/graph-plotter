@@ -53,17 +53,15 @@ int main()
 
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
-    Texture texture(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
-    ZBuffer zbuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     /* ================ Entities ================ */
     Sphere sphere1(&SPHERE_MATERIAL);
-    sphere1.setPos({25, 0, 0});
-    sphere1.setScale(5);
+    sphere1.pos.worldSpace = {25, 0, 0};
+    sphere1.scale          = 5;
 
     Sphere sphere2(&SPHERE_MATERIAL);
-    sphere2.setPos({25, 3, 10});
-    sphere2.setScale(3);
+    sphere2.pos.worldSpace = {25, 3, 10};
+    sphere2.scale          = 3;
 
     /* ================ Scene ================ */
     Camera camera(VIEW_FRUSTUM);
@@ -85,9 +83,14 @@ int main()
     Scene scene(camera);
     scene.lightSources.insert(&light1);
     scene.lightSources.insert(&light2);
-    scene.entities.insert(&sphere1);
-    scene.entities.insert(&sphere2);
+    scene.primitives.pushBack(&sphere1);
+    scene.primitives.pushBack(&sphere2);
     scene.ambientColor = AMBIENT_COLOR;
+
+    /* ================ Ray tracer ================ */
+    Texture texture(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    ZBuffer zbuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
+    RayTracer rayTracer = {&scene, &texture, &zbuffer};
 
     /* ================ Main loop ================ */
     SDL_Event event     = {};
@@ -144,7 +147,7 @@ int main()
         scene.updateCameraSpaceValues();
 
         zbuffer.reset();
-        renderSceneRayTracing(texture, zbuffer, scene);
+        rayTracer.renderScene();
         texture.update();
 
         renderer.renderTexture(texture, {0, 0});

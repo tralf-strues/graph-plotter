@@ -24,7 +24,7 @@ endif
 LIBS = sdl2 sdl2_ttf sdl2_image
 
 LXXFLAGS = $(shell pkg-config --libs $(LIBS)) $(ModeLinkerOptions)
-CXXFLAGS = $(shell pkg-config --cflags $(LIBS)) $(ModeCompilerOptions) $(NoWarnings) -std=c++2a 
+CXXFLAGS = $(shell pkg-config --cflags $(LIBS)) $(ModeCompilerOptions) $(NoWarnings) -std=c++17
 # ------------------------------------Options-----------------------------------
 
 # -------------------------------------Files------------------------------------
@@ -75,9 +75,6 @@ endif
 # -------------------------------------Files------------------------------------
 
 # ----------------------------------Make rules----------------------------------
-$(Exec): $(Objs) $(Deps)
-	$(CXX) -o $(Exec) $(Objs) $(LXXFLAGS)
-
 Dirs = $(SrcDir) $(3dDir) $(CoreDir) $(ContainersDir) $(GraphWrapDir) $(MathDir) $(GUIDir)
 
 ifeq ($(Program), ray_tracer)
@@ -87,6 +84,9 @@ endif
 ifeq ($(Program), ideal_gas)
 	Dirs += $(IGDir)
 endif
+
+$(Exec): $(Objs) $(Deps)
+	$(CXX) -o $(Exec) $(Objs) $(LXXFLAGS)
 
 vpath %.cpp $(Dirs)
 $(IntDir)/%.o: %.cpp $(Deps)

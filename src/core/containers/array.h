@@ -24,25 +24,31 @@ public:
     // Prefix
     ArrayIterator<T>& operator++()
     {
-        return *(++ptr);
+        ++ptr;
+        return *this;
     }
 
     // Postfix
     ArrayIterator<T> operator++(int)
     {
-        return *(ptr++);
+        ArrayIterator<T> it = *this;
+        --(*this);
+        return it;
     }
 
     // Prefix
     ArrayIterator<T>& operator--()
     {
-        return *(--ptr);
+        --ptr;
+        return *this;
     }
 
     // Postfix
     ArrayIterator<T> operator--(int)
     {
-        return *(ptr--);
+        ArrayIterator<T> it = *this;
+        --(*this);
+        return it;
     }
 
     Reference operator*()

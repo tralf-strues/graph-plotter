@@ -10,9 +10,9 @@
 #define SCENE_H
 
 #include "../core/math/_core_math.h"
-#include "../core/containers/dynamic_array.h"
+#include "../core/containers/_core_containers.h"
 #include "light.h"
-#include "entity.h"
+#include "primitive3d.h"
 #include "camera.h"
 
 struct Scene
@@ -21,8 +21,9 @@ struct Scene
 
     Camera&               camera;
     DynamicArray<Light*>  lightSources;
-    DynamicArray<Entity*> entities;
     Vec3<float>           ambientColor; ///< Global ambient used in Blinn-Phong shading
+    List<Primitive3d*>    primitives;
+    // List<Mesh*>        meshes;
 
     void updateWorldSpaceValues();
     void updateCameraSpaceValues();

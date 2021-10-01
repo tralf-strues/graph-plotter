@@ -15,6 +15,15 @@
 #include "scene.h"
 #include "zbuffer.h"
 
-void renderSceneRayTracing(Texture& texture, ZBuffer& zbuffer, Scene& scene);
+struct RayTracer
+{
+    RayTracer(Scene* scene = nullptr, Texture* targetTexture = nullptr, ZBuffer* zbuffer = nullptr);
+
+    Scene*   scene;  // FIXME: make const (add const iterators)
+    Texture* targetTexture;
+    ZBuffer* zbuffer;
+
+    void renderScene();
+};
 
 #endif // RAY_TRACER_H
