@@ -42,6 +42,8 @@ public:
     void updateGraphics(Renderer& renderer, const Viewport& viewport);
 
 private:
+    void distantInteract(PhysEntity* first, PhysEntity* second, float deltaTime);
+
     bool collisionDetect(EntitiesIterator first, EntitiesIterator second, 
                          float deltaTime, Collision* collision);
 
@@ -49,6 +51,9 @@ private:
 
     bool chemicalReaction(Collision& collision);
 };
+
+void distantInteractElectronWall(PhysEntity* first, PhysEntity* second, float deltaTime);
+void distantInteractWallAtom(PhysEntity* first, PhysEntity* second, float deltaTime);
 
 bool collisionDetectElectronElectron(EntitiesIterator first, EntitiesIterator second, 
                                      float deltaTime, Collision* collision); 

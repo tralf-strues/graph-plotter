@@ -10,6 +10,7 @@
 #include "../core/utils/random.h"
 #include "simulator.h"
 
+typedef void (*FDistantInteract) (PhysEntity* first, PhysEntity* second, float deltaTime);
 typedef bool (*FCollisionDetect) (EntitiesIterator first, EntitiesIterator second, 
                                   float deltaTime, Collision* collision);
 typedef void (*FCollisionRespond) (Collision& collision);
@@ -17,36 +18,44 @@ typedef bool (*FChemicalReaction) (List<PhysEntity*>& entities, Collision& colli
 
 struct EntityPairInteraction
 {
+    FDistantInteract  distantInteract;
     FCollisionDetect  collisionDetect;
     FCollisionRespond collisionRespond;
     FChemicalReaction chemicalReaction;
 };
 
-const EntityPairInteraction INTERACT_ELECTRON_ELECTRON = {collisionDetectElectronElectron, 
+const EntityPairInteraction INTERACT_ELECTRON_ELECTRON = {nullptr,
+                                                          collisionDetectElectronElectron, 
                                                           collisionRespondElectronElectron, 
                                                           nullptr};
 
-const EntityPairInteraction INTERACT_ELECTRON_WALL = {collisionDetectElectronWall, 
+const EntityPairInteraction INTERACT_ELECTRON_WALL = {distantInteractElectronWall,
+                                                      collisionDetectElectronWall, 
                                                       collisionRespondElectronWall, 
                                                       nullptr};
 
-const EntityPairInteraction INTERACT_ELECTRON_ATOM = {collisionDetectElectronAtom, 
+const EntityPairInteraction INTERACT_ELECTRON_ATOM = {nullptr,
+                                                      collisionDetectElectronAtom, 
                                                       collisionRespondElectronAtom, 
                                                       chemicalReactionElectronAtom};
 
-const EntityPairInteraction INTERACT_WALL_WALL = {nullptr, 
+const EntityPairInteraction INTERACT_WALL_WALL = {nullptr,
+                                                  nullptr, 
                                                   nullptr, 
                                                   nullptr};
 
-const EntityPairInteraction INTERACT_WALL_ATOM = {collisionDetectWallAtom, 
+const EntityPairInteraction INTERACT_WALL_ATOM = {distantInteractWallAtom,
+                                                  collisionDetectWallAtom, 
                                                   collisionRespondWallAtom, 
                                                   nullptr};
 
-const EntityPairInteraction INTERACT_ATOM_ATOM = {collisionDetectAtomAtom, 
+const EntityPairInteraction INTERACT_ATOM_ATOM = {nullptr,
+                                                  collisionDetectAtomAtom, 
                                                   collisionRespondAtomAtom, 
                                                   chemicalReactionAtomAtom};
 
-const EntityPairInteraction INTERACTIONS[PhysEntity::TOTAL_TYPES][PhysEntity::TOTAL_TYPES] = {
+const EntityPairInteraction INTERACTIONS[PhysEntity::TOTAL_TYPES][PhysEntity::TOTAL_TYPES] =
+{
     {INTERACT_ELECTRON_ELECTRON, INTERACT_ELECTRON_WALL, INTERACT_ELECTRON_ATOM},
     {INTERACT_ELECTRON_WALL,     INTERACT_WALL_WALL,     INTERACT_WALL_ATOM    },
     {INTERACT_ELECTRON_ATOM,     INTERACT_WALL_ATOM,     INTERACT_ATOM_ATOM    },
@@ -66,6 +75,14 @@ Simulator::~Simulator()
 void Simulator::simulate(float deltaTime)
 {
     DynamicArray<Collision> collisions = {};
+
+    for (EntitiesIterator first = entities.begin(); first != entities.end(); ++first)
+    {
+        for (EntitiesIterator second = first; (++second) != entities.end();)
+        {
+            distantInteract(*first, *second, deltaTime);
+        }
+    }
 
     for (PhysEntity* entity : entities)
     {
@@ -101,6 +118,58 @@ void Simulator::updateGraphics(Renderer& renderer, const Viewport& viewport)
         entity->updateGraphics(renderer, viewport);
     }
 }
+
+//-------------------------------Distant interact------------------------------
+void Simulator::distantInteract(PhysEntity* first, PhysEntity* second, float deltaTime)
+{
+    FDistantInteract function = INTERACTIONS[first->type][second->type].distantInteract;
+    if (function == nullptr)
+    {
+        return;
+    }
+
+    if (first->type > second->type)
+    {
+        function(second, first, deltaTime);
+    }
+    else
+    {
+        function(first, second, deltaTime);
+    }
+}
+
+void distantInteractElectronWall(PhysEntity* first, PhysEntity* second, float deltaTime)
+{
+    Electron* electron = (Electron*) first;
+    Wall*     wall     = (Wall*)     second;
+
+    Vec2<float> toWall = wall->getPos()     -
+                         electron->getPos() -
+                         wall->getDirection() * dotProduct(wall->getPos() - electron->getPos(), 
+                                                           wall->getDirection());
+
+    Vec2<float> force = -wall->getElectricField() * toWall * (float) ELECTRON_CHARGE;
+    Vec2<float> acceleration = force / electron->getMass();
+
+    electron->setVelocity(electron->getVelocity() + acceleration * deltaTime);
+}
+
+void distantInteractWallAtom(PhysEntity* first, PhysEntity* second, float deltaTime)
+{
+    Wall* wall = (Wall*) first;
+    Atom* atom = (Atom*) second;
+
+    Vec2<float> toWall = wall->getPos() -
+                         atom->getPos() -
+                         wall->getDirection() * dotProduct(wall->getPos() - atom->getPos(), 
+                                                           wall->getDirection());
+
+    Vec2<float> force = -wall->getElectricField() * toWall * (float) atom->getCharge();
+    Vec2<float> acceleration = force / atom->getMass();
+
+    atom->setVelocity(atom->getVelocity() + acceleration * deltaTime);
+}
+//------------------------------------------------------------------------------
 
 //------------------------------Collision detection-----------------------------
 bool Simulator::collisionDetect(EntitiesIterator first, EntitiesIterator second, 

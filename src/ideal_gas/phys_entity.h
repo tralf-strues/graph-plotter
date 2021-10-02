@@ -18,11 +18,11 @@ static const Color COLOR_WALL     = COLOR_RED;
 
 static const Color COLOR_ATOM_NEUTRAL  = 0xF6'E4'92'FF;
 static const Color COLOR_ATOM_POSITIVE = 0xE6'96'A8'FF;
-static const Color COLOR_ATOM_NEGATIVE = 0xA299D4'FF;
+static const Color COLOR_ATOM_NEGATIVE = 0xA2'99'D4'FF;
 
 static const Charge ELECTRON_CHARGE = -1;
 static const float  ELECTRON_ENERGY = 1e-5;
-static const float  ELECTRON_MASS   = 1e-6;
+static const float  ELECTRON_MASS   = 1e-4;
 
 static const float  WALL_ENERGY     = 1e5;
 
@@ -95,8 +95,12 @@ public:
     void setDirection(const Vec2<float>& direction);
     const Vec2<float>& getDirection() const;
 
+    void setElectricField(float electricField);
+    float getElectricField() const;
+
 private:
     Vec2<float> direction;
+    float       electricField;
 };
 //------------------------------------------------------------------------------
 

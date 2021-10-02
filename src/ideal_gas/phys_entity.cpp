@@ -86,7 +86,8 @@ float Electron::getRadius() const
 //------------------------------------------------------------------------------
 
 //-------------------------------------Wall-------------------------------------
-Wall::Wall(const Vec2<float>& direction) : PhysEntity(WALL), direction(direction) {}
+Wall::Wall(const Vec2<float>& direction) : 
+           PhysEntity(WALL), direction(direction), electricField(0) {}
 
 float Wall::getEnergy() const
 {
@@ -117,6 +118,16 @@ void Wall::setDirection(const Vec2<float>& direction)
 const Vec2<float>& Wall::getDirection() const
 {
     return direction;
+}
+
+void Wall::setElectricField(float electricField)
+{
+    this->electricField = electricField;
+}
+
+float Wall::getElectricField() const
+{
+    return electricField;
 }
 //------------------------------------------------------------------------------
 

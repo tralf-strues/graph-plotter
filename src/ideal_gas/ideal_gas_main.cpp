@@ -15,10 +15,10 @@ static const size_t   WINDOW_HEIGHT           = 800;
 static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
 static const Color    BACKGROUND_COLOR        = 0x02162E'FF; 
-static const Viewport VIEWPORT                = {{0, 0}, {30, 20}};
+static const Viewport VIEWPORT                = {{0, 0}, {60, 40}};
 static const float    DELTA_TIME              = 3e-6;
-static const size_t   ELECTRONS_COUNT         = 3;
-static const size_t   ATOMS_COUNT             = 10;
+static const size_t   ELECTRONS_COUNT         = 15;
+static const size_t   ATOMS_COUNT             = 25;
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
 void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type);
@@ -44,10 +44,12 @@ int main()
     Wall* wallLeft = new Wall();
     wallLeft->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
     wallLeft->setDirection(Vec2<float>{0, 1});
+    wallLeft->setElectricField(5e2);
 
     Wall* wallRight = new Wall();
     wallRight->setPos(Vec2<float>{VIEWPORT.axesMax.x, VIEWPORT.axesMin.y});
     wallRight->setDirection(Vec2<float>{0, 1});
+    wallRight->setElectricField(-5e2);
 
     simulator.entities.pushBack(wallTop);
     simulator.entities.pushBack(wallBottom);
