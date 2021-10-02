@@ -9,7 +9,6 @@
 #ifndef PHYS_ENTITY_H
 #define PHYS_ENTITY_H
 
-#include "graphics_object.h"
 #include "viewport.h"
 
 static const Color COLOR_ELECTRON = COLOR_BLUE;

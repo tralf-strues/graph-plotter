@@ -82,16 +82,56 @@ Triangle::Triangle(const Material* material) : Primitive3d(material) {}
 
 void Triangle::toWorldSpace()
 {
-    
+    Mat4<float> worldMatrix = createTranslationMatrix(pos.worldSpace) *
+                              createScaleMatrix(scale) *
+                              createRotationMatrix(rotation.x, rotation.y, rotation.z);
+
+    v0.pos.worldSpace    = worldMatrix * v0.pos.modelSpace;
+    v0.normal.worldSpace = worldMatrix * v0.normal.modelSpace;
+
+    v1.pos.worldSpace    = worldMatrix * v1.pos.modelSpace;
+    v1.normal.worldSpace = worldMatrix * v1.normal.modelSpace;
+
+    v2.pos.worldSpace    = worldMatrix * v2.pos.modelSpace;
+    v2.normal.worldSpace = worldMatrix * v2.normal.modelSpace;
 }
 
 void Triangle::toCameraSpace(const Camera& camera)
 {
+    const Mat4<float>& viewMatrix = camera.getViewMatrix();
 
+    v0.pos.cameraSpace    = viewMatrix * v0.pos.worldSpace;
+    v0.normal.cameraSpace = viewMatrix * v0.normal.worldSpace;
+
+    v1.pos.cameraSpace    = viewMatrix * v1.pos.worldSpace;
+    v1.normal.cameraSpace = viewMatrix * v1.normal.worldSpace;
+
+    v2.pos.cameraSpace    = viewMatrix * v2.pos.worldSpace;
+    v2.normal.cameraSpace = viewMatrix * v2.normal.worldSpace;
 }
 
 bool Triangle::intersect(const Ray& ray, Hit* hit)
 {
+    Vec3<float> direction = ray.direction;
+    Vec3<float> side0     = v0.pos.cameraSpace - v1.pos.cameraSpace;
+    Vec3<float> side1     = v0.pos.cameraSpace - v2.pos.cameraSpace;
+
+    Mat4<float> matrix    = {{direction.x, side0.x, side1.x, 0,
+                              direction.y, side0.y, side1.y, 0,
+                              direction.z, side0.z, side1.z, 0,
+                              0,           0,       0,       1}};
+
+    float determinant = determinant3x3(matrix);
+    
+    // determinant == 0 <=> ray is parallel to the triangle's surface
+    // determinant <  0 <=> the triangle is back-facing FIXME: WHY? 
+    if (cmpFloat(determinant, 0) <= 0)
+    {
+        return false;
+    }
+
+    
+
     return false;
 }
 //------------------------------------------------------------------------------

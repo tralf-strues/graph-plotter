@@ -50,6 +50,8 @@ struct Triangle : public Primitive3d
     Vertex v1;
     Vertex v2;
 
+    Vec3<float> rotation;
+
     Triangle(const Material* material);
 
     /* SpaceDependent */

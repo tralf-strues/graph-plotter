@@ -195,9 +195,14 @@ private:
 
         ListNode<T>* newNodes = new ListNode<T>[newCapacity];
         memcpy(newNodes, nodes, capacity * sizeof(ListNode<T>));
-        
+
+        delete[] nodes;
         nodes = newNodes;
+
+        size_t prevCapacity = capacity;
         capacity = newCapacity;
+
+        updateFreeList(prevCapacity);
     }
     
     void updateFreeList(int32_t begin = 1)

@@ -16,7 +16,7 @@ static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
 static const Color    BACKGROUND_COLOR        = 0x2F'69'AA'FF; 
 static const Viewport VIEWPORT                = {{0, 0}, {30, 20}};
 static const float    DELTA_TIME              = 1e-2;
-static const size_t   ELECTRONS_COUNT         = 4;
+static const size_t   ELECTRONS_COUNT         = 7;
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
 void generateParticles(Simulator& simulator, size_t count);
@@ -31,26 +31,26 @@ int main()
     Simulator simulator;
 
     /* ================ Entities ================ */
-    Wall wallTop;
-    wallTop.setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y});
-    wallTop.setDirection(Vec2<float>{1, 0});
+    Wall* wallTop = new Wall();
+    wallTop->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y});
+    wallTop->setDirection(Vec2<float>{1, 0});
 
-    Wall wallBottom;
-    wallBottom.setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
-    wallBottom.setDirection(Vec2<float>{1, 0});
+    Wall* wallBottom = new Wall();
+    wallBottom->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
+    wallBottom->setDirection(Vec2<float>{1, 0});
 
-    Wall wallLeft;
-    wallLeft.setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
-    wallLeft.setDirection(Vec2<float>{0, 1});
+    Wall* wallLeft = new Wall();
+    wallLeft->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
+    wallLeft->setDirection(Vec2<float>{0, 1});
 
-    Wall wallRight;
-    wallRight.setPos(Vec2<float>{VIEWPORT.axesMax.x, VIEWPORT.axesMin.y});
-    wallRight.setDirection(Vec2<float>{0, 1});
+    Wall* wallRight = new Wall();
+    wallRight->setPos(Vec2<float>{VIEWPORT.axesMax.x, VIEWPORT.axesMin.y});
+    wallRight->setDirection(Vec2<float>{0, 1});
 
-    simulator.entities.pushBack(&wallTop);
-    simulator.entities.pushBack(&wallBottom);
-    simulator.entities.pushBack(&wallLeft);
-    simulator.entities.pushBack(&wallRight);
+    simulator.entities.pushBack(wallTop);
+    simulator.entities.pushBack(wallBottom);
+    simulator.entities.pushBack(wallLeft);
+    simulator.entities.pushBack(wallRight);
 
     generateParticles(simulator, ELECTRONS_COUNT);
 
@@ -71,6 +71,16 @@ int main()
                 { 
                     running = false; 
                     break; 
+                }
+
+                case SDL_KEYDOWN:
+                {
+                    if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                    {
+                        running = false;
+                    }
+
+                    break;
                 }
 
                 default: { break; }

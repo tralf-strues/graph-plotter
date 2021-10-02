@@ -224,7 +224,6 @@ Mat4<float> createScaleMatrix(Vec3<float> scale);
 //------------------------------------------------------------------------------
 Mat4<float> createTranslationMatrix(Vec3<float> translation);
 
-
 //------------------------------------------------------------------------------
 //! @brief Creates a view matrix for translating from world to camera space.
 //! 
