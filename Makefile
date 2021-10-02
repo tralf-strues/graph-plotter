@@ -39,6 +39,7 @@ CoreDir       = $(SrcDir)/core
 ContainersDir = $(CoreDir)/containers
 GraphWrapDir  = $(CoreDir)/graphics_wrapper
 MathDir       = $(CoreDir)/math
+UtilsDir      = $(CoreDir)/utils
 GUIDir        = $(SrcDir)/gui
 RTDir         = $(SrcDir)/ray_tracer
 IGDir         = $(SrcDir)/ideal_gas
@@ -49,6 +50,7 @@ Deps = $(wildcard $(SrcDir)/*.h)        \
        $(wildcard $(ContainersDir)/*.h) \
        $(wildcard $(GraphWrapDir)/*.h)  \
        $(wildcard $(MathDir)/*.h)       \
+       $(wildcard $(UtilsDir)/*.h)      \
        $(wildcard $(GUIDir)/*.h)
 
 CppSrc = $(notdir $(wildcard $(SrcDir)/*.cpp))        \
@@ -57,6 +59,7 @@ CppSrc = $(notdir $(wildcard $(SrcDir)/*.cpp))        \
 		 $(notdir $(wildcard $(ContainersDir)/*.cpp)) \
 		 $(notdir $(wildcard $(GraphWrapDir)/*.cpp))  \
 		 $(notdir $(wildcard $(MathDir)/*.cpp))       \
+		 $(notdir $(wildcard $(UtilsDir)/*.cpp))      \
 		 $(notdir $(wildcard $(GUIDir)/*.cpp))        
 
 Objs = $(addprefix $(IntDir)/, $(CppSrc:.cpp=.o))
@@ -75,7 +78,7 @@ endif
 # -------------------------------------Files------------------------------------
 
 # ----------------------------------Make rules----------------------------------
-Dirs = $(SrcDir) $(3dDir) $(CoreDir) $(ContainersDir) $(GraphWrapDir) $(MathDir) $(GUIDir)
+Dirs = $(SrcDir) $(3dDir) $(CoreDir) $(ContainersDir) $(GraphWrapDir) $(MathDir) $(UtilsDir) $(GUIDir)
 
 ifeq ($(Program), ray_tracer)
 	Dirs += $(RTDir)

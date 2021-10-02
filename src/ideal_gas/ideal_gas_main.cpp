@@ -7,19 +7,21 @@
 //------------------------------------------------------------------------------
 
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
+#include "../core/utils/random.h"
 #include "simulator.h"
 
 static const size_t   WINDOW_WIDTH            = 1200;
 static const size_t   WINDOW_HEIGHT           = 800;
 static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
-static const Color    BACKGROUND_COLOR        = 0x2F'69'AA'FF; 
+static const Color    BACKGROUND_COLOR        = 0x02162E'FF; 
 static const Viewport VIEWPORT                = {{0, 0}, {30, 20}};
-static const float    DELTA_TIME              = 1e-2;
-static const size_t   ELECTRONS_COUNT         = 7;
+static const float    DELTA_TIME              = 3e-6;
+static const size_t   ELECTRONS_COUNT         = 3;
+static const size_t   ATOMS_COUNT             = 10;
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
-void generateParticles(Simulator& simulator, size_t count);
+void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type);
 
 int main()
 {
@@ -52,7 +54,8 @@ int main()
     simulator.entities.pushBack(wallLeft);
     simulator.entities.pushBack(wallRight);
 
-    generateParticles(simulator, ELECTRONS_COUNT);
+    generateParticles(simulator, ELECTRONS_COUNT, PhysEntity::ELECTRON);
+    generateParticles(simulator, ATOMS_COUNT,     PhysEntity::ATOM);
 
     /* ================ Main loop ================ */
     SDL_Event event   = {};
@@ -91,7 +94,7 @@ int main()
         simulator.simulate(DELTA_TIME);
 
         /* ================ Rendering ================ */
-        renderer.setColor(COLOR_BLACK);
+        renderer.setColor(BACKGROUND_COLOR);
         renderer.clear();
 
         renderer.setColor(COLOR_RED);
@@ -119,23 +122,45 @@ void updateFpsTitle(Window& window, uint32_t frameTime)
     window.updateTitle(windowTitle);
 }
 
-void generateParticles(Simulator& simulator, size_t count)
+void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type)
 {
+    if (type != PhysEntity::ELECTRON && type != PhysEntity::ATOM)
+    {
+        return;
+    }
+
     for (size_t i = 0; i < count; ++i)
     {
-        float radius = (50.0f + (rand() % 100)) / 100.0f;
-        float volume = 4 / 3 * 3.14f * radius * radius * radius;
-        Vec2<float> pos{radius + (VIEWPORT.getRelativeWidth()  - radius) * (rand() % 100) / 100.0f,
-                        radius + (VIEWPORT.getRelativeHeight() - radius) * (rand() % 100) / 100.0f};
+        float radius = randomFromInterval<float>(0.4, 1.2);
+        float volume = calculateSphereVolume(radius);
 
-        Vec2<float> velocity{30.0f * (rand() % 100) / 100.0f,
-                             30.0f * (rand() % 100) / 100.0f};
+        Vec2<float> pos{randomFromInterval<float>(radius, VIEWPORT.getRelativeWidth()  - radius),
+                        randomFromInterval<float>(radius, VIEWPORT.getRelativeHeight() - radius)};
 
-        Electron* electron = new Electron{radius};
-        electron->setMass(volume * 100.0f);
-        electron->setPos(pos);
-        electron->setVelocity(velocity);
+        Vec2<float> velocity{randomFromInterval<float>(-3e4, 3e4),
+                             randomFromInterval<float>(-3e4, 3e4)};
 
-        simulator.entities.pushBack(electron);
+        if (type == PhysEntity::ELECTRON)
+        {
+            Electron* electron = new Electron{0.2f};
+            electron->setPos(pos);
+            electron->setVelocity(velocity);
+
+            simulator.entities.pushBack(electron);
+        } 
+        else if (type == PhysEntity::ATOM)
+        {
+            Atom* atom = new Atom{radius};
+            atom->setMass(volume * ATOM_DENSITY);
+            atom->setPos(pos);
+            atom->setVelocity(velocity);
+
+            if (randomTry(0.1f))
+            {
+                atom->setCharge(-ELECTRON_CHARGE);
+            }
+
+            simulator.entities.pushBack(atom);
+        }
     }
 }

@@ -7,10 +7,11 @@
 //------------------------------------------------------------------------------
 
 #include "../core/containers/dynamic_array.h"
+#include "../core/utils/random.h"
 #include "simulator.h"
 
 typedef bool (*FCollisionDetect) (EntitiesIterator first, EntitiesIterator second, 
-                                 float deltaTime, Collision* collision);
+                                  float deltaTime, Collision* collision);
 typedef void (*FCollisionRespond) (Collision& collision);
 typedef bool (*FChemicalReaction) (List<PhysEntity*>& entities, Collision& collision);
 
@@ -21,16 +22,34 @@ struct EntityPairInteraction
     FChemicalReaction chemicalReaction;
 };
 
-const EntityPairInteraction INTERACTIONS[PhysEntity::TOTAL_TYPES][PhysEntity::TOTAL_TYPES] = {
-    {
-        {collisionDetectEleEle, collisionRespondEleEle, chemicalReactionEleEle},
-        {collisionDetectEleWal, collisionRespondEleWal, nullptr}
-    },
+const EntityPairInteraction INTERACT_ELECTRON_ELECTRON = {collisionDetectElectronElectron, 
+                                                          collisionRespondElectronElectron, 
+                                                          nullptr};
 
-    {
-        {collisionDetectEleWal, collisionRespondEleWal, nullptr},
-        {nullptr,               nullptr,                nullptr}
-    }
+const EntityPairInteraction INTERACT_ELECTRON_WALL = {collisionDetectElectronWall, 
+                                                      collisionRespondElectronWall, 
+                                                      nullptr};
+
+const EntityPairInteraction INTERACT_ELECTRON_ATOM = {collisionDetectElectronAtom, 
+                                                      collisionRespondElectronAtom, 
+                                                      chemicalReactionElectronAtom};
+
+const EntityPairInteraction INTERACT_WALL_WALL = {nullptr, 
+                                                  nullptr, 
+                                                  nullptr};
+
+const EntityPairInteraction INTERACT_WALL_ATOM = {collisionDetectWallAtom, 
+                                                  collisionRespondWallAtom, 
+                                                  nullptr};
+
+const EntityPairInteraction INTERACT_ATOM_ATOM = {collisionDetectAtomAtom, 
+                                                  collisionRespondAtomAtom, 
+                                                  chemicalReactionAtomAtom};
+
+const EntityPairInteraction INTERACTIONS[PhysEntity::TOTAL_TYPES][PhysEntity::TOTAL_TYPES] = {
+    {INTERACT_ELECTRON_ELECTRON, INTERACT_ELECTRON_WALL, INTERACT_ELECTRON_ATOM},
+    {INTERACT_ELECTRON_WALL,     INTERACT_WALL_WALL,     INTERACT_WALL_ATOM    },
+    {INTERACT_ELECTRON_ATOM,     INTERACT_WALL_ATOM,     INTERACT_ATOM_ATOM    },
 };
 
 Collision::Collision(const EntitiesIterator& first, const EntitiesIterator& second) : 
@@ -101,8 +120,8 @@ bool Simulator::collisionDetect(EntitiesIterator first, EntitiesIterator second,
     return function(first, second, deltaTime, collision);
 }
 
-bool collisionDetectEleEle(EntitiesIterator first, EntitiesIterator second, 
-                           float deltaTime, Collision* collision)
+bool collisionDetectElectronElectron(EntitiesIterator first, EntitiesIterator second, 
+                                     float deltaTime, Collision* collision)
 {
     Electron* firstElectron  = (Electron*) *first;
     Electron* secondElectron = (Electron*) *second;
@@ -121,23 +140,100 @@ bool collisionDetectEleEle(EntitiesIterator first, EntitiesIterator second,
     return false;
 }
 
-bool collisionDetectEleWal(EntitiesIterator first, EntitiesIterator second, 
-                           float deltaTime, Collision* collision)
+bool collisionDetectElectronWall(EntitiesIterator first, EntitiesIterator second, 
+                                 float deltaTime, Collision* collision)
 {
-    Electron* molecule  = (Electron*) *first;
+    Electron* electron  = (Electron*) *first;
     Wall*     wall      = (Wall*)     *second;
 
-    Vec2<float> point    = molecule->getPos();
+    Vec2<float> point    = electron->getPos();
     Vec2<float> lineFrom = wall->getPos();
     Vec2<float> along    = normalize(wall->getDirection());
 
     float distance = length((point - lineFrom) - (dotProduct(point - lineFrom, along) * along));
 
-    if (cmpFloat(distance, molecule->getRadius()) <= 0)
+    if (cmpFloat(distance, electron->getRadius()) <= 0)
     {
         collision->first  = first;
         collision->second = second;
 
+        return true;
+    }
+
+    return false;
+}
+
+bool collisionDetectWallAtom(EntitiesIterator first, EntitiesIterator second, 
+                             float deltaTime, Collision* collision)
+{
+    Wall* wall  = (Wall*) *first;
+    Atom* atom  = (Atom*) *second;
+
+    Vec2<float> point    = atom->getPos();
+    Vec2<float> lineFrom = wall->getPos();
+    Vec2<float> along    = normalize(wall->getDirection());
+
+    float distance = length((point - lineFrom) - (dotProduct(point - lineFrom, along) * along));
+
+    if (cmpFloat(distance, atom->getSize() / 2) <= 0)
+    {
+        collision->first  = first;
+        collision->second = second;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool collisionDetectAtomAtom(EntitiesIterator first, EntitiesIterator second, 
+                             float deltaTime, Collision* collision)
+{
+    Atom* firstAtom  = (Atom*) *first;
+    Atom* secondAtom = (Atom*) *second;
+
+    float firstLeft  = firstAtom->getPos().x  - firstAtom->getSize()  / 2;
+    float secondLeft = secondAtom->getPos().x - secondAtom->getSize() / 2;
+
+    float firstRight  = firstAtom->getPos().x  + firstAtom->getSize()  / 2;
+    float secondRight = secondAtom->getPos().x + secondAtom->getSize() / 2;
+
+    float firstTop  = firstAtom->getPos().y  - firstAtom->getSize()  / 2;
+    float secondTop = secondAtom->getPos().y - secondAtom->getSize() / 2;
+
+    float firstBottom  = firstAtom->getPos().y  + firstAtom->getSize()  / 2;
+    float secondBottom = secondAtom->getPos().y + secondAtom->getSize() / 2;
+
+    if (!(cmpFloat(secondLeft, firstRight) > 0 ||
+          cmpFloat(secondRight, firstLeft) < 0 || 
+          cmpFloat(secondTop, firstBottom) > 0 ||
+          cmpFloat(secondBottom, firstTop) < 0))
+    {
+        collision->first  = first;
+        collision->second = second;
+        return true;
+    }
+
+    return false;
+}
+
+bool collisionDetectElectronAtom(EntitiesIterator first, EntitiesIterator second, 
+                                 float deltaTime, Collision* collision)
+{
+    Electron* electron = (Electron*) *first;
+    Atom*     atom     = (Atom*)     *second;
+
+    float distanceSquare = lengthSquare(electron->getPos() - atom->getPos());
+
+    float electronRadius = electron->getRadius();
+    float atomRadius     = atom->getSize() * (1 + sqrtf(2)) / 4;
+    float sumRadiusSquare = electronRadius + atomRadius;
+    sumRadiusSquare *= sumRadiusSquare;
+
+    if (cmpFloat(distanceSquare, sumRadiusSquare) <= 0)
+    {
+        collision->first  = first;
+        collision->second = second;
         return true;
     }
 
@@ -163,7 +259,7 @@ void Simulator::collisionRespond(Collision& collision)
     }
 }
 
-void collisionRespondEleEle(Collision& collision)
+void collisionRespondElectronElectron(Collision& collision)
 {
     Electron* firstElectron  = (Electron*) *(collision.first);
     Electron* secondElectron = (Electron*) *(collision.second);
@@ -185,17 +281,74 @@ void collisionRespondEleEle(Collision& collision)
     secondElectron->setVelocity(perpendicularVelocity2 + newV2 * along);
 }
 
-void collisionRespondEleWal(Collision& collision)
+void collisionRespondElectronWall(Collision& collision)
 {
-    Electron* molecule = (Electron*) *(collision.first);
+    Electron* electron = (Electron*) *(collision.first);
     Wall*     wall     = (Wall*)     *(collision.second);
 
     Vec2<float> along = normalize(wall->getDirection());
 
-    float       vAlong         = dotProduct(molecule->getVelocity(), along);
-    Vec2<float> vPerpendicular = molecule->getVelocity() - vAlong * along;
+    float       vAlong         = dotProduct(electron->getVelocity(), along);
+    Vec2<float> vPerpendicular = electron->getVelocity() - vAlong * along;
 
-    molecule->setVelocity(vAlong * along - vPerpendicular);
+    electron->setVelocity(vAlong * along - vPerpendicular);
+}
+
+void collisionRespondWallAtom(Collision& collision)
+{
+    Wall* wall = (Wall*) *(collision.first);
+    Atom* atom = (Atom*) *(collision.second);
+
+    Vec2<float> along = normalize(wall->getDirection());
+
+    float       vAlong         = dotProduct(atom->getVelocity(), along);
+    Vec2<float> vPerpendicular = atom->getVelocity() - vAlong * along;
+
+    atom->setVelocity(vAlong * along - vPerpendicular);
+}
+
+void collisionRespondAtomAtom(Collision& collision)
+{
+    Atom* firstAtom  = (Atom*) *(collision.first);
+    Atom* secondAtom = (Atom*) *(collision.second);
+
+    Vec2<float> along = normalize(secondAtom->getPos() - firstAtom->getPos());
+    
+    float v1 = dotProduct(along, firstAtom->getVelocity());
+    float v2 = dotProduct(along, secondAtom->getVelocity());
+    float m1 = firstAtom->getMass();
+    float m2 = secondAtom->getMass();
+
+    float newV1 = (2 * m2 * v2 + v1 * (m1 - m2)) / (m1 + m2);
+    float newV2 = (2 * m1 * v1 + v2 * (m2 - m1)) / (m1 + m2);
+
+    Vec2<float> perpendicularVelocity1 = firstAtom->getVelocity()  - v1 * along;
+    Vec2<float> perpendicularVelocity2 = secondAtom->getVelocity() - v2 * along;
+
+    firstAtom->setVelocity(perpendicularVelocity1  + newV1 * along);
+    secondAtom->setVelocity(perpendicularVelocity2 + newV2 * along);
+}
+
+void collisionRespondElectronAtom(Collision& collision)
+{
+    Electron* electron = (Electron*) *(collision.first);
+    Atom*     atom     = (Atom*)     *(collision.second);
+
+    Vec2<float> along = normalize(atom->getPos() - electron->getPos());
+    
+    float v1 = dotProduct(along, electron->getVelocity());
+    float v2 = dotProduct(along, atom->getVelocity());
+    float m1 = electron->getMass();
+    float m2 = atom->getMass();
+
+    float newV1 = (2 * m2 * v2 + v1 * (m1 - m2)) / (m1 + m2);
+    float newV2 = (2 * m1 * v1 + v2 * (m2 - m1)) / (m1 + m2);
+
+    Vec2<float> perpendicularVelocityElectron = electron->getVelocity()  - v1 * along;
+    Vec2<float> perpendicularVelocityAtom     = atom->getVelocity() - v2 * along;
+
+    electron->setVelocity(perpendicularVelocityElectron  + newV1 * along);
+    atom->setVelocity(perpendicularVelocityAtom + newV2 * along);
 }
 //------------------------------------------------------------------------------
 
@@ -219,20 +372,94 @@ bool Simulator::chemicalReaction(Collision& collision)
     return function(entities, collision); 
 }
 
-bool chemicalReactionEleEle(List<PhysEntity*>& entities, Collision& collision)
+bool chemicalReactionElectronAtom(List<PhysEntity*>& entities, Collision& collision)
 {
-    Electron* firstElectron  = (Electron*) *(collision.first);
-    Electron* secondElectron = (Electron*) *(collision.second);
+    Electron* electron = (Electron*) *(collision.first);
+    Atom*     atom     = (Atom*)     *(collision.second);
 
-    Electron* newElectron = new Electron(firstElectron->getRadius() + secondElectron->getRadius());
-    newElectron->setPos(firstElectron->getPos());
-    newElectron->setMass(firstElectron->getMass() + secondElectron->getMass());
-    newElectron->setVelocity(firstElectron->getVelocity() + secondElectron->getVelocity());
+    if (atom->getEnergy() + electron->getEnergy() < ENERGY_THRESHOLD_ELECTRON_CAPTURE)
+    {
+        return false;
+    }
 
+    atom->setCharge(atom->getCharge() + ELECTRON_CHARGE);
     entities.remove(collision.first);
-    entities.remove(collision.second);
-    entities.pushBack(newElectron);
 
     return true;
+}
+
+bool chemicalReactionAtomAtom(List<PhysEntity*>& entities, Collision& collision)
+{
+    Atom* firstAtom  = (Atom*) *(collision.first);
+    Atom* secondAtom = (Atom*) *(collision.second);
+
+    if (firstAtom->getCharge() == 0 && secondAtom->getCharge() == 0)
+    {
+        float sumMass = firstAtom->getMass() + secondAtom->getMass();
+        printf("sumMass = %lf\n", sumMass);
+
+        if (sumMass >= MASS_THRESHOLD_ATOMS_BREAK)
+        {
+            float sumVolume = sumMass / ATOM_DENSITY;
+            int32_t atomsCount = sumVolume / VOLUME_BROKEN_ATOM;
+
+            float brokenAtomMass = sumMass / atomsCount;
+
+            float mass1     = firstAtom->getMass();
+            float mass2     = secondAtom->getMass();
+            float velocity1 = length(firstAtom->getVelocity());
+            float velocity2 = length(secondAtom->getVelocity());
+
+            float brokenAtomVelocity = sqrtf((mass1 * velocity1 * velocity1 +
+                                              mass2 * velocity2 * velocity2) /
+                                             (atomsCount * brokenAtomMass));
+
+            for (int32_t i = 0; i < atomsCount; ++i)
+            {
+                Atom* newAtom = new Atom{RADIUS_BROKEN_ATOM};
+                newAtom->setMass(brokenAtomMass);
+
+                float angle = randomFromInterval<float>(0, 2 * M_PI);
+                newAtom->setVelocity(Vec2<float>{cosf(angle), sinf(angle)});
+                newAtom->setPos(firstAtom->getPos() +
+                                2.0f * newAtom->getVelocity() * firstAtom->getSize());
+
+                newAtom->setVelocity(brokenAtomVelocity * newAtom->getVelocity());
+
+                entities.pushBack(newAtom);
+            }
+
+            entities.remove(collision.first);
+            entities.remove(collision.second);
+
+            return true;
+        }
+        else if (sumMass >= MASS_THRESHOLD_ATOMS_COMBINE)
+        {
+            float volume = sumMass / ATOM_DENSITY;
+
+            Atom* newAtom = new Atom{calculateSphereRadiusFromVolume(volume)};
+            newAtom->setMass(sumMass);
+            newAtom->setPos(firstAtom->getPos());
+            newAtom->setVelocity((firstAtom->getMass() * firstAtom->getVelocity() + 
+                                  secondAtom->getMass() * secondAtom->getVelocity()) / sumMass);
+            entities.pushBack(newAtom);
+
+            entities.remove(collision.first);
+            entities.remove(collision.second);
+
+            return true;
+        }
+    }
+
+    Charge sumCharge = firstAtom->getCharge() + secondAtom->getCharge();
+
+    if (abs(sumCharge) % 2 == 0 && (firstAtom->getCharge() != 0 || secondAtom->getCharge() != 0))
+    {
+        firstAtom->setCharge(sumCharge  / 2);
+        secondAtom->setCharge(sumCharge / 2);
+    }
+
+    return false;
 }
 //------------------------------------------------------------------------------

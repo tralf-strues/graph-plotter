@@ -12,10 +12,11 @@
 #define CORE_MATH_H
 
 #include "float_compare.h"
+#include "geometry.h"
+#include "mat4.h"
+#include "ray.h"
 #include "solve_equation.h"
 #include "vec2.h"
 #include "vec3.h"
-#include "mat4.h"
-#include "ray.h"
 
 #endif // CORE_MATH_H
