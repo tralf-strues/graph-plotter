@@ -8,6 +8,14 @@
 
 #include "viewport.h"
 
+Viewport::Viewport(const Vec2<float>& axesMin, 
+                   const Vec2<float>& axesMax,
+                   const Rectangle& windowArea) :
+                   axesMin(axesMin),
+                   axesMax(axesMax),
+                   windowArea(windowArea)
+{}
+
 float Viewport::getRelativeWidth() const
 {
     return axesMax.x - axesMin.x;
@@ -18,19 +26,19 @@ float Viewport::getRelativeHeight() const
     return axesMax.y - axesMin.y;
 }
 
-Vec2<float> Viewport::toPixels(const Renderer& renderer, const Vec2<float>& point) const
+Vec2<float> Viewport::toPixels(const Vec2<float>& point) const
 {
     float relWidth  = getRelativeWidth();
     float relHeight = getRelativeHeight();
 
-    float x = (renderer.getWindow().getWidth() / relWidth)  * (point.x - axesMin.x); 
-    float y = renderer.getWindow().getHeight() + 
-              (renderer.getWindow().getHeight() / relHeight) * (point.y - axesMax.y); 
+    float x = windowArea.pos.x + (windowArea.width / relWidth)  * (point.x - axesMin.x); 
+    float y = windowArea.pos.y + 
+              (windowArea.height / relHeight) * (axesMax.y - point.y); 
 
     return {x, y};
 }
 
-float Viewport::toPixels(const Renderer& renderer, float distance) const
+float Viewport::toPixels(float distance) const
 {
-    return length(toPixels(renderer, Vec2<float>{1, 0} * distance));
+    return (float) windowArea.width * distance / getRelativeWidth();
 }

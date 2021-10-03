@@ -68,8 +68,8 @@ void Electron::updateGraphics(Renderer& renderer, const Viewport& viewport)
 {
     renderer.setColor(COLOR_ELECTRON);
 
-    Vec2<int32_t> circlePos    = viewport.toPixels(renderer, pos);
-    int32_t       circleRadius = viewport.toPixels(renderer, radius);
+    Vec2<int32_t> circlePos    = viewport.toPixels(pos);
+    int32_t       circleRadius = viewport.toPixels(radius);
 
     renderCircle(renderer, {circlePos, circleRadius});
 }
@@ -104,8 +104,8 @@ void Wall::updateGraphics(Renderer& renderer, const Viewport& viewport)
     renderer.setColor(COLOR_WALL);
 
     InfLine line;
-    line.from      = viewport.toPixels(renderer, pos);
-    line.direction = viewport.toPixels(renderer, direction);
+    line.from      = viewport.toPixels(pos);
+    line.direction = direction;
 
     renderInfLine(renderer, line);
 }
@@ -163,8 +163,8 @@ void Atom::updateGraphics(Renderer& renderer, const Viewport& viewport)
 
     renderer.setColor(color);
 
-    int32_t       rectSize = viewport.toPixels(renderer, size);
-    Vec2<int32_t> rectPos  = viewport.toPixels(renderer, pos) - 
+    int32_t       rectSize = viewport.toPixels(size);
+    Vec2<int32_t> rectPos  = viewport.toPixels(pos) - 
                              (float) (rectSize / 2) * Vec2<float>{1, 1};
 
     Rectangle rect{rectPos, rectSize, rectSize};

@@ -13,14 +13,18 @@
 
 struct Viewport
 {
+    Viewport(const Vec2<float>& axesMin, const Vec2<float>& axesMax, const Rectangle& windowArea);
+
     Vec2<float> axesMin;
     Vec2<float> axesMax;
+
+    Rectangle   windowArea;
 
     float getRelativeWidth()  const;
     float getRelativeHeight() const;
 
-    Vec2<float> toPixels(const Renderer& renderer, const Vec2<float>& point) const;
-    float       toPixels(const Renderer& renderer, float distance) const;
+    Vec2<float> toPixels(const Vec2<float>& point) const;
+    float       toPixels(float distance) const;
 };
 
 #endif // VIEWPORT_H

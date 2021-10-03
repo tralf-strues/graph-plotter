@@ -15,7 +15,7 @@ static const size_t   WINDOW_HEIGHT           = 800;
 static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
 static const Color    BACKGROUND_COLOR        = 0x02162E'FF; 
-static const Viewport VIEWPORT                = {{0, 0}, {60, 40}};
+static const Viewport VIEWPORT                = Viewport{{0, 0}, {30, 20}, {{50, 50}, 600, 400}};
 static const float    DELTA_TIME              = 3e-6;
 static const size_t   ELECTRONS_COUNT         = 15;
 static const size_t   ATOMS_COUNT             = 25;
@@ -34,20 +34,20 @@ int main()
 
     /* ================ Entities ================ */
     Wall* wallTop = new Wall();
-    wallTop->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y});
+    wallTop->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y - 1});
     wallTop->setDirection(Vec2<float>{1, 0});
 
     Wall* wallBottom = new Wall();
-    wallBottom->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
+    wallBottom->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y + 1});
     wallBottom->setDirection(Vec2<float>{1, 0});
 
     Wall* wallLeft = new Wall();
-    wallLeft->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
+    wallLeft->setPos(Vec2<float>{VIEWPORT.axesMin.x + 1, VIEWPORT.axesMin.y});
     wallLeft->setDirection(Vec2<float>{0, 1});
     wallLeft->setElectricField(5e2);
 
     Wall* wallRight = new Wall();
-    wallRight->setPos(Vec2<float>{VIEWPORT.axesMax.x, VIEWPORT.axesMin.y});
+    wallRight->setPos(Vec2<float>{VIEWPORT.axesMax.x - 1, VIEWPORT.axesMin.y});
     wallRight->setDirection(Vec2<float>{0, 1});
     wallRight->setElectricField(-5e2);
 
@@ -100,7 +100,10 @@ int main()
         renderer.clear();
 
         renderer.setColor(COLOR_RED);
+
+        renderer.setClipRegion(VIEWPORT.windowArea);
         simulator.updateGraphics(renderer, VIEWPORT);
+        renderer.resetClipRegion();
 
         renderer.present();
 
