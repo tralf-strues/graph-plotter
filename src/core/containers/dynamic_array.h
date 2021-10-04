@@ -25,18 +25,18 @@ class DynamicArray
 public:
     typedef ArrayIterator<T> Iterator;
 
-    DynamicArray(size_t capacity = DYNAMIC_ARRAY_DEFAULT_CAPACITY) : capacity(capacity), size(0)
+    DynamicArray(size_t capacity = DYNAMIC_ARRAY_DEFAULT_CAPACITY) : m_Capacity(capacity), m_Size(0)
     {
-        assert(capacity != 0);
+        assert(m_Capacity != 0);
 
-        data = new T[capacity];
-        assert(data);
+        m_Data = new T[m_Capacity];
+        assert(m_Data);
     }
 
     DynamicArray(std::initializer_list<T> init)
         : DynamicArray(init.size() == 0 ? DYNAMIC_ARRAY_DEFAULT_CAPACITY : init.size())
     {
-        assert(capacity != 0);
+        assert(m_Capacity != 0);
 
         for (auto value : init)
         {
@@ -46,86 +46,86 @@ public:
 
     ~DynamicArray()
     {
-        assert(data);
-        delete[] data;
+        assert(m_Data);
+        delete[] m_Data;
 
-        capacity = 0;
-        size     = 0;
+        m_Capacity = 0;
+        m_Size     = 0;
     }
 
     T& operator[](size_t i)
     {
-        assert(i < size);
+        assert(i < m_Size);
 
-        return data[i];
+        return m_Data[i];
     }
 
-    Iterator begin() { return Iterator{data};        }
-    Iterator end  () { return Iterator{data + size}; }
+    Iterator begin() { return Iterator{m_Data};        }
+    Iterator end  () { return Iterator{m_Data + m_Size}; }
 
     void insert(T element)
     {
-        if (size >= capacity)
+        if (m_Size >= m_Capacity)
         {
-            resize(capacity * DYNAMIC_ARRAY_EXPAND_MULT);
+            resize(m_Capacity * DYNAMIC_ARRAY_EXPAND_MULT);
         }
 
-        data[size++] = element;
+        m_Data[m_Size++] = element;
     }
 
     void pop()
     {
-        assert(size > 0);
+        assert(m_Size > 0);
 
-        --size;
+        --m_Size;
     }
 
     void clear()
     {
-        size = 0;
+        m_Size = 0;
     }
 
     T& getFirst() const
     {
-        assert(size > 0);
-        return data[0];
+        assert(m_Size > 0);
+        return m_Data[0];
     }
 
     T& getLast() const
     {
-        assert(size > 0);
-        return data[size - 1];
+        assert(m_Size > 0);
+        return m_Data[m_Size - 1];
     }
 
     T* getData() const
     {
-        return data;
+        return m_Data;
     }
 
     size_t getCapacity() const
     {
-        return capacity;
+        return m_Capacity;
     }
 
     size_t getSize() const
     {
-        return size;
+        return m_Size;
     }
 
 private:
-    T*     data;
-    size_t capacity;
-    size_t size;
+    T*     m_Data;
+    size_t m_Capacity;
+    size_t m_Size;
 
     void resize(size_t newCapacity)
     {
-        assert(newCapacity > capacity);
+        assert(newCapacity > m_Capacity);
 
-        T* newData = (T*) realloc(data, newCapacity * sizeof(T));
+        T* newData = (T*) realloc(m_Data, newCapacity * sizeof(T));
         assert(newData);
 
-        data     = newData;
-        capacity = newCapacity;
+        m_Data     = newData;
+        m_Capacity = newCapacity;
     }
 };
 

@@ -73,7 +73,7 @@ int main()
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
 
-    Font font{renderer, FONT_FILENAME, FONT_SIZE};
+    Font font{FONT_FILENAME, FONT_SIZE};
 
     bool running = true;
 

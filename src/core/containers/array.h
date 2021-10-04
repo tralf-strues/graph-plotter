@@ -20,12 +20,12 @@ public:
     typedef T* Pointer; 
     typedef T& Reference; 
 
-    ArrayIterator(Pointer ptr) : ptr(ptr) {}
+    ArrayIterator(Pointer ptr) : m_Ptr(ptr) {}
 
     // Prefix
     ArrayIterator<T>& operator++()
     {
-        ++ptr;
+        ++m_Ptr;
         return *this;
     }
 
@@ -40,7 +40,7 @@ public:
     // Prefix
     ArrayIterator<T>& operator--()
     {
-        --ptr;
+        --m_Ptr;
         return *this;
     }
 
@@ -54,26 +54,26 @@ public:
 
     Reference operator*()
     {
-        return *(ptr);
+        return *(m_Ptr);
     }
 
     Pointer operator->()
     {
-        return ptr;
+        return m_Ptr;
     }
 
     bool operator==(const ArrayIterator<T>& second)
     {
-        return ptr == second.ptr;
+        return m_Ptr == second.m_Ptr;
     }
 
     bool operator!=(const ArrayIterator<T>& second)
     {
-        return ptr != second.ptr;
+        return m_Ptr != second.m_Ptr;
     }
 
 private:
-    Pointer ptr;
+    Pointer m_Ptr;
 };
 
 template<typename T>
@@ -82,11 +82,11 @@ class Array
 public:
     typedef ArrayIterator<T> Iterator;
 
-    Array(size_t size) : size(size)
+    Array(size_t size) : m_Size(size)
     {
-        assert(size);
+        assert(m_Size);
 
-        data = new T[size];
+        m_Data = new T[m_Size];
     }
 
     Array(std::initializer_list<T> init) : Array(init.size())
@@ -106,35 +106,35 @@ public:
 
     ~Array()
     {
-        assert(data);
-        delete[] data;
+        assert(m_Data);
+        delete[] m_Data;
     }
 
     T& operator[](size_t i)
     {
-        assert(i < size);
+        assert(i < m_Size);
 
-        return data[i];
+        return m_Data[i];
     }
 
-    Iterator begin() { return Iterator{data};        }
-    Iterator end  () { return Iterator{data + size}; }
+    Iterator begin() { return Iterator{m_Data};        }
+    Iterator end  () { return Iterator{m_Data + m_Size}; }
 
     T* getData() const
     {
-        assert(data);
+        assert(m_Data);
 
-        return data;
+        return m_Data;
     }
 
     size_t getSize() const
     {
-        return size;
+        return m_Size;
     }
 
 private:
-    T*     data;
-    size_t size;
+    T*     m_Data;
+    size_t m_Size;
 };
 
 #endif // ARRAY_H

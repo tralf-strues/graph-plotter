@@ -12,18 +12,18 @@ void Notifier::attachListener(const std::initializer_list<Event::Type>& events, 
 {
     assert(listener);
 
-    listeners.pushBack(ListenerInfo(events, listener));
+    m_Listeners.pushBack(ListenerInfo(events, listener));
 }
 
 void Notifier::detachListener(IListener* listener)
 {
     assert(listener);
 
-    for (ListIterator it = listeners.begin(); it != listeners.end(); ++it)
+    for (ListIterator it = m_Listeners.begin(); it != m_Listeners.end(); ++it)
     {
         if (it->listener == listener)
         {
-            listeners.remove(it);
+            m_Listeners.remove(it);
             return;
         }
     }
@@ -31,7 +31,7 @@ void Notifier::detachListener(IListener* listener)
 
 void Notifier::notify(const Event& event)
 {
-    for (auto listenerInfo : listeners)
+    for (auto listenerInfo : m_Listeners)
     {
         for (auto eventType : listenerInfo.events)
         {

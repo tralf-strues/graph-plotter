@@ -10,84 +10,81 @@
 
 //----------------------------------PhysEntity----------------------------------
 PhysEntity::PhysEntity(Type type, float mass, const Vec2<float>& pos, const Vec2<float>& velocity) :
-                       type(type), mass(mass), pos(pos), velocity(velocity) {}
+                       type(type), m_Mass(mass), m_Pos(pos), m_Velocity(velocity) {}
 
 void PhysEntity::setPos(const Vec2<float> pos)
 {
-    this->pos = pos;
+    m_Pos = pos;
 }
 
 Vec2<float> PhysEntity::getPos() const
 {
-    return pos;
+    return m_Pos;
 }
 
 void PhysEntity::setVelocity(const Vec2<float> velocity)
 {
-    this->velocity = velocity;
+    m_Velocity = velocity;
 }
 
 Vec2<float> PhysEntity::getVelocity() const
 {
-    return velocity;
+    return m_Velocity;
 }
 
 void PhysEntity::setMass(float mass)
 {
-    this->mass = mass;
+    m_Mass = mass;
 }
 
 float PhysEntity::getMass() const
 {
-    return mass;
+    return m_Mass;
+}
+
+void PhysEntity::move(float deltaTime)
+{
+    m_Pos += m_Velocity * deltaTime;
 }
 //------------------------------------------------------------------------------
 
 //-----------------------------------Electron-----------------------------------
-Electron::Electron(float radius) : PhysEntity(ELECTRON), radius(radius)
+Electron::Electron(float radius) : PhysEntity(ELECTRON), m_Radius(radius)
 {
-    this->mass = ELECTRON_MASS;
+    m_Mass = ELECTRON_MASS;
 }
 
 float Electron::getEnergy() const
 {
-    float v = length(velocity);
+    float v = length(m_Velocity);
 
-    // FIXME:
-    // printf("Electron energy = %f\n", mass * v * v / 2 + ELECTRON_ENERGY);
-
-    return mass * v * v / 2 + ELECTRON_ENERGY;
-}
-
-void Electron::move(float deltaTime)
-{
-    pos += velocity * deltaTime;
+    return m_Mass * v * v / 2 + ELECTRON_ENERGY;
 }
 
 void Electron::updateGraphics(Renderer& renderer, const Viewport& viewport)
 {
     renderer.setColor(COLOR_ELECTRON);
 
-    Vec2<int32_t> circlePos    = viewport.toPixels(pos);
-    int32_t       circleRadius = viewport.toPixels(radius);
+    Vec2<int32_t> circlePos    = viewport.toPixels(m_Pos);
+    int32_t       circleRadius = viewport.toPixels(m_Radius);
 
     renderFilledCircle(renderer, {circlePos, circleRadius});
 }
 
 void Electron::setRadius(float radius)
 {
-    this->radius = radius;
+    m_Radius = radius;
 }
 
 float Electron::getRadius() const
 {
-    return radius;
+    return m_Radius;
 }
 //------------------------------------------------------------------------------
 
 //-------------------------------------Wall-------------------------------------
 Wall::Wall(const Vec2<float>& direction) : 
-           PhysEntity(WALL), direction(direction), electricField(0) {}
+           PhysEntity(WALL), m_Direction(direction), m_ElectricField(0) {}
 
 float Wall::getEnergy() const
 {
@@ -96,7 +93,7 @@ float Wall::getEnergy() const
 
 void Wall::move(float deltaTime)
 {
-    pos += velocity * deltaTime;
+    
 }
 
 void Wall::updateGraphics(Renderer& renderer, const Viewport& viewport)
@@ -104,67 +101,59 @@ void Wall::updateGraphics(Renderer& renderer, const Viewport& viewport)
     renderer.setColor(COLOR_WALL);
 
     InfLine line;
-    line.from      = viewport.toPixels(pos);
-    line.direction = direction;
+    line.from      = viewport.toPixels(m_Pos);
+    line.direction = m_Direction;
 
     renderInfLine(renderer, line);
 }
 
 void Wall::setDirection(const Vec2<float>& direction)
 {
-    this->direction = direction;
+    m_Direction = direction;
 }
 
 const Vec2<float>& Wall::getDirection() const
 {
-    return direction;
+    return m_Direction;
 }
 
 void Wall::setElectricField(float electricField)
 {
-    this->electricField = electricField;
+    m_ElectricField = electricField;
 }
 
 float Wall::getElectricField() const
 {
-    return electricField;
+    return m_ElectricField;
 }
 //------------------------------------------------------------------------------
 
 //-------------------------------------Atom-------------------------------------
-Atom::Atom(float size, Charge charge) : PhysEntity(ATOM), size(size), charge(charge) {}
+Atom::Atom(float size, Charge charge) : PhysEntity(ATOM), m_Size(size), m_Charge(charge) {}
 
 float Atom::getEnergy() const
 {
-    float v = length(velocity);
+    float v = length(m_Velocity);
 
-    // FIXME:
-    // printf("Atom energy = %lf\n", mass * v * v / 2 + abs(charge) * ELECTRON_ENERGY);
-
-    return mass * v * v / 2 + abs(charge) * ELECTRON_ENERGY;
-}
-
-void Atom::move(float deltaTime)
-{
-    pos += velocity * deltaTime;
+    return m_Mass * v * v / 2 + abs(m_Charge) * ELECTRON_ENERGY;
 }
 
 void Atom::updateGraphics(Renderer& renderer, const Viewport& viewport)
 {
     Color color = COLOR_ATOM_NEUTRAL;
-    if (charge > 0)
+    if (m_Charge > 0)
     {
         color = COLOR_ATOM_POSITIVE;
     }
-    else if (charge < 0)
+    else if (m_Charge < 0)
     {
         color = COLOR_ATOM_NEGATIVE;
     }
 
     renderer.setColor(color);
 
-    int32_t       rectSize = viewport.toPixels(size);
-    Vec2<int32_t> rectPos  = viewport.toPixels(pos) - 
+    int32_t       rectSize = viewport.toPixels(m_Size);
+    Vec2<int32_t> rectPos  = viewport.toPixels(m_Pos) - 
                              (float) (rectSize / 2) * Vec2<float>{1, 1};
 
     Rectangle rect{rectPos, rectSize, rectSize};
@@ -173,21 +162,21 @@ void Atom::updateGraphics(Renderer& renderer, const Viewport& viewport)
 
 void Atom::setSize(float size)
 {
-    this->size = size;
+    m_Size = size;
 }
 
 float Atom::getSize() const
 {
-    return size;
+    return m_Size;
 }
 
 void Atom::setCharge(Charge charge)
 {
-    this->charge = charge;
+    m_Charge = charge;
 }
 
 Charge Atom::getCharge() const
 {
-    return charge;
+    return m_Charge;
 }
 //------------------------------------------------------------------------------

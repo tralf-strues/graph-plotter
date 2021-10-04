@@ -44,23 +44,23 @@ public:
     PhysEntity(Type type, float mass = 1, const Vec2<float>& pos = {0.0f, 0.0f}, 
                const Vec2<float>& velocity = {0.0f, 0.0f});
 
+    void setMass(float mass);
+    float getMass() const;
+
     void setPos(const Vec2<float> pos);
     Vec2<float> getPos() const;
 
     void setVelocity(const Vec2<float> velocity);
     Vec2<float> getVelocity() const;
 
-    void setMass(float mass);
-    float getMass() const;
-
     virtual float getEnergy() const = 0;
-    virtual void move(float deltaTime) = 0;
+    virtual void move(float deltaTime);
     virtual void updateGraphics(Renderer& renderer, const Viewport& viewport) = 0;
 
 protected:
-    Vec2<float> pos;
-    Vec2<float> velocity;
-    float       mass;
+    float       m_Mass;
+    Vec2<float> m_Pos;
+    Vec2<float> m_Velocity;
 };
 //------------------------------------------------------------------------------
 
@@ -71,14 +71,13 @@ public:
     Electron(float radius = 1);
 
     virtual float getEnergy() const override;
-    virtual void move(float deltaTime) override;
     virtual void updateGraphics(Renderer& renderer, const Viewport& viewport) override;
 
     void setRadius(float radius);
     float getRadius() const;
 
 private:
-    float radius;
+    float m_Radius;
 };
 //------------------------------------------------------------------------------
 
@@ -99,8 +98,8 @@ public:
     float getElectricField() const;
 
 private:
-    Vec2<float> direction;
-    float       electricField;
+    Vec2<float> m_Direction;
+    float       m_ElectricField;
 };
 //------------------------------------------------------------------------------
 
@@ -111,7 +110,6 @@ public:
     Atom(float size = 1, Charge charge = 0);
 
     virtual float getEnergy() const override;
-    virtual void move(float deltaTime) override;
     virtual void updateGraphics(Renderer& renderer, const Viewport& viewport) override;
 
     void setSize(float size);
@@ -121,8 +119,8 @@ public:
     Charge getCharge() const;
 
 private:
-    float  size;
-    Charge charge;
+    float  m_Size;
+    Charge m_Charge;
 };
 //------------------------------------------------------------------------------
 

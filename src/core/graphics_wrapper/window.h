@@ -86,12 +86,12 @@ public:
     void resizeWindow(size_t width, size_t height);
 
 private:
-    size_t      width;
-    size_t      height;
-    const char* title; 
-    uint32_t    errorStatus;
+    size_t      m_Width;
+    size_t      m_Height;
+    const char* m_Title; 
+    uint32_t    m_ErrorStatus;
 
-    SDL_Window* nativeWindow;
+    SDL_Window* m_NativeWindow;
 
     //--------------------------------------------------------------------------
     //! @brief Set the error.
@@ -120,8 +120,5 @@ bool initGraphics();
 //! @warning Supposed to be called only once after using graphics functionality.
 //------------------------------------------------------------------------------
 void quitGraphics();
-
-// FIXME:
-// void renderTexture(SDL_Renderer* renderer, SDL_Texture* texture, Rectangle renderRect);
 
 #endif // WINDOW_H

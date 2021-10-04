@@ -39,11 +39,11 @@ public:
     bool loadFromBMP(Renderer& renderer, const char* filename);
 
 private:
-    size_t       width;
-    size_t       height;
-    Color*       pixels;
+    size_t       m_Width;
+    size_t       m_Height;
+    Color*       m_Pixels;
 
-    SDL_Texture* nativeTexture;
+    SDL_Texture* m_NativeTexture;
 };
 
 #endif // TEXTURE_H

@@ -129,11 +129,11 @@ public:
     void renderTexture(const Texture& texture, const Vec2<int32_t>& pos);
 
 private:
-    Window&       window;
-    Color         color;
-    uint32_t      errorStatus;
+    Window&       m_Window;
+    Color         m_Color;
+    uint32_t      m_ErrorStatus;
 
-    SDL_Renderer* nativeRenderer;
+    SDL_Renderer* m_NativeRenderer;
 
     //--------------------------------------------------------------------------
     //! @brief Set the error.

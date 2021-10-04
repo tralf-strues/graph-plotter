@@ -55,7 +55,7 @@ protected:
         }
     };
 
-    List<ListenerInfo> listeners;
+    List<ListenerInfo> m_Listeners;
 
     virtual void notify(const Event& event);
 };

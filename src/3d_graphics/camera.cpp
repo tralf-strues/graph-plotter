@@ -26,7 +26,7 @@ ViewFrustum::ViewFrustum(float verticalFOV, float aspect, float near, float far)
 
 Camera::Camera(const ViewFrustum& viewFrustum, const Vec3<float>& pos, 
                float pitchVertical, float yawHorizontal) :
-               viewFrustum(viewFrustum)
+               m_ViewFrustum(viewFrustum)
 {
     setPitchVertical(pitchVertical);
     setYawHorizontal(yawHorizontal);
@@ -35,60 +35,60 @@ Camera::Camera(const ViewFrustum& viewFrustum, const Vec3<float>& pos,
 
 const SpaceDepValue<Vec3<float>>& Camera::getPos() const
 {
-    return pos;
+    return m_Pos;
 }
 
 void Camera::setPos(const Vec3<float>& pos)
 {
-    this->pos.worldSpace = pos;
+    m_Pos.worldSpace = pos;
     updateViewMatrix();
 }
 
 float Camera::getPitchVertical() const
 {
-    return pitchVertical;
+    return m_PitchVertical;
 }
 
 void Camera::setPitchVertical(float pitchVertical)
 {
-    this->pitchVertical = pitchVertical;
+    m_PitchVertical = pitchVertical;
     updateViewMatrix();
 }
 
 float Camera::getYawHorizontal() const
 {
-    return yawHorizontal;
+    return m_YawHorizontal;
 }
 
 void Camera::setYawHorizontal(float yawHorizontal)
 {
-    this->yawHorizontal = yawHorizontal;
+    m_YawHorizontal = yawHorizontal;
     updateViewMatrix();
 }
 
 const Mat4<float>& Camera::getViewMatrix() const
 {
-    return viewMatrix;
+    return m_ViewMatrix;
 }
 
 const ViewFrustum& Camera::getViewFrustum() const
 {
-    return viewFrustum;
+    return m_ViewFrustum;
 }
 
 void Camera::setViewFrustum(const ViewFrustum& viewFrustum)
 {
-    this->viewFrustum = viewFrustum;
+    m_ViewFrustum = viewFrustum;
 }
 
 void Camera::updateViewMatrix()
 {
     static const Vec3<float> originalDirection = {1.0f, 0.0f, 0.0f};
-    Mat4<float> rotationMatrix = createRotationMatrix(pitchVertical, yawHorizontal, 0);
+    Mat4<float> rotationMatrix = createRotationMatrix(m_PitchVertical, m_YawHorizontal, 0);
 
     Vec3<float> direction = rotationMatrix * originalDirection;
 
-    viewMatrix = lookAt(pos.worldSpace, direction);
+    m_ViewMatrix = lookAt(m_Pos.worldSpace, direction);
 }
 
 Vec2<float> toPixel(const Vec3<float>& point,

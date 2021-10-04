@@ -33,8 +33,8 @@ void Button::onEvent(const Event& event)
 
     const EventMouseButton& mouseEvent = (const EventMouseButton&) event;
 
-    if (mouseEvent.clickX >= pos.x && mouseEvent.clickX < pos.x + width &&
-        mouseEvent.clickY >= pos.y && mouseEvent.clickY < pos.y + height)
+    if (mouseEvent.clickX >= pos.x && mouseEvent.clickX < pos.x + static_cast<int32_t>(width) &&
+        mouseEvent.clickY >= pos.y && mouseEvent.clickY < pos.y + static_cast<int32_t>(height))
     {
         EventButtonPressed eventButtonPressed{this};
         notify(eventButtonPressed);

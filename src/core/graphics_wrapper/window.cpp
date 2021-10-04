@@ -10,16 +10,17 @@
 #include <SDL_ttf.h>
 #include "window.h"
 
-Window::Window(size_t width, size_t height, const char* title) : width(width), height(height) 
+Window::Window(size_t width, size_t height, const char* title)
+    : m_Width(width), m_Height(height), m_Title(title) 
 {
-    assert(width);
-    assert(height);
+    assert(m_Width);
+    assert(m_Height);
 
-    nativeWindow = SDL_CreateWindow(title, 
-                                    SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                    width, height, 0);
+    m_NativeWindow = SDL_CreateWindow(title, 
+                                      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                      m_Width, m_Height, 0);
 
-    if (nativeWindow == nullptr)
+    if (m_NativeWindow == nullptr)
     {
         setError(CREATE_ERROR);
         return;
@@ -28,39 +29,39 @@ Window::Window(size_t width, size_t height, const char* title) : width(width), h
 
 Window::~Window()
 {
-    SDL_DestroyWindow(nativeWindow);
+    SDL_DestroyWindow(m_NativeWindow);
 }
 
 size_t Window::getWidth() const 
 { 
-    return width;       
+    return m_Width;       
 }
 
 size_t Window::getHeight() const 
 { 
-    return height;      
+    return m_Height;      
 }
 
 const char* Window::getTitle() const 
 { 
-    return title;       
+    return m_Title;       
 }
 
 uint32_t Window::getError() const 
 { 
-    return errorStatus; 
+    return m_ErrorStatus; 
 }
 
 SDL_Window* Window::getNativeWindow() const
 {
-    return nativeWindow;
+    return m_NativeWindow;
 }
 
 void Window::updateTitle(const char* title)
 {
-    this->title  = (title == nullptr) ? WINDOW_DEFAULT_TITLE : title;
+    m_Title  = (title == nullptr) ? WINDOW_DEFAULT_TITLE : title;
 
-    SDL_SetWindowTitle(nativeWindow, this->title);
+    SDL_SetWindowTitle(m_NativeWindow, m_Title);
 }
 
 void Window::resizeWindow(size_t width, size_t height)
@@ -68,15 +69,15 @@ void Window::resizeWindow(size_t width, size_t height)
     assert(width);
     assert(height);
 
-    this->width  = width;
-    this->height = height;
+    m_Width  = width;
+    m_Height = height;
 
-    SDL_SetWindowSize(nativeWindow, (int) width, (int) height);
+    SDL_SetWindowSize(m_NativeWindow, (int) m_Width, (int) m_Height);
 }
 
 void Window::setError(uint32_t error)
 {
-    errorStatus |= error;
+    m_ErrorStatus |= error;
 }
 
 bool initGraphics()

@@ -15,15 +15,15 @@
 class Font
 {
 public:
-    Font(Renderer& renderer, const char* filename, size_t size);
+    Font(const char* filename, size_t size);
     Font();
 
     TTF_Font* getNativeFont() const;
     size_t getSize() const;
 
 private:
-    TTF_Font* nativeFont;
-    size_t    fontSize;
+    TTF_Font* m_NativeFont;
+    size_t    m_FontSize;
 };
 
 class Text
@@ -40,14 +40,14 @@ public:
     void render(Renderer& renderer, const Vec2<int32_t>& pos) const;
 
 private:
-    const char* str;
-    Font        font;
-    Color       color;
+    const char*  m_Str;
+    Font         m_Font;
+    Color        m_Color;
 
-    size_t      width;
-    size_t      height;
+    size_t       m_Width;
+    size_t       m_Height;
 
-    SDL_Texture* texture;
+    SDL_Texture* m_Texture;
 };
 
 #endif // TEXT_H

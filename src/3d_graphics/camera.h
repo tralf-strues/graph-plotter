@@ -74,19 +74,19 @@ public:
 
 private:
     /** Position in model/world/camera spaces. */
-    SpaceDepValue<Vec3<float>> pos;
+    SpaceDepValue<Vec3<float>> m_Pos;
     
     /** Pitch angle around Z axis (around X-Y plane). */
-    float pitchVertical;
+    float m_PitchVertical;
 
     /** Yaw angle around Y axis (around Z-X plane). */
-    float yawHorizontal;
+    float m_YawHorizontal;
 
     /** View matrix for converting vertices from world to camera space. */
-    Mat4<float> viewMatrix;
+    Mat4<float> m_ViewMatrix;
 
     /** Camera's view frustum */
-    ViewFrustum viewFrustum;
+    ViewFrustum m_ViewFrustum;
 
     //--------------------------------------------------------------------------
     //! @brief Update viewMatrix based on pos and forward vectors.

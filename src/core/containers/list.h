@@ -37,12 +37,12 @@ public:
     typedef T&           Reference; 
     typedef ListNode<T>* NodePointer; 
 
-    ListIterator(NodePointer nodes = nullptr, int32_t id = -1) : nodes(nodes), id(id) {}
+    ListIterator(NodePointer nodes = nullptr, int32_t id = -1) : m_Nodes(nodes), m_Id(id) {}
 
     // Prefix
     ListIterator<T>& operator++()
     {
-        id = nodes[id].next;
+        m_Id = m_Nodes[m_Id].next;
         return *this;
     }
 
@@ -57,7 +57,7 @@ public:
     // Prefix
     ListIterator<T>& operator--()
     {
-        id = nodes[id].prev;
+        m_Id = m_Nodes[m_Id].prev;
         return *this;
     }
 
@@ -71,17 +71,17 @@ public:
 
     Reference operator*()
     {
-        return nodes[id].value;
+        return m_Nodes[m_Id].value;
     }
 
     Pointer operator->()
     {
-        return &nodes[id].value;
+        return &m_Nodes[m_Id].value;
     }
 
     bool operator==(const ListIterator<T>& second)
     {
-        return nodes == second.nodes && id == second.id;
+        return m_Nodes == second.m_Nodes && m_Id == second.m_Id;
     }
 
     bool operator!=(const ListIterator<T>& second)
@@ -91,12 +91,12 @@ public:
 
     int32_t getId() const
     {
-        return id;
+        return m_Id;
     }
 
 private:
-    NodePointer nodes;
-    int32_t     id;
+    NodePointer m_Nodes;
+    int32_t     m_Id;
 };
 
 template <typename T>
@@ -105,12 +105,12 @@ class List
 public:
     typedef ListIterator<T> Iterator;
 
-    List(size_t capacity = LIST_DEFAULT_CAPACITY) : size(0), capacity(capacity + 1), 
-                                                    head(0), tail(0), free(0)
+    List(size_t capacity = LIST_DEFAULT_CAPACITY) : m_Size(0), m_Capacity(capacity + 1), 
+                                                    m_Head(0), m_Tail(0), m_Free(0)
     {
-        assert(this->capacity);
+        assert(m_Capacity);
 
-        nodes = new ListNode<T>[this->capacity];
+        m_Nodes = new ListNode<T>[m_Capacity];
         updateFreeList();
     }
 
@@ -125,27 +125,27 @@ public:
 
     ~List()
     {
-        delete[] nodes;
+        delete[] m_Nodes;
     }
 
-    Iterator begin       ()       { return Iterator{nodes, head}; }
-    Iterator end         ()       { return Iterator{nodes, 0};    }
-    size_t   getSize     () const { return size;                  }
-    size_t   getCapacity () const { return capacity;              }
+    Iterator begin       ()       { return Iterator{m_Nodes, m_Head}; }
+    Iterator end         ()       { return Iterator{m_Nodes, 0};      }
+    size_t   getSize     () const { return m_Size;                    }
+    size_t   getCapacity () const { return m_Capacity;                }
 
     Iterator insert(Iterator it, const T& value)
     {
-        return Iterator{nodes, insertAfter(nodes[it.id].prev, value)};
+        return Iterator{m_Nodes, insertAfter(m_Nodes[it.id].prev, value)};
     }
 
     Iterator pushBack(const T& value)
     {
-        return Iterator{nodes, insertAfter(tail, value)};
+        return Iterator{m_Nodes, insertAfter(m_Tail, value)};
     }
 
     Iterator pushFront(const T& value)
     {
-        return Iterator{nodes, insertAfter(0, value)};
+        return Iterator{m_Nodes, insertAfter(0, value)};
     }
 
     void remove(Iterator iterator)
@@ -168,156 +168,151 @@ public:
 
     void popBack()
     {
-        remove(tail);
+        remove(m_Tail);
     }
 
     void popFront()
     {
-        remove(head);
+        remove(m_Head);
     }
 
     void clear()
     {
-        head           = 0;
-        tail           = 0;
-        free           = 1;
-        size           = 0;
+        m_Head           = 0;
+        m_Tail           = 0;
+        m_Free           = 1;
+        m_Size           = 0;
 
-        nodes[0].next  = 0;
-        nodes[0].prev  = 0;
+        m_Nodes[0].next  = 0;
+        m_Nodes[0].prev  = 0;
 
         updateFreeList(1);
     }
 
 private:
-    ListNode<T>* nodes;
-    size_t       size;
-    size_t       capacity;
+    ListNode<T>* m_Nodes;
+    size_t       m_Size;
+    size_t       m_Capacity;
 
-    int32_t      head;
-    int32_t      tail;
-    int32_t      free;
+    int32_t      m_Head;
+    int32_t      m_Tail;
+    int32_t      m_Free;
 
     void resize(size_t newCapacity)
     {
-        assert(newCapacity > capacity);
+        assert(newCapacity > m_Capacity);
 
         ListNode<T>* newNodes = new ListNode<T>[newCapacity];
-        memcpy(newNodes, nodes, capacity * sizeof(ListNode<T>));
+        memcpy(newNodes, m_Nodes, m_Capacity * sizeof(ListNode<T>));
 
-        delete[] nodes;
-        nodes = newNodes;
+        delete[] m_Nodes;
+        m_Nodes = newNodes;
 
-        size_t prevCapacity = capacity;
-        capacity = newCapacity;
+        size_t prevCapacity = m_Capacity;
+        m_Capacity = newCapacity;
 
         updateFreeList(prevCapacity);
     }
     
     void updateFreeList(int32_t begin = 1)
     {
-        if (free == 0) { free = begin; }
+        if (m_Free == 0) { m_Free = begin; }
 
-        for (size_t i = begin; i < capacity; ++i)
+        for (size_t i = begin; i < m_Capacity; ++i)
         {
-            nodes[i].prev = -1;
+            m_Nodes[i].prev = -1;
 
-            if (free == begin && i == capacity - 1)
+            if (m_Free == begin && i == m_Capacity - 1)
             {
-                nodes[i].next = 0;
+                m_Nodes[i].next = 0;
             }
-            else if (i == capacity - 1)
+            else if (i == m_Capacity - 1)
             {
-                nodes[i].next = free;
+                m_Nodes[i].next = m_Free;
             }
             else
             {
-                nodes[i].next = i + 1;
+                m_Nodes[i].next = i + 1;
             }
         }
     }
 
     int32_t insertAfter(int32_t id, const T& value)
     {
-        if (!(id >= 0 && id < capacity))
+        assert(id >= 0 && id < static_cast<int32_t>(m_Capacity));
+
+        if (m_Size == m_Capacity - 1)
         {
-            printf("insertAfter(id=%d)\n", id);
+            resize((double) m_Capacity * LIST_EXPAND_MULTIPLIER);
         }
 
-        assert(id >= 0 && id < capacity);
+        int32_t newFree = m_Nodes[m_Free].next;
 
-        if (size == capacity - 1)
+        if (m_Size == 0)
         {
-            resize((double) capacity * LIST_EXPAND_MULTIPLIER);
+            m_Nodes[m_Free].prev = 0;
+            m_Nodes[m_Free].next = 0;
+            m_Head               = m_Free;
+            m_Tail               = m_Free;
         }
-
-        int32_t newFree = nodes[free].next;
-
-        if (size == 0)
+        else if (id == m_Tail)
         {
-            nodes[free].prev = 0;
-            nodes[free].next = 0;
-            head             = free;
-            tail             = free;
-        }
-        else if (id == tail)
-        {
-            nodes[free].next = 0;
-            nodes[free].prev = tail;
-            nodes[tail].next = free;
-            tail             = free;
+            m_Nodes[m_Free].next = 0;
+            m_Nodes[m_Free].prev = m_Tail;
+            m_Nodes[m_Tail].next = m_Free;
+            m_Tail               = m_Free;
         }
         else if (id == 0)
         {
-            nodes[free].next = head;
-            nodes[free].prev = 0;
-            nodes[head].prev = free;
-            head             = free;
+            m_Nodes[m_Free].next = m_Head;
+            m_Nodes[m_Free].prev = 0;
+            m_Nodes[m_Head].prev = m_Free;
+            m_Head               = m_Free;
         }
         else
         {
-            nodes[free].next            = nodes[id].next;
-            nodes[free].prev            = id;
-            nodes[nodes[id].next].prev  = free;
-            nodes[id].next              = free;
+            m_Nodes[m_Free].next           = m_Nodes[id].next;
+            m_Nodes[m_Free].prev           = id;
+            m_Nodes[m_Nodes[id].next].prev = m_Free;
+            m_Nodes[id].next               = m_Free;
         }
 
-        int insertedId = free;
+        int insertedId = m_Free;
 
-        nodes[free].value = value;
-        free = newFree;
-        size++;
+        m_Nodes[m_Free].value = value;
+        m_Free = newFree;
+        m_Size++;
 
         return insertedId;
     }
 
     void remove(int32_t id)
     {
-        if (nodes[id].prev != 0)
+        if (m_Nodes[id].prev != 0)
         {
-            nodes[nodes[id].prev].next = nodes[id].next;
+            m_Nodes[m_Nodes[id].prev].next = m_Nodes[id].next;
         }
 
-        if (nodes[id].next != 0)
+        if (m_Nodes[id].next != 0)
         {
-            nodes[nodes[id].next].prev = nodes[id].prev;
+            m_Nodes[m_Nodes[id].next].prev = m_Nodes[id].prev;
         }
 
-        if (id == head)
+        if (id == m_Head)
         {
-            head = nodes[id].next;
+            m_Head = m_Nodes[id].next;
         }
 
-        if (id == tail)
+        if (id == m_Tail)
         {
-            tail = nodes[id].prev;
+            m_Tail = m_Nodes[id].prev;
         }
 
-        nodes[id].prev = -1;
-        nodes[id].next = free;
-        free           = id;
+        m_Nodes[id].prev = -1;
+        m_Nodes[id].next = m_Free;
+        m_Free           = id;
 
-        size--;
+        m_Size--;
     }
 };
 
