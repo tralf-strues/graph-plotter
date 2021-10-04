@@ -8,8 +8,8 @@ NoWarnings     =
 Mode = DEBUG_MODE
 # ----------------------------------Debug-mode----------------------------------
 ifeq ($(Mode), DEBUG_MODE)
-	ModeLinkerOptions   = -g
-	ModeCompilerOptions = -O0 -g
+	ModeLinkerOptions   = -g -fsanitize=address -fno-optimize-sibling-calls
+	ModeCompilerOptions = -O0 -g -fsanitize=address -fno-optimize-sibling-calls
 endif
 # ----------------------------------Debug-mode----------------------------------
 
@@ -22,6 +22,8 @@ endif
 
 # ------------------------------------Options-----------------------------------
 LIBS = sdl2 sdl2_ttf sdl2_image
+
+CXX = clang++
 
 LXXFLAGS = $(shell pkg-config --libs $(LIBS)) $(ModeLinkerOptions)
 CXXFLAGS = $(shell pkg-config --cflags $(LIBS)) $(ModeCompilerOptions) $(NoWarnings) -std=c++17

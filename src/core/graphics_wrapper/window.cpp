@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------
 
 #include <assert.h>
+#include <SDL_ttf.h>
 #include "window.h"
 
 Window::Window(size_t width, size_t height, const char* title) : width(width), height(height) 
@@ -85,6 +86,11 @@ bool initGraphics()
         return false;
     }
 
+    if (TTF_Init() == -1)
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -92,13 +98,3 @@ void quitGraphics()
 {
     SDL_Quit();
 }
-
-// FIXME:
-// void renderTexture(SDL_Renderer* renderer, SDL_Texture* texture, Rectangle renderRect)
-// {
-//     assert(renderer);
-//     assert(texture);
-
-//     SDL_Rect renderQuad = {renderRect.x, renderRect.y, renderRect.width, renderRect.height};
-// 	SDL_RenderCopy(renderer, texture, nullptr, &renderQuad);   
-// }

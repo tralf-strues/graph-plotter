@@ -24,7 +24,9 @@ struct InfLine
 };
 
 void renderRect(Renderer& renderer, const Rectangle& rect);
+void renderFilledRect(Renderer& renderer, const Rectangle& rect);
 void renderCircle(Renderer& renderer, const Circle& circle);
+void renderFilledCircle(Renderer& renderer, const Circle& circle);
 void renderInfLine(Renderer& renderer, const InfLine& infLine);
 
 #endif // PRIMITIVES_H

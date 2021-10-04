@@ -29,6 +29,15 @@ void renderRect(Renderer& renderer, const Rectangle& rect)
     renderLine(renderer, upperRightCorner, bottomRightCorner);
 }
 
+void renderFilledRect(Renderer& renderer, const Rectangle& rect)
+{
+    for (int32_t row = 0; row < rect.height; ++row)
+    {
+        renderLine(renderer, Vec2<int32_t>{rect.pos.x, rect.pos.y + row}, 
+                             Vec2<int32_t>{rect.pos.x + rect.width - 1, rect.pos.y + row});
+    }
+}
+
 void renderCircle(Renderer& renderer, const Circle& circle)
 {
     int32_t diameter = 2 * circle.radius;
@@ -62,6 +71,23 @@ void renderCircle(Renderer& renderer, const Circle& circle)
             --x;
             tx    += 2;
             error += (tx - diameter);
+        }
+    }
+}
+
+void renderFilledCircle(Renderer& renderer, const Circle& circle)
+{
+    for (int w = 0; w < 2 * circle.radius; w++)
+    {
+        for (int h = 0; h < 2 * circle.radius; h++)
+        {
+            int dx = circle.radius - w;
+            int dy = circle.radius - h;
+
+            if ((dx * dx + dy * dy) <= (circle.radius * circle.radius))
+            {
+                renderPoint(renderer, Vec2<int32_t>{circle.center.x + dx, circle.center.y + dy});
+            }
         }
     }
 }

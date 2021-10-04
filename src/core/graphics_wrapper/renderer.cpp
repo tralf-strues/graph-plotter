@@ -21,7 +21,7 @@ Renderer::Renderer(Window& window) : window(window)
 
 Renderer::~Renderer()
 {
-    SDL_DestroyRenderer(nativeRenderer);
+    // SDL_DestroyRenderer(nativeRenderer);
 }
 
 Color Renderer::getColor() const

@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
 #include <initializer_list>
@@ -36,7 +37,7 @@ public:
     typedef T&           Reference; 
     typedef ListNode<T>* NodePointer; 
 
-    ListIterator(NodePointer nodes, int32_t id) : nodes(nodes), id(id) {}
+    ListIterator(NodePointer nodes = nullptr, int32_t id = -1) : nodes(nodes), id(id) {}
 
     // Prefix
     ListIterator<T>& operator++()
@@ -105,11 +106,11 @@ public:
     typedef ListIterator<T> Iterator;
 
     List(size_t capacity = LIST_DEFAULT_CAPACITY) : size(0), capacity(capacity + 1), 
-                                                    head(-1), tail(-1), free(0)
+                                                    head(0), tail(0), free(0)
     {
-        assert(capacity);
+        assert(this->capacity);
 
-        nodes = new ListNode<T>[capacity];
+        nodes = new ListNode<T>[this->capacity];
         updateFreeList();
     }
 
@@ -238,6 +239,13 @@ private:
 
     int32_t insertAfter(int32_t id, const T& value)
     {
+        if (!(id >= 0 && id < capacity))
+        {
+            printf("insertAfter(id=%d)\n", id);
+        }
+
+        assert(id >= 0 && id < capacity);
+
         if (size == capacity - 1)
         {
             resize((double) capacity * LIST_EXPAND_MULTIPLIER);

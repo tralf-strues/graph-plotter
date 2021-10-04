@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------
 
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
+#include "../gui/button.h"
 #include "../core/utils/random.h"
 #include "simulator.h"
 
@@ -14,10 +15,12 @@ static const size_t   WINDOW_WIDTH            = 1200;
 static const size_t   WINDOW_HEIGHT           = 800;
 static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
+static const char*    FONT_FILENAME           = "../res/OpenSans-Bold.ttf";
+static const size_t   FONT_SIZE               = 16;
 static const Color    BACKGROUND_COLOR        = 0x02162E'FF; 
 static const Viewport VIEWPORT                = Viewport{{0, 0}, {30, 20}, {{50, 50}, 600, 400}};
-static const float    DELTA_TIME              = 3e-6;
-static const size_t   ELECTRONS_COUNT         = 15;
+static const float    DELTA_TIME              = 1e-6;
+static const size_t   ELECTRONS_COUNT         = 20;
 static const size_t   ATOMS_COUNT             = 25;
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
@@ -52,12 +55,25 @@ struct QuitListener : public IListener
     }
 };
 
+struct ButtonListener : public IListener
+{
+    void onEvent(const Event& event) override
+    {
+        assert(event.type == Event::GUI_BUTTON_PRESSED);
+
+        const EventButtonPressed& buttonEvent = (const EventButtonPressed&) event;
+        printf("Button pressed!\n");
+    }
+};
+
 int main()
 {
     initGraphics();
 
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
+
+    Font font{renderer, FONT_FILENAME, FONT_SIZE};
 
     bool running = true;
 
@@ -75,12 +91,12 @@ int main()
     Wall* wallLeft = new Wall();
     wallLeft->setPos(Vec2<float>{VIEWPORT.axesMin.x + 1, VIEWPORT.axesMin.y});
     wallLeft->setDirection(Vec2<float>{0, 1});
-    wallLeft->setElectricField(5e2);
+    wallLeft->setElectricField(7e2);
 
     Wall* wallRight = new Wall();
     wallRight->setPos(Vec2<float>{VIEWPORT.axesMax.x - 1, VIEWPORT.axesMin.y});
     wallRight->setDirection(Vec2<float>{0, 1});
-    wallRight->setElectricField(-5e2);
+    wallRight->setElectricField(-7e2);
 
     simulator.entities.pushBack(wallTop);
     simulator.entities.pushBack(wallBottom);
@@ -90,36 +106,42 @@ int main()
     generateParticles(simulator, ELECTRONS_COUNT, PhysEntity::ELECTRON);
     generateParticles(simulator, ATOMS_COUNT,     PhysEntity::ATOM);
 
-    /* ================ Events handling ================ */
     SystemEventManager eventManager{};
 
+    /* ================== GUI =================== */
+    Button button{Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN};
+    Text buttonLabel{renderer, "Hello!", font, COLOR_WHITE};
+    button.setLabel(&buttonLabel);
+    button.attachToSystemEventManager(eventManager);
+
+    ButtonListener buttonListener{};
+    button.attachListener({Event::GUI_BUTTON_PRESSED}, &buttonListener);
+
+    /* ============= Events handling ============ */
     QuitListener quitListener{running};
     eventManager.attachListener({Event::WINDOW_CLOSE, Event::KEYBOARD_PRESSED}, &quitListener);
 
-    /* ================ Main loop ================ */
+    /* ================ Main loop =============== */
     while (running)
     {
         uint32_t frameStartTime = SDL_GetTicks();
 
-        /* ================ Process events ================ */
         eventManager.proccessEvents();
 
-        /* ================ Update objects ================ */
         simulator.simulate(DELTA_TIME);
 
-        /* ================ Rendering ================ */
         renderer.setColor(BACKGROUND_COLOR);
         renderer.clear();
-
-        renderer.setColor(COLOR_RED);
 
         renderer.setClipRegion(VIEWPORT.windowArea);
         simulator.updateGraphics(renderer, VIEWPORT);
         renderer.resetClipRegion();
 
+        button.render(renderer);
+
         renderer.present();
 
-        /* ================ Update fps title ================ */
+        /* Update fps title */
         updateFpsTitle(window, SDL_GetTicks() - frameStartTime);
     }
 
@@ -172,7 +194,7 @@ void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type
             atom->setPos(pos);
             atom->setVelocity(velocity);
 
-            if (randomTry(0.1f))
+            if (randomTry(0.3f))
             {
                 atom->setCharge(-ELECTRON_CHARGE);
             }

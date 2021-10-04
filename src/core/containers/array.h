@@ -82,15 +82,14 @@ class Array
 public:
     typedef ArrayIterator<T> Iterator;
 
-    Array(size_t size)
+    Array(size_t size) : size(size)
     {
-        this->size = (size == 0) ? 1 : size;
+        assert(size);
 
-        data = new T[this->size];
+        data = new T[size];
     }
 
-    Array(std::initializer_list<T> init)
-        : Array(init.size())
+    Array(std::initializer_list<T> init) : Array(init.size())
     {
         auto arrayIt = begin();
         auto initIt  = init.begin();
@@ -123,6 +122,8 @@ public:
 
     T* getData() const
     {
+        assert(data);
+
         return data;
     }
 

@@ -10,11 +10,15 @@
 
 void Notifier::attachListener(const std::initializer_list<Event::Type>& events, IListener* listener)
 {
+    assert(listener);
+
     listeners.pushBack(ListenerInfo(events, listener));
 }
 
 void Notifier::detachListener(IListener* listener)
 {
+    assert(listener);
+
     for (ListIterator it = listeners.begin(); it != listeners.end(); ++it)
     {
         if (it->listener == listener)

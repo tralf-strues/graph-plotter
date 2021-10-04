@@ -54,7 +54,7 @@ float Electron::getEnergy() const
     float v = length(velocity);
 
     // FIXME:
-    printf("Electron energy = %f\n", mass * v * v / 2 + ELECTRON_ENERGY);
+    // printf("Electron energy = %f\n", mass * v * v / 2 + ELECTRON_ENERGY);
 
     return mass * v * v / 2 + ELECTRON_ENERGY;
 }
@@ -71,7 +71,7 @@ void Electron::updateGraphics(Renderer& renderer, const Viewport& viewport)
     Vec2<int32_t> circlePos    = viewport.toPixels(pos);
     int32_t       circleRadius = viewport.toPixels(radius);
 
-    renderCircle(renderer, {circlePos, circleRadius});
+    renderFilledCircle(renderer, {circlePos, circleRadius});
 }
 
 void Electron::setRadius(float radius)
@@ -139,7 +139,7 @@ float Atom::getEnergy() const
     float v = length(velocity);
 
     // FIXME:
-    printf("Atom energy = %lf\n", mass * v * v / 2 + abs(charge) * ELECTRON_ENERGY);
+    // printf("Atom energy = %lf\n", mass * v * v / 2 + abs(charge) * ELECTRON_ENERGY);
 
     return mass * v * v / 2 + abs(charge) * ELECTRON_ENERGY;
 }
@@ -168,7 +168,7 @@ void Atom::updateGraphics(Renderer& renderer, const Viewport& viewport)
                              (float) (rectSize / 2) * Vec2<float>{1, 1};
 
     Rectangle rect{rectPos, rectSize, rectSize};
-    renderRect(renderer, rect);
+    renderFilledRect(renderer, rect);
 }
 
 void Atom::setSize(float size)

@@ -27,6 +27,9 @@ struct Event
         /* Keyboard events */
         KEYBOARD_PRESSED,
 
+        /* GUI */
+        GUI_BUTTON_PRESSED,
+
         TOTAL_TYPES
     };
 

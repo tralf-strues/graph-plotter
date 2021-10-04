@@ -29,13 +29,15 @@ public:
     {
         assert(capacity != 0);
 
-        data = (T*) calloc(capacity, sizeof(T));
+        data = new T[capacity];
         assert(data);
     }
 
     DynamicArray(std::initializer_list<T> init)
         : DynamicArray(init.size() == 0 ? DYNAMIC_ARRAY_DEFAULT_CAPACITY : init.size())
     {
+        assert(capacity != 0);
+
         for (auto value : init)
         {
             pushBack(value);
@@ -44,7 +46,8 @@ public:
 
     ~DynamicArray()
     {
-        free(data);
+        assert(data);
+        delete[] data;
 
         capacity = 0;
         size     = 0;

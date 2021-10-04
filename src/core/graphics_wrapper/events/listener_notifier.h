@@ -23,7 +23,8 @@ public:
 class Notifier
 {
 public:
-    virtual void attachListener(const std::initializer_list<Event::Type>& events, IListener* listener);
+    virtual void attachListener(const std::initializer_list<Event::Type>& events, 
+                                IListener* listener);
     virtual void detachListener(IListener* listener);
 
 protected:
@@ -40,7 +41,8 @@ protected:
             }
         }
 
-        ListenerInfo(const std::initializer_list<Event::Type>& events, IListener* listener = nullptr)
+        ListenerInfo(const std::initializer_list<Event::Type>& events, 
+                     IListener* listener = nullptr)
             : ListenerInfo(listener) 
         {
             assert(events.size() <= MAX_LISTENED_EVENTS);

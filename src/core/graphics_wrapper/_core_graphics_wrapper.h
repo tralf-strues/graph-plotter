@@ -15,6 +15,7 @@
 #include "window.h"
 #include "texture.h"
 #include "renderer.h"
+#include "text.h"
 #include "primitives.h"
 
 #include "events/event.h"

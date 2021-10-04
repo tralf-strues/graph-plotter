@@ -10,6 +10,7 @@
 #define COLOR_H
 
 #include <stdint.h>
+#include <SDL.h>
 
 typedef uint32_t Color;
 
@@ -31,6 +32,14 @@ static const Color COLOR_YELLOW = 0xFF'FF'00'FF;
 //! @return Created rgba color. 
 //------------------------------------------------------------------------------
 Color rgbaColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
+//------------------------------------------------------------------------------
+//! @brief Get the system level color object.
+//! 
+//! @param color
+//! @return System level color. 
+//------------------------------------------------------------------------------
+SDL_Color getSystemColor(Color color);
 
 //------------------------------------------------------------------------------
 //! @param color

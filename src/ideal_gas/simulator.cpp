@@ -80,19 +80,6 @@ void Simulator::simulate(float deltaTime)
     {
         for (EntitiesIterator second = first; (++second) != entities.end();)
         {
-            distantInteract(*first, *second, deltaTime);
-        }
-    }
-
-    for (PhysEntity* entity : entities)
-    {
-        entity->move(deltaTime);
-    }
-
-    for (EntitiesIterator first = entities.begin(); first != entities.end(); ++first)
-    {
-        for (EntitiesIterator second = first; (++second) != entities.end();)
-        {
             Collision collision{entities.begin(), entities.begin()};
             
             if (collisionDetect(first, second, deltaTime, &collision))
@@ -108,6 +95,19 @@ void Simulator::simulate(float deltaTime)
         {
             collisionRespond(collisions[i]);
         }
+    }
+
+    for (EntitiesIterator first = entities.begin(); first != entities.end(); ++first)
+    {
+        for (EntitiesIterator second = first; (++second) != entities.end();)
+        {
+            distantInteract(*first, *second, deltaTime);
+        }
+    }
+
+    for (PhysEntity* entity : entities)
+    {
+        entity->move(deltaTime);
     }
 }
 

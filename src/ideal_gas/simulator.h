@@ -17,7 +17,7 @@
 typedef List<PhysEntity*>::Iterator EntitiesIterator;
 
 static const float ATOM_DENSITY                      = 1e-3;
-static const float ENERGY_THRESHOLD_ELECTRON_CAPTURE = 1e5;
+static const float ENERGY_THRESHOLD_ELECTRON_CAPTURE = 3e6;
 static const float MASS_THRESHOLD_ATOMS_COMBINE      = 5e-3;
 static const float MASS_THRESHOLD_ATOMS_BREAK        = 1e-2;
 static const float RADIUS_BROKEN_ATOM                = 0.7f;
@@ -29,6 +29,7 @@ struct Collision
     EntitiesIterator second;
 
     Collision(const EntitiesIterator& first, const EntitiesIterator& second);
+    Collision() = default;
 };
 
 class Simulator
