@@ -11,7 +11,9 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 #include <inttypes.h>
+#include <initializer_list>
 
 static const size_t LIST_DEFAULT_CAPACITY  = 8;
 static const double LIST_EXPAND_MULTIPLIER = 1.8;
@@ -111,6 +113,15 @@ public:
         updateFreeList();
     }
 
+    List(std::initializer_list<T> init)
+        : List(init.size() == 0 ? LIST_DEFAULT_CAPACITY : init.size())
+    {
+        for (auto value : init)
+        {
+            pushBack(value);
+        }
+    }
+
     ~List()
     {
         delete[] nodes;
@@ -141,6 +152,19 @@ public:
         remove(iterator.getId());
     }
 
+    Iterator find(const T& value)
+    {
+        for (Iterator it = begin(); it != end(); ++it)
+        {
+            if (*it == value)
+            {
+                return it;
+            }
+        }
+
+        return end();
+    }
+
     void popBack()
     {
         remove(tail);
@@ -162,22 +186,6 @@ public:
         nodes[0].prev  = 0;
 
         updateFreeList(1);
-    }
-
-    Iterator find(const T& value)
-    {
-        int curId = head;
-        for (size_t i = 1; i <= size; i++)
-        {
-            if (nodes[curId].value == value)
-            {
-                return {nodes, curId};
-            }
-
-            curId = nodes[curId].next;
-        }
-
-        return end();
     }
 
 private:

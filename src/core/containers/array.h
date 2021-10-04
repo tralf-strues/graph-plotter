@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <initializer_list>
 
 template <typename T>
 class ArrayIterator
@@ -81,19 +82,33 @@ class Array
 public:
     typedef ArrayIterator<T> Iterator;
 
-    Array(size_t size) : size(size)
+    Array(size_t size)
     {
-        assert(size != 0);
+        this->size = (size == 0) ? 1 : size;
 
-        data = (T*) calloc(size, sizeof(T));
-        assert(data);
+        data = new T[this->size];
     }
+
+    Array(std::initializer_list<T> init)
+        : Array(init.size())
+    {
+        auto arrayIt = begin();
+        auto initIt  = init.begin();
+
+        while (arrayIt != end())
+        {
+            *arrayIt = *initIt;
+            ++arrayIt;
+            ++initIt;
+        }
+    }
+
+    Array() : Array(1) {}
 
     ~Array()
     {
-        free(data);
-
-        size = 0;
+        assert(data);
+        delete[] data;
     }
 
     T& operator[](size_t i)

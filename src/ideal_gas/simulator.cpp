@@ -465,7 +465,6 @@ bool chemicalReactionAtomAtom(List<PhysEntity*>& entities, Collision& collision)
     if (firstAtom->getCharge() == 0 && secondAtom->getCharge() == 0)
     {
         float sumMass = firstAtom->getMass() + secondAtom->getMass();
-        printf("sumMass = %lf\n", sumMass);
 
         if (sumMass >= MASS_THRESHOLD_ATOMS_BREAK)
         {

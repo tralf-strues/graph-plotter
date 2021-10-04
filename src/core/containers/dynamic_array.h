@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <initializer_list>
 #include "array.h"
 
 static const double DYNAMIC_ARRAY_EXPAND_MULT      = 1.8; ///< Expand multiplier for data realloc.
@@ -30,6 +31,15 @@ public:
 
         data = (T*) calloc(capacity, sizeof(T));
         assert(data);
+    }
+
+    DynamicArray(std::initializer_list<T> init)
+        : DynamicArray(init.size() == 0 ? DYNAMIC_ARRAY_DEFAULT_CAPACITY : init.size())
+    {
+        for (auto value : init)
+        {
+            pushBack(value);
+        }
     }
 
     ~DynamicArray()

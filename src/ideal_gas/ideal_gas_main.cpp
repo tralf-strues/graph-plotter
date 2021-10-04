@@ -23,12 +23,43 @@ static const size_t   ATOMS_COUNT             = 25;
 void updateFpsTitle(Window& window, uint32_t frameTime);
 void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type);
 
+struct QuitListener : public IListener
+{
+    bool& running;
+    QuitListener(bool& running) : running(running) {}
+
+    void onEvent(const Event& event) override
+    {
+        switch (event.type)
+        {
+            case Event::WINDOW_CLOSE:
+            { 
+                running = false;
+                break;
+            }
+
+            case Event::KEYBOARD_PRESSED:
+            {
+                if (((const EventKeyboardPressed&) event).scancode == SCANCODE_ESCAPE)
+                {
+                    running = false;
+                }
+                break;
+            }
+
+            default: { break; }
+        }
+    }
+};
+
 int main()
 {
     initGraphics();
 
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     Renderer renderer(window);
+
+    bool running = true;
 
     Simulator simulator;
 
@@ -59,38 +90,19 @@ int main()
     generateParticles(simulator, ELECTRONS_COUNT, PhysEntity::ELECTRON);
     generateParticles(simulator, ATOMS_COUNT,     PhysEntity::ATOM);
 
-    /* ================ Main loop ================ */
-    SDL_Event event   = {};
-    bool      running = true;
+    /* ================ Events handling ================ */
+    SystemEventManager eventManager{};
 
+    QuitListener quitListener{running};
+    eventManager.attachListener({Event::WINDOW_CLOSE, Event::KEYBOARD_PRESSED}, &quitListener);
+
+    /* ================ Main loop ================ */
     while (running)
     {
         uint32_t frameStartTime = SDL_GetTicks();
 
         /* ================ Process events ================ */
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-                case SDL_QUIT: 
-                { 
-                    running = false; 
-                    break; 
-                }
-
-                case SDL_KEYDOWN:
-                {
-                    if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-                    {
-                        running = false;
-                    }
-
-                    break;
-                }
-
-                default: { break; }
-            }
-        }
+        eventManager.proccessEvents();
 
         /* ================ Update objects ================ */
         simulator.simulate(DELTA_TIME);
@@ -139,8 +151,8 @@ void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type
         float radius = randomFromInterval<float>(0.4, 1.2);
         float volume = calculateSphereVolume(radius);
 
-        Vec2<float> pos{randomFromInterval<float>(radius, VIEWPORT.getRelativeWidth()  - radius),
-                        randomFromInterval<float>(radius, VIEWPORT.getRelativeHeight() - radius)};
+        Vec2<float> pos{randomFromInterval<float>(2 * radius, VIEWPORT.getRelativeWidth()  - 2 * radius),
+                        randomFromInterval<float>(2 * radius, VIEWPORT.getRelativeHeight() - 2 * radius)};
 
         Vec2<float> velocity{randomFromInterval<float>(-3e4, 3e4),
                              randomFromInterval<float>(-3e4, 3e4)};

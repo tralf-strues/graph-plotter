@@ -17,4 +17,8 @@
 #include "renderer.h"
 #include "primitives.h"
 
+#include "events/event.h"
+#include "events/scancode.h"
+#include "events/system_event_manager.h"
+
 #endif // CORE_GRAPHICS_WRAPPER_H
