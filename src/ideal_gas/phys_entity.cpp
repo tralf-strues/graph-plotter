@@ -98,7 +98,18 @@ void Wall::move(float deltaTime)
 
 void Wall::updateGraphics(Renderer& renderer, const Viewport& viewport)
 {
-    renderer.setColor(COLOR_WALL);
+    Color color = COLOR_WALL_NEUTRAL;
+
+    if (m_ElectricField > 0)
+    {
+        color = COLOR_WALL_POSITIVE;
+    }
+    else if (m_ElectricField < 0)
+    {
+        color = COLOR_WALL_NEGATIVE;
+    }
+
+    renderer.setColor(color);
 
     InfLine line;
     line.from      = viewport.toPixels(m_Pos);

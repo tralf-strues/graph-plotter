@@ -20,7 +20,7 @@ static const char*    FONT_FILENAME           = "../res/OpenSans-Bold.ttf";
 static const size_t   FONT_SIZE               = 16;
 static const Color    BACKGROUND_COLOR        = 0x02162E'FF; 
 static const Viewport VIEWPORT                = Viewport{{0, 0}, {30, 20}, {{50, 50}, 600, 400}};
-static const float    DELTA_TIME              = 1e-6;
+static const float    DELTA_TIME              = 5e-7;
 static const size_t   ELECTRONS_COUNT         = 20;
 static const size_t   ATOMS_COUNT             = 25;
 
@@ -84,22 +84,22 @@ int main()
 
     /* ================ Entities ================ */
     Wall* wallTop = new Wall();
-    wallTop->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y - 1});
+    wallTop->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMax.y});
     wallTop->setDirection(Vec2<float>{1, 0});
 
     Wall* wallBottom = new Wall();
-    wallBottom->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y + 1});
+    wallBottom->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
     wallBottom->setDirection(Vec2<float>{1, 0});
 
     Wall* wallLeft = new Wall();
-    wallLeft->setPos(Vec2<float>{VIEWPORT.axesMin.x + 1, VIEWPORT.axesMin.y});
+    wallLeft->setPos(Vec2<float>{VIEWPORT.axesMin.x, VIEWPORT.axesMin.y});
     wallLeft->setDirection(Vec2<float>{0, 1});
-    wallLeft->setElectricField(7e2);
+    wallLeft->setElectricField(1e3);
 
     Wall* wallRight = new Wall();
-    wallRight->setPos(Vec2<float>{VIEWPORT.axesMax.x - 1, VIEWPORT.axesMin.y});
+    wallRight->setPos(Vec2<float>{VIEWPORT.axesMax.x, VIEWPORT.axesMin.y});
     wallRight->setDirection(Vec2<float>{0, 1});
-    wallRight->setElectricField(-7e2);
+    wallRight->setElectricField(-1e3);
 
     simulator.entities.pushBack(wallTop);
     simulator.entities.pushBack(wallBottom);
@@ -143,7 +143,8 @@ int main()
         renderer.setColor(BACKGROUND_COLOR);
         renderer.clear();
 
-        renderer.setClipRegion(VIEWPORT.windowArea);
+        renderer.setClipRegion(Rectangle{VIEWPORT.windowArea.pos, VIEWPORT.windowArea.width  + 1,
+                                                                  VIEWPORT.windowArea.height + 1});
         simulator.updateGraphics(renderer, VIEWPORT);
         renderer.resetClipRegion();
 
@@ -156,7 +157,7 @@ int main()
         updateFpsTitle(window, SDL_GetTicks() - frameStartTime);
 
         // FIXME:
-        SDL_Delay(50);
+        // SDL_Delay(50);
     }
 
     quitGraphics();

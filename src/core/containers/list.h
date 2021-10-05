@@ -20,14 +20,7 @@ static const size_t LIST_DEFAULT_CAPACITY  = 8;
 static const double LIST_EXPAND_MULTIPLIER = 1.8;
 
 template <typename T>
-struct ListNode
-{
-    T       value;
-    int32_t prev;
-    int32_t next;
-
-    ListNode(int32_t prev = -1, int32_t next = -1) : prev(prev), next(next) {}
-};
+class List;
 
 template <typename T>
 class ListIterator
@@ -35,14 +28,15 @@ class ListIterator
 public:
     typedef T*           Pointer; 
     typedef T&           Reference; 
-    typedef ListNode<T>* NodePointer; 
+    // typedef ListNode<T>* NodePointer;
+    typedef List<T>*     ListPointer;
 
-    ListIterator(NodePointer nodes = nullptr, int32_t id = -1) : m_Nodes(nodes), m_Id(id) {}
+    ListIterator(ListPointer list = nullptr, int32_t id = -1) : m_List(list), m_Id(id) {}
 
     // Prefix
     ListIterator<T>& operator++()
     {
-        m_Id = m_Nodes[m_Id].next;
+        m_Id = m_List->m_Nodes[m_Id].next;
         return *this;
     }
 
@@ -57,7 +51,7 @@ public:
     // Prefix
     ListIterator<T>& operator--()
     {
-        m_Id = m_Nodes[m_Id].prev;
+        m_Id = m_List->m_Nodes[m_Id].prev;
         return *this;
     }
 
@@ -71,17 +65,17 @@ public:
 
     Reference operator*()
     {
-        return m_Nodes[m_Id].value;
+        return m_List->m_Nodes[m_Id].value;
     }
 
     Pointer operator->()
     {
-        return &m_Nodes[m_Id].value;
+        return &m_List->m_Nodes[m_Id].value;
     }
 
     bool operator==(const ListIterator<T>& second)
     {
-        return m_Nodes == second.m_Nodes && m_Id == second.m_Id;
+        return m_List->m_Nodes == second.m_List->m_Nodes && m_Id == second.m_Id;
     }
 
     bool operator!=(const ListIterator<T>& second)
@@ -95,22 +89,33 @@ public:
     }
 
 private:
-    NodePointer m_Nodes;
+    ListPointer m_List;
     int32_t     m_Id;
 };
 
 template <typename T>
 class List
 {
+private:
+    struct ListNode
+    {
+        T       value;
+        int32_t prev;
+        int32_t next;
+
+        ListNode(int32_t prev = -1, int32_t next = -1) : prev(prev), next(next) {}
+    };
+
 public:
     typedef ListIterator<T> Iterator;
+    friend ListIterator<T>;
 
     List(size_t capacity = LIST_DEFAULT_CAPACITY) : m_Size(0), m_Capacity(capacity + 1), 
                                                     m_Head(0), m_Tail(0), m_Free(0)
     {
         assert(m_Capacity);
 
-        m_Nodes = new ListNode<T>[m_Capacity];
+        m_Nodes = new ListNode[m_Capacity];
         updateFreeList();
     }
 
@@ -128,24 +133,24 @@ public:
         delete[] m_Nodes;
     }
 
-    Iterator begin       ()       { return Iterator{m_Nodes, m_Head}; }
-    Iterator end         ()       { return Iterator{m_Nodes, 0};      }
+    Iterator begin       ()       { return Iterator{this, m_Head}; }
+    Iterator end         ()       { return Iterator{this, 0};      }
     size_t   getSize     () const { return m_Size;                    }
     size_t   getCapacity () const { return m_Capacity;                }
 
     Iterator insert(Iterator it, const T& value)
     {
-        return Iterator{m_Nodes, insertAfter(m_Nodes[it.id].prev, value)};
+        return Iterator{this, insertAfter(m_Nodes[it.id].prev, value)};
     }
 
     Iterator pushBack(const T& value)
     {
-        return Iterator{m_Nodes, insertAfter(m_Tail, value)};
+        return Iterator{this, insertAfter(m_Tail, value)};
     }
 
     Iterator pushFront(const T& value)
     {
-        return Iterator{m_Nodes, insertAfter(0, value)};
+        return Iterator{this, insertAfter(0, value)};
     }
 
     void remove(Iterator iterator)
@@ -190,20 +195,20 @@ public:
     }
 
 private:
-    ListNode<T>* m_Nodes;
-    size_t       m_Size;
-    size_t       m_Capacity;
+    ListNode* m_Nodes;
+    size_t    m_Size;
+    size_t    m_Capacity;
 
-    int32_t      m_Head;
-    int32_t      m_Tail;
-    int32_t      m_Free;
+    int32_t   m_Head;
+    int32_t   m_Tail;
+    int32_t   m_Free;
 
     void resize(size_t newCapacity)
     {
         assert(newCapacity > m_Capacity);
 
-        ListNode<T>* newNodes = new ListNode<T>[newCapacity];
-        memcpy(newNodes, m_Nodes, m_Capacity * sizeof(ListNode<T>));
+        ListNode* newNodes = new ListNode[newCapacity];
+        memcpy(newNodes, m_Nodes, m_Capacity * sizeof(ListNode));
 
         delete[] m_Nodes;
         m_Nodes = newNodes;

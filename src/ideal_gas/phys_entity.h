@@ -14,7 +14,10 @@
 typedef int8_t Charge;
 
 static const Color COLOR_ELECTRON = 0x7A'6D'C1'FF;
-static const Color COLOR_WALL     = COLOR_RED;
+
+static const Color COLOR_WALL_NEUTRAL  = 0xF6'E4'92'FF;
+static const Color COLOR_WALL_POSITIVE = 0xE6'96'A8'FF;
+static const Color COLOR_WALL_NEGATIVE = 0xA2'99'D4'FF;
 
 static const Color COLOR_ATOM_NEUTRAL  = 0xF6'E4'92'FF;
 static const Color COLOR_ATOM_POSITIVE = 0xE6'96'A8'FF;
