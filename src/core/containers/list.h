@@ -31,7 +31,7 @@ public:
     // typedef ListNode<T>* NodePointer;
     typedef List<T>*     ListPointer;
 
-    ListIterator(ListPointer list = nullptr, int32_t id = -1) : m_List(list), m_Id(id) {}
+    ListIterator(ListPointer list = nullptr, int32_t id = 0) : m_List(list), m_Id(id) {}
 
     // Prefix
     ListIterator<T>& operator++()
@@ -103,7 +103,7 @@ private:
         int32_t prev;
         int32_t next;
 
-        ListNode(int32_t prev = -1, int32_t next = -1) : prev(prev), next(next) {}
+        ListNode(int32_t prev = 0, int32_t next = 0) : prev(prev), next(next) {}
     };
 
 public:
@@ -313,7 +313,7 @@ private:
             m_Tail = m_Nodes[id].prev;
         }
 
-        m_Nodes[id].prev = -1;
+        m_Nodes[id].prev = 0;
         m_Nodes[id].next = m_Free;
         m_Free           = id;
 

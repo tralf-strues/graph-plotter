@@ -12,15 +12,16 @@
 #include "../core/utils/random.h"
 #include "simulator.h"
 
-static const size_t   WINDOW_WIDTH            = 1200;
-static const size_t   WINDOW_HEIGHT           = 800;
+static const size_t   WINDOW_WIDTH            = 1400;
+static const size_t   WINDOW_HEIGHT           = 700;
 static const char*    WINDOW_TITLE            = "Ideal gas simulation";
 static const size_t   MAX_WINDOW_TITLE_LENGTH = 128;
 static const char*    FONT_FILENAME           = "../res/OpenSans-Bold.ttf";
 static const size_t   FONT_SIZE               = 16;
 static const Color    BACKGROUND_COLOR        = 0x02162E'FF; 
 static const Viewport VIEWPORT                = Viewport{{0, 0}, {30, 20}, {{50, 50}, 600, 400}};
-static const float    DELTA_TIME              = 5e-7;
+static const float    DELTA_TIME              = 1e-6;
+static const float    TIME_SCALE              = 1e-7; // simulation time passed after 1 real millisecond
 static const size_t   ELECTRONS_COUNT         = 20;
 static const size_t   ATOMS_COUNT             = 25;
 
@@ -131,6 +132,7 @@ int main()
     eventManager.attachListener({Event::WINDOW_CLOSE, Event::KEYBOARD_PRESSED}, &quitListener);
 
     /* ================ Main loop =============== */
+    uint32_t frameTime = 0;
     while (running)
     {
         uint32_t frameStartTime = SDL_GetTicks();
@@ -138,6 +140,8 @@ int main()
         eventManager.proccessEvents();
 
         simulator.simulate(DELTA_TIME);
+        // simulator.simulate(frameTime * TIME_SCALE); FIXME:
+
         activityMonitor.addSample(randomFromInterval(0, 10));
 
         renderer.setColor(BACKGROUND_COLOR);
@@ -154,7 +158,8 @@ int main()
         renderer.present();
 
         /* Update fps title */
-        updateFpsTitle(window, SDL_GetTicks() - frameStartTime);
+        frameTime = SDL_GetTicks() - frameStartTime;
+        updateFpsTitle(window, frameTime);
 
         // FIXME:
         // SDL_Delay(50);

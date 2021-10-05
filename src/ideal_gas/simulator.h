@@ -22,6 +22,7 @@ static const float MASS_THRESHOLD_ATOMS_COMBINE      = 5e-3;
 static const float MASS_THRESHOLD_ATOMS_BREAK        = 1e-2;
 static const float RADIUS_BROKEN_ATOM                = 0.7f;
 static const float VOLUME_BROKEN_ATOM                = calculateSphereVolume(RADIUS_BROKEN_ATOM);
+static const float WALL_BOUNCE_VELOCITY_PERCENTAGE   = 0.2f;
 
 struct Collision
 {

@@ -360,6 +360,11 @@ void collisionRespondElectronWall(Collision& collision)
     float       vAlong         = dotProduct(electron->getVelocity(), along);
     Vec2<float> vPerpendicular = electron->getVelocity() - vAlong * along;
 
+    // Vec2<float> toWall = electron->getPos() - wall->getPos() - 
+    //                      dotProduct(electron->getPos() - wall->getPos(), along) * along;
+
+    // vPerpendicular += toWall * length(electron->getVelocity()) * WALL_BOUNCE_VELOCITY_PERCENTAGE;
+
     electron->setVelocity(vAlong * along - vPerpendicular);
 }
 
@@ -372,6 +377,11 @@ void collisionRespondWallAtom(Collision& collision)
 
     float       vAlong         = dotProduct(atom->getVelocity(), along);
     Vec2<float> vPerpendicular = atom->getVelocity() - vAlong * along;
+
+    // Vec2<float> toWall = atom->getPos() - wall->getPos() - 
+    //                      dotProduct(atom->getPos() - wall->getPos(), along) * along;
+
+    // vPerpendicular += toWall * length(atom->getVelocity()) * WALL_BOUNCE_VELOCITY_PERCENTAGE;
 
     atom->setVelocity(vAlong * along - vPerpendicular);
 }
