@@ -11,17 +11,26 @@
 
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
 
-struct GUIComponent : protected IListener
+class GUIComponent
 {
-    Vec2<int32_t> pos;
+public:
+    GUIComponent(const Vec2<int32_t>& pos);
 
-    GUIComponent(const Vec2<int32_t>& pos) : pos(pos) {}
+    const Vec2<int32_t>& getPos() const;
+    void setPos(const Vec2<int32_t>& pos);
 
-    virtual void attachToSystemEventManager(SystemEventManager& manager) = 0;
     virtual void render(Renderer& renderer) = 0;
 
 protected:
-    
+    Vec2<int32_t> m_Pos;
+};
+
+class SystemEventManagerListener : protected IListener
+{
+public:
+    virtual void attachToSystemEventManager(SystemEventManager& manager) = 0;
+
+protected:
     /* IListener */
     virtual void onEvent(const Event& event) = 0;
 };

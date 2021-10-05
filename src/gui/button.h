@@ -12,34 +12,47 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-struct Button;
+class GUIButton;
 
 struct EventButtonPressed : public Event
 {
-    Button* button;
+    GUIButton* button;
 
-    EventButtonPressed(Button* button);
+    EventButtonPressed(GUIButton* button);
 };
 
-struct Button : public GUIComponent, public Notifier
+class GUIButton : public GUIComponent, public SystemEventManagerListener, public Notifier
 {
-    size_t      width;
-    size_t      height;
-    Color       color;
-    const Text* label;
-
-    Button(const Vec2<int32_t>& pos,
+public:
+    GUIButton(const Vec2<int32_t>& pos,
            size_t width, size_t height,
            Color color = COLOR_BLACK);
 
+    size_t getWidth() const;
+    void setWidth(size_t width);
+
+    size_t getHeight() const;
+    void setHeight(size_t height);
+
+    Color getColor() const;
+    void setColor(Color color);
+
+    const Text* getLabe() const;
     void setLabel(const Text* label);
 
-    /* GUIComponent */
+    /* SystemEventManagerListener */
     void attachToSystemEventManager(SystemEventManager& manager) override;
+
+    /* GUIComponent */
     void render(Renderer& renderer) override;
 
 protected:
-    /* IListener */
+    size_t      m_Width;
+    size_t      m_Height;
+    Color       m_Color;
+    const Text* m_Label;
+
+    /* SystemEventManagerListener */
     void onEvent(const Event& event) override;
 };
 

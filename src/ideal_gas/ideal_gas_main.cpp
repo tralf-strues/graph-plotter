@@ -8,6 +8,7 @@
 
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
 #include "../gui/button.h"
+#include "../gui/activity_monitor.h"
 #include "../core/utils/random.h"
 #include "simulator.h"
 
@@ -22,6 +23,8 @@ static const Viewport VIEWPORT                = Viewport{{0, 0}, {30, 20}, {{50,
 static const float    DELTA_TIME              = 1e-6;
 static const size_t   ELECTRONS_COUNT         = 20;
 static const size_t   ATOMS_COUNT             = 25;
+
+static const Viewport ACTIVITY_MONITOR_VIEWPORT = Viewport{{0, 0}, {20, 10}, {{600, 600}, 400, 200}};
 
 void updateFpsTitle(Window& window, uint32_t frameTime);
 void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type);
@@ -62,7 +65,7 @@ struct ButtonListener : public IListener
         assert(event.type == Event::GUI_BUTTON_PRESSED);
 
         const EventButtonPressed& buttonEvent = (const EventButtonPressed&) event;
-        printf("Button pressed!\n");
+        printf("GUIButton pressed!\n");
     }
 };
 
@@ -109,13 +112,15 @@ int main()
     SystemEventManager eventManager{};
 
     /* ================== GUI =================== */
-    Button button{Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN};
+    GUIButton button{Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN};
     Text buttonLabel{renderer, "Hello!", font, COLOR_WHITE};
     button.setLabel(&buttonLabel);
     button.attachToSystemEventManager(eventManager);
 
     ButtonListener buttonListener{};
     button.attachListener({Event::GUI_BUTTON_PRESSED}, &buttonListener);
+
+    GUIActivityMonitor activityMonitor{ACTIVITY_MONITOR_VIEWPORT, 50};
 
     /* ============= Events handling ============ */
     QuitListener quitListener{running};
@@ -129,6 +134,7 @@ int main()
         eventManager.proccessEvents();
 
         simulator.simulate(DELTA_TIME);
+        activityMonitor.addSample(randomFromInterval(0, 10));
 
         renderer.setColor(BACKGROUND_COLOR);
         renderer.clear();
@@ -138,11 +144,15 @@ int main()
         renderer.resetClipRegion();
 
         button.render(renderer);
+        activityMonitor.render(renderer);
 
         renderer.present();
 
         /* Update fps title */
         updateFpsTitle(window, SDL_GetTicks() - frameStartTime);
+
+        // FIXME:
+        SDL_Delay(50);
     }
 
     quitGraphics();

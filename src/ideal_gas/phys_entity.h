@@ -9,7 +9,7 @@
 #ifndef PHYS_ENTITY_H
 #define PHYS_ENTITY_H
 
-#include "viewport.h"
+#include "../core/utils/viewport.h"
 
 typedef int8_t Charge;
 

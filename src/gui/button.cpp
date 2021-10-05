@@ -8,56 +8,89 @@
 
 #include "button.h"
 
-EventButtonPressed::EventButtonPressed(Button* button)
+EventButtonPressed::EventButtonPressed(GUIButton* button)
     : Event(Event::GUI_BUTTON_PRESSED), button(button)
 {
     assert(button);
 }
 
-Button::Button(const Vec2<int32_t>& pos,
-               size_t width, size_t height,
-               Color color)
-    : GUIComponent(pos), width(width), height(height), color(color), label(nullptr)
+GUIButton::GUIButton(const Vec2<int32_t>& pos, size_t width, size_t height, Color color)
+    : GUIComponent(pos), m_Width(width), m_Height(height), m_Color(color), m_Label(nullptr)
 {}
 
-void Button::setLabel(const Text* label)
+size_t GUIButton::getWidth() const
+{
+    return m_Width;
+}
+
+void GUIButton::setWidth(size_t width)
+{
+    m_Width = width;
+}
+
+size_t GUIButton::getHeight() const
+{
+    return m_Height;
+}
+
+void GUIButton::setHeight(size_t height)
+{
+    m_Height = height;
+}
+
+Color GUIButton::getColor() const
+{
+    return m_Color;
+}
+
+void GUIButton::setColor(Color color)
+{
+    m_Color = color;
+}
+
+const Text* GUIButton::getLabe() const
+{
+    return m_Label;
+}
+
+void GUIButton::setLabel(const Text* label)
 {
     assert(label);
 
-    this->label = label;
+    m_Label = label;
 }
 
-void Button::onEvent(const Event& event)
+void GUIButton::onEvent(const Event& event)
 {
     assert(event.type == Event::MOUSE_BUTTON_PRESSED);
 
     const EventMouseButton& mouseEvent = (const EventMouseButton&) event;
 
-    if (mouseEvent.clickX >= pos.x && mouseEvent.clickX < pos.x + static_cast<int32_t>(width) &&
-        mouseEvent.clickY >= pos.y && mouseEvent.clickY < pos.y + static_cast<int32_t>(height))
+    if (mouseEvent.clickX >= m_Pos.x && mouseEvent.clickX < m_Pos.x + static_cast<int32_t>(m_Width) &&
+        mouseEvent.clickY >= m_Pos.y && mouseEvent.clickY < m_Pos.y + static_cast<int32_t>(m_Height))
     {
         EventButtonPressed eventButtonPressed{this};
         notify(eventButtonPressed);
     }
 }
 
-void Button::attachToSystemEventManager(SystemEventManager& manager)
+void GUIButton::attachToSystemEventManager(SystemEventManager& manager)
 {
     manager.attachListener({Event::MOUSE_BUTTON_PRESSED}, this);
 }
 
-void Button::render(Renderer& renderer)
+void GUIButton::render(Renderer& renderer)
 {
-    Rectangle rect{pos, static_cast<int32_t>(width), static_cast<int32_t>(height)};
+    Rectangle rect{m_Pos, static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height)};
 
-    renderer.setColor(color);
+    renderer.setColor(m_Color);
     renderFilledRect(renderer, rect);
 
-    if (label != nullptr)
+    if (m_Label != nullptr)
     {
-        Vec2<int32_t> margin{(width  - label->getWidth())  / 2,
-                             (height - label->getHeight()) / 2};
+        Vec2<int32_t> margin{(m_Width  - m_Label->getWidth())  / 2,
+                             (m_Height - m_Label->getHeight()) / 2};
 
-        label->render(renderer, pos + margin);
+        m_Label->render(renderer, m_Pos + margin);
     }
 }
