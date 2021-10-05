@@ -8,14 +8,14 @@
 
 #include "gui_component.h"
 
-GUIComponent::GUIComponent(const Vec2<int32_t>& pos) : m_Pos(pos) {}
+GUI_Component::GUI_Component(const Vec2<int32_t>& pos) : m_Pos(pos) {}
 
-const Vec2<int32_t>& GUIComponent::getPos() const
+const Vec2<int32_t>& GUI_Component::getPos() const
 {
     return m_Pos;
 }
 
-void GUIComponent::setPos(const Vec2<int32_t>& pos)
+void GUI_Component::setPos(const Vec2<int32_t>& pos)
 {
     m_Pos = pos;
 }

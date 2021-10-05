@@ -11,10 +11,10 @@
 
 #include "../core/graphics_wrapper/_core_graphics_wrapper.h"
 
-class GUIComponent
+class GUI_Component
 {
 public:
-    GUIComponent(const Vec2<int32_t>& pos);
+    GUI_Component(const Vec2<int32_t>& pos);
 
     const Vec2<int32_t>& getPos() const;
     void setPos(const Vec2<int32_t>& pos);

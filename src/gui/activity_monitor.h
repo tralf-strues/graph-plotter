@@ -16,10 +16,10 @@ static const size_t  GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE  = 32;
 static const Color   GUI_ACTIVITY_MONITOR_LABEL_COLOR     = COLOR_WHITE; // FIXME: parameter
 static const int32_t GUI_ACTIVITY_MONITOR_LABELS_MARGIN_X = 5; 
 
-class GUIActivityMonitor : public GUIComponent
+class GUI_ActivityMonitor : public GUI_Component
 {
 public:
-    GUIActivityMonitor(const Viewport& viewport, size_t samplesCount);
+    GUI_ActivityMonitor(const Viewport& viewport, size_t samplesCount);
 
     size_t getSamplesCount() const;
 
@@ -30,7 +30,7 @@ public:
 
     void addSample(float sample);
 
-    /* GUIComponent */
+    /* GUI_Component */
     void render(Renderer& renderer) override;
 
 private:

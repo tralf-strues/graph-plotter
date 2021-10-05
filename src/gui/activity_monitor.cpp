@@ -8,29 +8,29 @@
 
 #include "activity_monitor.h"
 
-GUIActivityMonitor::GUIActivityMonitor(const Viewport& viewport, size_t samplesCount)
-    : GUIComponent(viewport.windowArea.pos), m_SamplesCount(samplesCount), 
+GUI_ActivityMonitor::GUI_ActivityMonitor(const Viewport& viewport, size_t samplesCount)
+    : GUI_Component(viewport.windowArea.pos), m_SamplesCount(samplesCount), 
       m_Samples(m_SamplesCount), m_Viewport(viewport)
 {
     assert(m_SamplesCount != 0);
 }
 
-size_t GUIActivityMonitor::getSamplesCount() const
+size_t GUI_ActivityMonitor::getSamplesCount() const
 {
     return m_SamplesCount;
 }
 
-const Viewport& GUIActivityMonitor::getViewport() const
+const Viewport& GUI_ActivityMonitor::getViewport() const
 {
     return m_Viewport;
 }
 
-void GUIActivityMonitor::setViewport(const Viewport& viewport)
+void GUI_ActivityMonitor::setViewport(const Viewport& viewport)
 {
     m_Viewport = viewport;
 }
 
-void GUIActivityMonitor::updateLabels(Renderer& renderer, Font font)
+void GUI_ActivityMonitor::updateLabels(Renderer& renderer, Font font)
 {
     m_LabelMin.destroy();
     m_LabelMax.destroy();
@@ -44,7 +44,7 @@ void GUIActivityMonitor::updateLabels(Renderer& renderer, Font font)
     m_LabelMax.load(renderer, labelStr, font, GUI_ACTIVITY_MONITOR_LABEL_COLOR);
 }
 
-void GUIActivityMonitor::addSample(float sample)
+void GUI_ActivityMonitor::addSample(float sample)
 {
     if (m_Samples.getSize() == m_SamplesCount)
     {
@@ -54,7 +54,7 @@ void GUIActivityMonitor::addSample(float sample)
     m_Samples.pushBack(sample);
 }
 
-void GUIActivityMonitor::render(Renderer& renderer)
+void GUI_ActivityMonitor::render(Renderer& renderer)
 {
     // FIXME: parameter
     renderer.setColor(COLOR_YELLOW);
