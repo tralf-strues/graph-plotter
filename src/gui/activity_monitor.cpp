@@ -30,6 +30,20 @@ void GUIActivityMonitor::setViewport(const Viewport& viewport)
     m_Viewport = viewport;
 }
 
+void GUIActivityMonitor::updateLabels(Renderer& renderer, Font font)
+{
+    m_LabelMin.destroy();
+    m_LabelMax.destroy();
+
+    static char labelStr[GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE];
+
+    snprintf(labelStr, GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE, "%g", m_Viewport.axesMin.y);
+    m_LabelMin.load(renderer, labelStr, font, GUI_ACTIVITY_MONITOR_LABEL_COLOR);
+
+    snprintf(labelStr, GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE, "%g", m_Viewport.axesMax.y);
+    m_LabelMax.load(renderer, labelStr, font, GUI_ACTIVITY_MONITOR_LABEL_COLOR);
+}
+
 void GUIActivityMonitor::addSample(float sample)
 {
     if (m_Samples.getSize() == m_SamplesCount)
@@ -60,5 +74,20 @@ void GUIActivityMonitor::render(Renderer& renderer)
         renderLine(renderer, prevPoint, nextPoint);
 
         prevPoint = nextPoint;
+    }
+
+    if (m_LabelMax.getStr() != nullptr)
+    {
+        m_LabelMax.render(renderer, Vec2<int32_t>{m_Viewport.windowArea.pos.x + m_Viewport.windowArea.width +
+                                                  GUI_ACTIVITY_MONITOR_LABELS_MARGIN_X,
+                                                  m_Viewport.windowArea.pos.y});
+    }
+
+    if (m_LabelMin.getStr() != nullptr)
+    {
+        m_LabelMin.render(renderer, Vec2<int32_t>{m_Viewport.windowArea.pos.x + m_Viewport.windowArea.width +
+                                                  GUI_ACTIVITY_MONITOR_LABELS_MARGIN_X,
+                                                  m_Viewport.windowArea.pos.y + m_Viewport.windowArea.height -
+                                                  m_LabelMax.getHeight()});
     }
 }

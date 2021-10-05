@@ -22,14 +22,17 @@ public:
     size_t getSize() const;
 
 private:
-    TTF_Font* m_NativeFont;
-    size_t    m_FontSize;
+    TTF_Font* m_NativeFont = nullptr;
+    size_t    m_FontSize   = 0;
 };
 
 class Text
 {
 public:
-    Text(Renderer& renderer, const char* str, Font font, Color color = COLOR_BLACK);
+    ~Text();
+
+    void load(Renderer& renderer, const char* str, Font font, Color color = COLOR_BLACK);
+    void destroy();
 
     const char* getStr() const;
     const Font& getFont() const;
@@ -40,14 +43,14 @@ public:
     void render(Renderer& renderer, const Vec2<int32_t>& pos) const;
 
 private:
-    const char*  m_Str;
-    Font         m_Font;
-    Color        m_Color;
+    const char*  m_Str     = nullptr;
+    Font         m_Font    = {nullptr, 0};
+    Color        m_Color   = 0;
 
-    size_t       m_Width;
-    size_t       m_Height;
+    size_t       m_Width   = 0;
+    size_t       m_Height  = 0;
 
-    SDL_Texture* m_Texture;
+    SDL_Texture* m_Texture = nullptr;
 };
 
 #endif // TEXT_H

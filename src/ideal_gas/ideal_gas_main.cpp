@@ -113,7 +113,10 @@ int main()
 
     /* ================== GUI =================== */
     GUIButton button{Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN};
-    Text buttonLabel{renderer, "Hello!", font, COLOR_WHITE};
+
+    Text buttonLabel{};
+    buttonLabel.load(renderer, "Hello!", font, COLOR_WHITE);
+
     button.setLabel(&buttonLabel);
     button.attachToSystemEventManager(eventManager);
 
@@ -121,6 +124,7 @@ int main()
     button.attachListener({Event::GUI_BUTTON_PRESSED}, &buttonListener);
 
     GUIActivityMonitor activityMonitor{ACTIVITY_MONITOR_VIEWPORT, 50};
+    activityMonitor.updateLabels(renderer, font);
 
     /* ============= Events handling ============ */
     QuitListener quitListener{running};

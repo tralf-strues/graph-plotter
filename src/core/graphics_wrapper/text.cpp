@@ -10,11 +10,11 @@
 
 Font::Font(const char* filename, size_t size) : m_FontSize(size)
 {
-    assert(filename);
-    assert(size);
-
-    m_NativeFont = TTF_OpenFont(filename, size);
-    assert(m_NativeFont);
+    if (filename != nullptr)
+    {
+        m_NativeFont = TTF_OpenFont(filename, size);
+        assert(m_NativeFont);
+    }
 }
 
 Font::Font() : m_NativeFont(nullptr), m_FontSize(0) {}
@@ -54,10 +54,18 @@ size_t Text::getHeight() const
     return m_Height;
 }
 
-Text::Text(Renderer& renderer, const char* str, Font font, Color color)
-    : m_Str(str), m_Font(font), m_Color(color)
+Text::~Text()
 {
-    assert(m_Str);
+    destroy();
+}
+
+void Text::load(Renderer& renderer, const char* str, Font font, Color color)
+{
+    assert(str);
+
+    m_Str   = str;
+    m_Font  = font;
+    m_Color = color;
 
     SDL_Surface* loadedSurface = TTF_RenderText_Blended(m_Font.getNativeFont(), 
                                                         m_Str, 
@@ -72,6 +80,21 @@ Text::Text(Renderer& renderer, const char* str, Font font, Color color)
     m_Height = loadedSurface->h;
 
     SDL_FreeSurface(loadedSurface);
+}
+
+void Text::destroy()
+{
+    if (m_Texture != nullptr)
+    {
+        SDL_DestroyTexture(m_Texture);
+    }
+
+    m_Str     = nullptr;
+    m_Font    = {nullptr, 0};
+    m_Color   = 0;
+    m_Width   = 0;
+    m_Height  = 0;
+    m_Texture = 0;
 }
 
 void Text::render(Renderer& renderer, const Vec2<int32_t>& pos) const
