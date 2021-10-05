@@ -10,8 +10,8 @@
 #include "../core/utils/random.h"
 #include "simulator.h"
 
-typedef void (*FDistantInteract) (PhysEntity* first, PhysEntity* second, float deltaTime);
-typedef bool (*FCollisionDetect) (EntitiesIterator first, EntitiesIterator second, 
+typedef void (*FDistantInteract) (PhysEntity* first, PhysEntity* secondEntity, float deltaTime);
+typedef bool (*FCollisionDetect) (EntitiesIterator first, EntitiesIterator secondEntity, 
                                   float deltaTime, Collision* collision);
 typedef void (*FCollisionRespond) (Collision& collision);
 typedef bool (*FChemicalReaction) (List<PhysEntity*>& entities, Collision& collision);
@@ -61,8 +61,8 @@ const EntityPairInteraction INTERACTIONS[PhysEntity::TOTAL_TYPES][PhysEntity::TO
     {INTERACT_ELECTRON_ATOM,     INTERACT_WALL_ATOM,     INTERACT_ATOM_ATOM    },
 };
 
-Collision::Collision(const EntitiesIterator& first, const EntitiesIterator& second) : 
-                     first(first), second(second) {}
+Collision::Collision(const EntitiesIterator& firstEntity, const EntitiesIterator& secondEntity) : 
+                     firstEntity(firstEntity), secondEntity(secondEntity) {}
 
 Simulator::~Simulator()
 {
@@ -76,13 +76,13 @@ void Simulator::simulate(float deltaTime)
 {
     DynamicArray<Collision> collisions = {};
 
-    for (EntitiesIterator first = entities.begin(); first != entities.end(); ++first)
+    for (EntitiesIterator firstEntity = entities.begin(); firstEntity != entities.end(); ++firstEntity)
     {
-        for (EntitiesIterator second = first; (++second) != entities.end();)
+        for (EntitiesIterator secondEntity = firstEntity; (++secondEntity) != entities.end();)
         {
             Collision collision{entities.begin(), entities.begin()};
             
-            if (collisionDetect(first, second, deltaTime, &collision))
+            if (collisionDetect(firstEntity, secondEntity, deltaTime, &collision))
             {
                 collisions.insert(collision);
             }
@@ -97,11 +97,11 @@ void Simulator::simulate(float deltaTime)
         }
     }
 
-    for (EntitiesIterator first = entities.begin(); first != entities.end(); ++first)
+    for (EntitiesIterator firstEntity = entities.begin(); firstEntity != entities.end(); ++firstEntity)
     {
-        for (EntitiesIterator second = first; (++second) != entities.end();)
+        for (EntitiesIterator secondEntity = firstEntity; (++secondEntity) != entities.end();)
         {
-            distantInteract(*first, *second, deltaTime);
+            distantInteract(*firstEntity, *secondEntity, deltaTime);
         }
     }
 
@@ -120,28 +120,28 @@ void Simulator::updateGraphics(Renderer& renderer, const Viewport& viewport)
 }
 
 //-------------------------------Distant interact------------------------------
-void Simulator::distantInteract(PhysEntity* first, PhysEntity* second, float deltaTime)
+void Simulator::distantInteract(PhysEntity* firstEntity, PhysEntity* secondEntity, float deltaTime)
 {
-    FDistantInteract function = INTERACTIONS[first->type][second->type].distantInteract;
+    FDistantInteract function = INTERACTIONS[firstEntity->type][secondEntity->type].distantInteract;
     if (function == nullptr)
     {
         return;
     }
 
-    if (first->type > second->type)
+    if (firstEntity->type > secondEntity->type)
     {
-        function(second, first, deltaTime);
+        function(secondEntity, firstEntity, deltaTime);
     }
     else
     {
-        function(first, second, deltaTime);
+        function(firstEntity, secondEntity, deltaTime);
     }
 }
 
-void distantInteractElectronWall(PhysEntity* first, PhysEntity* second, float deltaTime)
+void distantInteractElectronWall(PhysEntity* firstEntity, PhysEntity* secondEntity, float deltaTime)
 {
-    Electron* electron = (Electron*) first;
-    Wall*     wall     = (Wall*)     second;
+    Electron* electron = (Electron*) firstEntity;
+    Wall*     wall     = (Wall*)     secondEntity;
 
     Vec2<float> toWall = wall->getPos()     -
                          electron->getPos() -
@@ -154,10 +154,10 @@ void distantInteractElectronWall(PhysEntity* first, PhysEntity* second, float de
     electron->setVelocity(electron->getVelocity() + acceleration * deltaTime);
 }
 
-void distantInteractWallAtom(PhysEntity* first, PhysEntity* second, float deltaTime)
+void distantInteractWallAtom(PhysEntity* firstEntity, PhysEntity* secondEntity, float deltaTime)
 {
-    Wall* wall = (Wall*) first;
-    Atom* atom = (Atom*) second;
+    Wall* wall = (Wall*) firstEntity;
+    Atom* atom = (Atom*) secondEntity;
 
     Vec2<float> toWall = wall->getPos() -
                          atom->getPos() -
@@ -172,28 +172,28 @@ void distantInteractWallAtom(PhysEntity* first, PhysEntity* second, float deltaT
 //------------------------------------------------------------------------------
 
 //------------------------------Collision detection-----------------------------
-bool Simulator::collisionDetect(EntitiesIterator first, EntitiesIterator second, 
+bool Simulator::collisionDetect(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                                 float deltaTime, Collision* collision)
 {
-    FCollisionDetect function = INTERACTIONS[(*first)->type][(*second)->type].collisionDetect;
+    FCollisionDetect function = INTERACTIONS[(*firstEntity)->type][(*secondEntity)->type].collisionDetect;
     if (function == nullptr)
     {
         return false;
     }
 
-    if ((*first)->type > (*second)->type)
+    if ((*firstEntity)->type > (*secondEntity)->type)
     {
-        return function(second, first, deltaTime, collision);
+        return function(secondEntity, firstEntity, deltaTime, collision);
     }
 
-    return function(first, second, deltaTime, collision);
+    return function(firstEntity, secondEntity, deltaTime, collision);
 }
 
-bool collisionDetectElectronElectron(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectElectronElectron(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                                      float deltaTime, Collision* collision)
 {
-    Electron* firstElectron  = (Electron*) *first;
-    Electron* secondElectron = (Electron*) *second;
+    Electron* firstElectron  = (Electron*) *firstEntity;
+    Electron* secondElectron = (Electron*) *secondEntity;
 
     float distanceSquare  = lengthSquare(firstElectron->getPos() - secondElectron->getPos());
     float sumRadiusSquare = firstElectron->getRadius() + secondElectron->getRadius();
@@ -201,19 +201,19 @@ bool collisionDetectElectronElectron(EntitiesIterator first, EntitiesIterator se
 
     if (cmpFloat(distanceSquare, sumRadiusSquare) <= 0)
     {
-        collision->first  = first;
-        collision->second = second;
+        collision->firstEntity  = firstEntity;
+        collision->secondEntity = secondEntity;
         return true;
     }
 
     return false;
 }
 
-bool collisionDetectElectronWall(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectElectronWall(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                                  float deltaTime, Collision* collision)
 {
-    Electron* electron  = (Electron*) *first;
-    Wall*     wall      = (Wall*)     *second;
+    Electron* electron  = (Electron*) *firstEntity;
+    Wall*     wall      = (Wall*)     *secondEntity;
 
     Vec2<float> point    = electron->getPos();
     Vec2<float> lineFrom = wall->getPos();
@@ -223,8 +223,8 @@ bool collisionDetectElectronWall(EntitiesIterator first, EntitiesIterator second
 
     if (cmpFloat(distance, electron->getRadius()) <= 0)
     {
-        collision->first  = first;
-        collision->second = second;
+        collision->firstEntity  = firstEntity;
+        collision->secondEntity = secondEntity;
 
         return true;
     }
@@ -232,11 +232,11 @@ bool collisionDetectElectronWall(EntitiesIterator first, EntitiesIterator second
     return false;
 }
 
-bool collisionDetectWallAtom(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectWallAtom(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                              float deltaTime, Collision* collision)
 {
-    Wall* wall  = (Wall*) *first;
-    Atom* atom  = (Atom*) *second;
+    Wall* wall  = (Wall*) *firstEntity;
+    Atom* atom  = (Atom*) *secondEntity;
 
     Vec2<float> point    = atom->getPos();
     Vec2<float> lineFrom = wall->getPos();
@@ -246,8 +246,8 @@ bool collisionDetectWallAtom(EntitiesIterator first, EntitiesIterator second,
 
     if (cmpFloat(distance, atom->getSize() / 2) <= 0)
     {
-        collision->first  = first;
-        collision->second = second;
+        collision->firstEntity  = firstEntity;
+        collision->secondEntity = secondEntity;
 
         return true;
     }
@@ -255,11 +255,11 @@ bool collisionDetectWallAtom(EntitiesIterator first, EntitiesIterator second,
     return false;
 }
 
-bool collisionDetectAtomAtom(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectAtomAtom(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                              float deltaTime, Collision* collision)
 {
-    Atom* firstAtom  = (Atom*) *first;
-    Atom* secondAtom = (Atom*) *second;
+    Atom* firstAtom  = (Atom*) *firstEntity;
+    Atom* secondAtom = (Atom*) *secondEntity;
 
     float firstLeft  = firstAtom->getPos().x  - firstAtom->getSize()  / 2;
     float secondLeft = secondAtom->getPos().x - secondAtom->getSize() / 2;
@@ -278,19 +278,19 @@ bool collisionDetectAtomAtom(EntitiesIterator first, EntitiesIterator second,
           cmpFloat(secondTop, firstBottom) > 0 ||
           cmpFloat(secondBottom, firstTop) < 0))
     {
-        collision->first  = first;
-        collision->second = second;
+        collision->firstEntity  = firstEntity;
+        collision->secondEntity = secondEntity;
         return true;
     }
 
     return false;
 }
 
-bool collisionDetectElectronAtom(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectElectronAtom(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                                  float deltaTime, Collision* collision)
 {
-    Electron* electron = (Electron*) *first;
-    Atom*     atom     = (Atom*)     *second;
+    Electron* electron = (Electron*) *firstEntity;
+    Atom*     atom     = (Atom*)     *secondEntity;
 
     float distanceSquare = lengthSquare(electron->getPos() - atom->getPos());
 
@@ -301,8 +301,8 @@ bool collisionDetectElectronAtom(EntitiesIterator first, EntitiesIterator second
 
     if (cmpFloat(distanceSquare, sumRadiusSquare) <= 0)
     {
-        collision->first  = first;
-        collision->second = second;
+        collision->firstEntity  = firstEntity;
+        collision->secondEntity = secondEntity;
         return true;
     }
 
@@ -313,15 +313,15 @@ bool collisionDetectElectronAtom(EntitiesIterator first, EntitiesIterator second
 //-------------------------------Collision respond------------------------------
 void Simulator::collisionRespond(Collision& collision)
 {
-    FCollisionRespond function = INTERACTIONS[(*collision.first)->type][(*collision.second)->type]
+    FCollisionRespond function = INTERACTIONS[(*collision.firstEntity)->type][(*collision.secondEntity)->type]
                                              .collisionRespond;
     if (function != nullptr)
     {
-        if ((*collision.first)->type > (*collision.second)->type)
+        if ((*collision.firstEntity)->type > (*collision.secondEntity)->type)
         {
-            EntitiesIterator tmp = collision.first;
-            collision.first = collision.second;
-            collision.second = tmp;
+            EntitiesIterator tmp = collision.firstEntity;
+            collision.firstEntity = collision.secondEntity;
+            collision.secondEntity = tmp;
         }
 
         function(collision);
@@ -330,8 +330,8 @@ void Simulator::collisionRespond(Collision& collision)
 
 void collisionRespondElectronElectron(Collision& collision)
 {
-    Electron* firstElectron  = (Electron*) *(collision.first);
-    Electron* secondElectron = (Electron*) *(collision.second);
+    Electron* firstElectron  = (Electron*) *(collision.firstEntity);
+    Electron* secondElectron = (Electron*) *(collision.secondEntity);
 
     Vec2<float> along = normalize(secondElectron->getPos() - firstElectron->getPos());
     
@@ -352,8 +352,8 @@ void collisionRespondElectronElectron(Collision& collision)
 
 void collisionRespondElectronWall(Collision& collision)
 {
-    Electron* electron = (Electron*) *(collision.first);
-    Wall*     wall     = (Wall*)     *(collision.second);
+    Electron* electron = (Electron*) *(collision.firstEntity);
+    Wall*     wall     = (Wall*)     *(collision.secondEntity);
 
     Vec2<float> along = normalize(wall->getDirection());
 
@@ -365,8 +365,8 @@ void collisionRespondElectronWall(Collision& collision)
 
 void collisionRespondWallAtom(Collision& collision)
 {
-    Wall* wall = (Wall*) *(collision.first);
-    Atom* atom = (Atom*) *(collision.second);
+    Wall* wall = (Wall*) *(collision.firstEntity);
+    Atom* atom = (Atom*) *(collision.secondEntity);
 
     Vec2<float> along = normalize(wall->getDirection());
 
@@ -378,8 +378,8 @@ void collisionRespondWallAtom(Collision& collision)
 
 void collisionRespondAtomAtom(Collision& collision)
 {
-    Atom* firstAtom  = (Atom*) *(collision.first);
-    Atom* secondAtom = (Atom*) *(collision.second);
+    Atom* firstAtom  = (Atom*) *(collision.firstEntity);
+    Atom* secondAtom = (Atom*) *(collision.secondEntity);
 
     Vec2<float> along = normalize(secondAtom->getPos() - firstAtom->getPos());
     
@@ -400,8 +400,8 @@ void collisionRespondAtomAtom(Collision& collision)
 
 void collisionRespondElectronAtom(Collision& collision)
 {
-    Electron* electron = (Electron*) *(collision.first);
-    Atom*     atom     = (Atom*)     *(collision.second);
+    Electron* electron = (Electron*) *(collision.firstEntity);
+    Atom*     atom     = (Atom*)     *(collision.secondEntity);
 
     Vec2<float> along = normalize(atom->getPos() - electron->getPos());
     
@@ -424,18 +424,18 @@ void collisionRespondElectronAtom(Collision& collision)
 //-------------------------------Chemical reaction------------------------------
 bool Simulator::chemicalReaction(Collision& collision)
 {
-    FChemicalReaction function = INTERACTIONS[(*collision.first)->type][(*collision.second)->type]
+    FChemicalReaction function = INTERACTIONS[(*collision.firstEntity)->type][(*collision.secondEntity)->type]
                                              .chemicalReaction;
     if (function == nullptr)
     {
         return false;
     }
 
-    if ((*collision.first)->type > (*collision.second)->type)
+    if ((*collision.firstEntity)->type > (*collision.secondEntity)->type)
     {
-        EntitiesIterator tmp = collision.first;
-        collision.first = collision.second;
-        collision.second = tmp;
+        EntitiesIterator tmp = collision.firstEntity;
+        collision.firstEntity = collision.secondEntity;
+        collision.secondEntity = tmp;
     }
 
     return function(entities, collision); 
@@ -443,8 +443,8 @@ bool Simulator::chemicalReaction(Collision& collision)
 
 bool chemicalReactionElectronAtom(List<PhysEntity*>& entities, Collision& collision)
 {
-    Electron* electron = (Electron*) *(collision.first);
-    Atom*     atom     = (Atom*)     *(collision.second);
+    Electron* electron = (Electron*) *(collision.firstEntity);
+    Atom*     atom     = (Atom*)     *(collision.secondEntity);
 
     if (atom->getEnergy() + electron->getEnergy() < ENERGY_THRESHOLD_ELECTRON_CAPTURE)
     {
@@ -452,15 +452,15 @@ bool chemicalReactionElectronAtom(List<PhysEntity*>& entities, Collision& collis
     }
 
     atom->setCharge(atom->getCharge() + ELECTRON_CHARGE);
-    entities.remove(collision.first);
+    entities.remove(collision.firstEntity);
 
     return true;
 }
 
 bool chemicalReactionAtomAtom(List<PhysEntity*>& entities, Collision& collision)
 {
-    Atom* firstAtom  = (Atom*) *(collision.first);
-    Atom* secondAtom = (Atom*) *(collision.second);
+    Atom* firstAtom  = (Atom*) *(collision.firstEntity);
+    Atom* secondAtom = (Atom*) *(collision.secondEntity);
 
     if (firstAtom->getCharge() == 0 && secondAtom->getCharge() == 0)
     {
@@ -497,8 +497,8 @@ bool chemicalReactionAtomAtom(List<PhysEntity*>& entities, Collision& collision)
                 entities.pushBack(newAtom);
             }
 
-            entities.remove(collision.first);
-            entities.remove(collision.second);
+            entities.remove(collision.firstEntity);
+            entities.remove(collision.secondEntity);
 
             return true;
         }
@@ -513,8 +513,8 @@ bool chemicalReactionAtomAtom(List<PhysEntity*>& entities, Collision& collision)
                                   secondAtom->getMass() * secondAtom->getVelocity()) / sumMass);
             entities.pushBack(newAtom);
 
-            entities.remove(collision.first);
-            entities.remove(collision.second);
+            entities.remove(collision.firstEntity);
+            entities.remove(collision.secondEntity);
 
             return true;
         }

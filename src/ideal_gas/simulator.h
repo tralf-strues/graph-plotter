@@ -25,10 +25,10 @@ static const float VOLUME_BROKEN_ATOM                = calculateSphereVolume(RAD
 
 struct Collision
 {
-    EntitiesIterator first;
-    EntitiesIterator second;
+    EntitiesIterator firstEntity;
+    EntitiesIterator secondEntity;
 
-    Collision(const EntitiesIterator& first, const EntitiesIterator& second);
+    Collision(const EntitiesIterator& firstEntity, const EntitiesIterator& secondEntity);
     Collision() = default;
 };
 
@@ -43,9 +43,9 @@ public:
     void updateGraphics(Renderer& renderer, const Viewport& viewport);
 
 private:
-    void distantInteract(PhysEntity* first, PhysEntity* second, float deltaTime);
+    void distantInteract(PhysEntity* firstEntity, PhysEntity* secondEntity, float deltaTime);
 
-    bool collisionDetect(EntitiesIterator first, EntitiesIterator second, 
+    bool collisionDetect(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                          float deltaTime, Collision* collision);
 
     void collisionRespond(Collision& collision);
@@ -53,22 +53,22 @@ private:
     bool chemicalReaction(Collision& collision);
 };
 
-void distantInteractElectronWall(PhysEntity* first, PhysEntity* second, float deltaTime);
-void distantInteractWallAtom(PhysEntity* first, PhysEntity* second, float deltaTime);
+void distantInteractElectronWall(PhysEntity* firstEntity, PhysEntity* secondEntity, float deltaTime);
+void distantInteractWallAtom(PhysEntity* firstEntity, PhysEntity* secondEntity, float deltaTime);
 
-bool collisionDetectElectronElectron(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectElectronElectron(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                                      float deltaTime, Collision* collision); 
 
-bool collisionDetectElectronWall(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectElectronWall(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                                  float deltaTime, Collision* collision);
 
-bool collisionDetectWallAtom(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectWallAtom(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                              float deltaTime, Collision* collision);
 
-bool collisionDetectAtomAtom(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectAtomAtom(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                              float deltaTime, Collision* collision);
 
-bool collisionDetectElectronAtom(EntitiesIterator first, EntitiesIterator second, 
+bool collisionDetectElectronAtom(EntitiesIterator firstEntity, EntitiesIterator secondEntity, 
                                  float deltaTime, Collision* collision);
 
 
