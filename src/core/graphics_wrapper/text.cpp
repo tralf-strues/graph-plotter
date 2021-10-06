@@ -67,6 +67,8 @@ void Text::load(Renderer& renderer, const char* str, Font font, Color color)
     m_Font  = font;
     m_Color = color;
 
+    SDL_Color sysColor = getSystemColor(color);
+
     SDL_Surface* loadedSurface = TTF_RenderText_Blended(m_Font.getNativeFont(), 
                                                         m_Str, 
                                                         getSystemColor(color));

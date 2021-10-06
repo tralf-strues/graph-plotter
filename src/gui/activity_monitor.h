@@ -12,19 +12,40 @@
 #include "../core/utils/viewport.h"
 #include "gui_component.h"
 
+static const int32_t GUI_ACTIVITY_MONITOR_TITLE_HEIGHT    = 30;
 static const size_t  GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE  = 32;
-static const Color   GUI_ACTIVITY_MONITOR_LABEL_COLOR     = COLOR_WHITE; // FIXME: parameter
 static const int32_t GUI_ACTIVITY_MONITOR_LABELS_MARGIN_X = 5; 
 
 class GUI_ActivityMonitor : public GUI_Component
 {
 public:
-    GUI_ActivityMonitor(const Viewport& viewport, size_t samplesCount);
+    GUI_ActivityMonitor(const Viewport& viewport,
+                        size_t samplesCount,
+                        Color frameColor = COLOR_BLACK,
+                        Color lineColor  = COLOR_BLACK,
+                        Color textColor  = COLOR_BLACK);
 
     size_t getSamplesCount() const;
 
+    void setColors(Color frameColor, Color lineColor, Color textColor);
+
+    Color getFrameColor() const;
+    void setFrameColor(Color color);
+
+    Color getLineColor() const;
+    void setLineColor(Color color);
+
+    Color getTextColor() const;
+    void setTextColor(Color color);
+
     const Viewport& getViewport() const;
     void setViewport(const Viewport& viewport);
+
+    void setValueRange(float minY, float maxY);
+
+    void setTitle(Renderer& renderer, Font font, const char* title);
+    const Text* getTitle() const;
+    void removeTitle();
 
     void updateLabels(Renderer& renderer, Font font);
 
@@ -34,10 +55,17 @@ public:
     void render(Renderer& renderer) override;
 
 private:
-    size_t      m_SamplesCount;
+    size_t      m_SamplesCount = 0;
     List<float> m_Samples;
-    Viewport    m_Viewport;
 
+    Color       m_FrameColor;
+    Color       m_LineColor;
+    Color       m_TextColor;
+
+    Rectangle   m_TitleRenderRect;
+    Viewport    m_GraphViewport;
+
+    Text        m_Title;
     Text        m_LabelMin;
     Text        m_LabelMax;
 };

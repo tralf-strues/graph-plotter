@@ -31,9 +31,9 @@ Vec2<float> Viewport::toPixels(const Vec2<float>& point) const
     float relWidth  = getRelativeWidth();
     float relHeight = getRelativeHeight();
 
-    float x = windowArea.pos.x + (windowArea.width / relWidth)  * (point.x - axesMin.x); 
+    float x = windowArea.pos.x + ((windowArea.width - 1) / relWidth)  * (point.x - axesMin.x); 
     float y = windowArea.pos.y + 
-              (windowArea.height / relHeight) * (axesMax.y - point.y); 
+              ((windowArea.height - 1) / relHeight) * (axesMax.y - point.y); 
 
     return {x, y};
 }

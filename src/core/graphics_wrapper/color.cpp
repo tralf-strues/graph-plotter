@@ -21,7 +21,13 @@ Color rgbaColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 
 SDL_Color getSystemColor(Color color)
 {
-    return *((SDL_Color*) &color);
+    SDL_Color sysColor;
+    sysColor.r = colorGetR(color);
+    sysColor.g = colorGetG(color);
+    sysColor.b = colorGetB(color);
+    sysColor.a = colorGetA(color);
+    
+    return sysColor;
 }
 
 uint8_t getByte(uint32_t number, uint8_t byteNumber)

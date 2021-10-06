@@ -35,25 +35,8 @@ void IdealGasApp::run()
 
         m_SystemEventManager.proccessEvents();
 
-        m_Simulator.simulate(DELTA_TIME);
-        // m_Simulator.simulate(frameTime * TIME_SCALE); FIXME:
-
-        m_ActivityMonitor.addSample(randomFromInterval(0, 10));
-
-        m_Renderer.setColor(BACKGROUND_COLOR);
-        m_Renderer.clear();
-
-        m_Renderer.setClipRegion(Rectangle{SIMULATOR_VIEWPORT.windowArea.pos, 
-                                           SIMULATOR_VIEWPORT.windowArea.width  + 1,
-                                           SIMULATOR_VIEWPORT.windowArea.height + 1});
-        m_Simulator.updateGraphics(m_Renderer, SIMULATOR_VIEWPORT);
-        m_Renderer.resetClipRegion();
-
-        // button.render(m_Renderer);
-        // activityMonitor.render(m_Renderer);
-        m_GuiManager.renderComponents(m_Renderer);
-
-        m_Renderer.present();
+        updateAll();
+        renderAll();
 
         /* Update fps title */
         frameTime = SDL_GetTicks() - frameStartTime;
@@ -64,6 +47,82 @@ void IdealGasApp::run()
     }
 }
 
+void IdealGasApp::updateAll()
+{
+    m_Simulator.simulate(DELTA_TIME);
+    // m_Simulator.simulate(frameTime * TIME_SCALE); FIXME:
+
+    int32_t atoms        = 0;
+    int32_t electrons    = 0;
+    int32_t positiveIons = 0;
+    int32_t negativeIons = 0;
+    int32_t maxValue     = 0;
+
+    for (auto entity : m_Simulator.entities)
+    {
+        if (entity->type == PhysEntity::ELECTRON)
+        {
+            ++electrons;
+            if (electrons > maxValue) { maxValue = electrons; }
+        }
+        else if (entity->type == PhysEntity::ATOM)
+        {
+            Atom* atom = static_cast<Atom*>(entity);
+
+            if (atom->getCharge() == 0)
+            {
+                ++atoms;
+                if (atoms > maxValue) { maxValue = atoms; }
+            }
+            else if (atom->getCharge() > 0)
+            {
+                ++positiveIons;
+                if (positiveIons > maxValue) { maxValue = positiveIons; }
+            }
+            else
+            {
+                ++negativeIons;
+                if (negativeIons > maxValue) { maxValue = negativeIons; }
+            }
+        }
+    }
+
+    if (static_cast<int32_t>(m_AtomsMonitor.getViewport().axesMax.y) <= maxValue)
+    {
+        float rangeMax = static_cast<int32_t>(maxValue * 1.5f);
+
+        m_AtomsMonitor.setValueRange(0, rangeMax);
+        m_AtomsMonitor.updateLabels(m_Renderer, m_Font);
+        
+        m_ElectronsMonitor.setValueRange(0, rangeMax);
+        m_ElectronsMonitor.updateLabels(m_Renderer, m_Font);
+
+        m_PIonsMonitor.setValueRange(0, rangeMax);
+        m_PIonsMonitor.updateLabels(m_Renderer, m_Font);
+
+        m_NIonsMonitor.setValueRange(0, rangeMax);
+        m_NIonsMonitor.updateLabels(m_Renderer, m_Font);
+    }
+
+    m_AtomsMonitor.addSample(atoms);
+    m_ElectronsMonitor.addSample(electrons);
+    m_PIonsMonitor.addSample(positiveIons);
+    m_NIonsMonitor.addSample(negativeIons);
+}
+
+void IdealGasApp::renderAll()
+{
+    m_Renderer.setColor(BACKGROUND_COLOR);
+    m_Renderer.clear();
+
+    m_Renderer.setClipRegion(SIMULATOR_VIEWPORT.windowArea);
+    m_Simulator.updateGraphics(m_Renderer, SIMULATOR_VIEWPORT);
+    m_Renderer.resetClipRegion();
+
+    m_GuiManager.renderComponents(m_Renderer);
+    m_Renderer.present();
+}
+
 IdealGasApp::IdealGasApp(int32_t argc, char* argv[])
     : Application(argc, argv),
       m_Window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE),
@@ -71,7 +130,10 @@ IdealGasApp::IdealGasApp(int32_t argc, char* argv[])
       m_Font(FONT_FILENAME, FONT_SIZE),
       m_Running(false),
       m_ButtonLeftElectrodeIncrease(Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN),
-      m_ActivityMonitor(ACTIVITY_MONITOR_VIEWPORT, 50)
+      m_AtomsMonitor(ATOMS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_ElectronsMonitor(ELECTRONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_PIonsMonitor(PIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_NIonsMonitor(NIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES)
 {
     initSimulator();
     initGUI();
@@ -94,12 +156,12 @@ void IdealGasApp::initSimulator()
     Wall* wallLeft = new Wall();
     wallLeft->setPos(Vec2<float>{SIMULATOR_VIEWPORT.axesMin.x, SIMULATOR_VIEWPORT.axesMin.y});
     wallLeft->setDirection(Vec2<float>{0, 1});
-    wallLeft->setElectricField(1e3);
+    wallLeft->setElectricField(5e3);
 
     Wall* wallRight = new Wall();
     wallRight->setPos(Vec2<float>{SIMULATOR_VIEWPORT.axesMax.x, SIMULATOR_VIEWPORT.axesMin.y});
     wallRight->setDirection(Vec2<float>{0, 1});
-    wallRight->setElectricField(-1e3);
+    wallRight->setElectricField(-5e3);
 
     m_Simulator.entities.pushBack(wallTop);
     m_Simulator.entities.pushBack(wallBottom);
@@ -114,18 +176,33 @@ void IdealGasApp::initSimulator()
 
 void IdealGasApp::initGUI()
 {
-    // TODO:
-    // Text buttonLabel{};
-    // buttonLabel.load(m_Renderer, "Hello!", FONT, COLOR_WHITE);
+    /* Buttons */
     m_ButtonLeftElectrodeIncrease.setLabel(m_Renderer, "Hello!", m_Font);
     m_ButtonLeftElectrodeIncrease.attachToSystemEventManager(m_SystemEventManager);
+
+    /* Monitors */
+    m_AtomsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_NEUTRAL, ENTITIES_MONITOR_TEXT_CLR);
+    m_AtomsMonitor.setTitle(m_Renderer, m_Font, "Atoms");
+    m_AtomsMonitor.updateLabels(m_Renderer, m_Font);
+
+    m_ElectronsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ELECTRON, ENTITIES_MONITOR_TEXT_CLR);
+    m_ElectronsMonitor.setTitle(m_Renderer, m_Font, "Electrons");
+    m_ElectronsMonitor.updateLabels(m_Renderer, m_Font);
+
+    m_PIonsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_POSITIVE, ENTITIES_MONITOR_TEXT_CLR);
+    m_PIonsMonitor.setTitle(m_Renderer, m_Font, "Positive ions");
+    m_PIonsMonitor.updateLabels(m_Renderer, m_Font);
+
+    m_NIonsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_NEGATIVE, ENTITIES_MONITOR_TEXT_CLR);
+    m_NIonsMonitor.setTitle(m_Renderer, m_Font, "Negative ions");
+    m_NIonsMonitor.updateLabels(m_Renderer, m_Font);
+
     m_GuiManager.addComponent(&m_ButtonLeftElectrodeIncrease);
 
-    // TODO:
-    m_ActivityMonitor.updateLabels(m_Renderer, m_Font);
-    m_GuiManager.addComponent(&m_ActivityMonitor);
-
-
+    m_GuiManager.addComponent(&m_AtomsMonitor);
+    m_GuiManager.addComponent(&m_ElectronsMonitor);
+    m_GuiManager.addComponent(&m_PIonsMonitor);
+    m_GuiManager.addComponent(&m_NIonsMonitor);
 }
 
 void IdealGasApp::initEventListeners()

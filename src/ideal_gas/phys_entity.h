@@ -13,7 +13,7 @@
 
 typedef int8_t Charge;
 
-static const Color COLOR_ELECTRON = 0x7A'6D'C1'FF;
+static const Color COLOR_ELECTRON      = 0x7A'6D'C1'FF;
 
 static const Color COLOR_WALL_NEUTRAL  = 0xF6'E4'92'FF;
 static const Color COLOR_WALL_POSITIVE = 0xE6'96'A8'FF;
@@ -23,11 +23,11 @@ static const Color COLOR_ATOM_NEUTRAL  = 0xF6'E4'92'FF;
 static const Color COLOR_ATOM_POSITIVE = 0xE6'96'A8'FF;
 static const Color COLOR_ATOM_NEGATIVE = 0xA2'99'D4'FF;
 
-static const Charge ELECTRON_CHARGE = -1;
-static const float  ELECTRON_ENERGY = 1e-5;
-static const float  ELECTRON_MASS   = 1e-4;
+static const Charge ELECTRON_CHARGE    = -1;
+static const float  ELECTRON_ENERGY    = 1e-5;
+static const float  ELECTRON_MASS      = 1e-4;
 
-static const float  WALL_ENERGY     = 1e5;
+static const float  WALL_ENERGY        = 1e5;
 
 //----------------------------------PhysEntity----------------------------------
 class PhysEntity
