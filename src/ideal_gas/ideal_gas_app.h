@@ -87,16 +87,24 @@ static const Vec2<int32_t> LABEL_LEFT_ELECTRODE_POS       = {1120, 20};
 static const Vec2<int32_t> LABEL_RIGHT_ELECTRODE_POS      = {1120, 50};
 static const Vec2<int32_t> LABEL_LEFT_ELECTRIC_FIELD_POS  = {1255, 20};
 static const Vec2<int32_t> LABEL_RIGHT_ELECTRIC_FIELD_POS = {1255, 50};
-static const Vec2<int32_t> LABEL_SPAWN_PARTICLE_POS       = {1120, 100};
 
 static const int32_t       BUTTON_CHANGE_FIELD_WIDTH      = 20;
 static const int32_t       BUTTON_CHANGE_FIELD_HEIGHT     = 20;
 
 static const Vec2<int32_t> BUTTON_LEFT_INCREASE_POS       = {1340, 20};
 static const Vec2<int32_t> BUTTON_RIGHT_INCREASE_POS      = {1340, 50};
-
 static const Vec2<int32_t> BUTTON_LEFT_DECREASE_POS       = {1310, 20};
 static const Vec2<int32_t> BUTTON_RIGHT_DECREASE_POS      = {1310, 50};
+
+static const Vec2<int32_t> LABEL_SPAWN_PARTICLE_POS       = {1180, 150};
+
+static const int32_t       BUTTON_SPAWN_WIDTH             = 160;
+static const int32_t       BUTTON_SPAWN_HEIGHT            = 40;
+
+static const Vec2<int32_t> BUTTON_SPAWN_ATOM_POS          = {1160, 180};
+static const Vec2<int32_t> BUTTON_SPAWN_ELECTRON_POS      = {1160, 230};
+static const Vec2<int32_t> BUTTON_SPAWN_PION_POS          = {1160, 280};
+static const Vec2<int32_t> BUTTON_SPAWN_NION_POS          = {1160, 330};
 //------------------------------------------------------------------------------
 
 struct ButtonListener;
@@ -124,6 +132,11 @@ private:
     GUI_Button              m_ButtonLeftElectrodeDecrease;
     GUI_Button              m_ButtonRightElectrodeDecrease;
 
+    GUI_Button              m_ButtonSpawnAtom;
+    GUI_Button              m_ButtonSpawnElectron;
+    GUI_Button              m_ButtonSpawnPIon;
+    GUI_Button              m_ButtonSpawnNIon;
+
     GUI_ActivityMonitor     m_AtomsMonitor;
     GUI_ActivityMonitor     m_ElectronsMonitor;
     GUI_ActivityMonitor     m_PIonsMonitor;
@@ -141,6 +154,11 @@ private:
     ElectrodeButtonListener m_RightElectrodeIncreaseListener;
     ElectrodeButtonListener m_LeftElectrodeDecreaseListener;
     ElectrodeButtonListener m_RightElectrodeDecreaseListener;
+
+    SpawnButtonListener     m_SpawnAtomListener;
+    SpawnButtonListener     m_SpawnElectronListener;
+    SpawnButtonListener     m_SpawnPIonListener;
+    SpawnButtonListener     m_SpawnNIonListener;
 
     void initSimulator();
     void initGUI();

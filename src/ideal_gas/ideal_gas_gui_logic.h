@@ -88,4 +88,69 @@ struct ElectrodeButtonListener : public IListener
     }
 };
 
+struct SpawnButtonListener : public IListener
+{
+    enum Type
+    {
+        INVALID,
+        SPAWN_ATOM,
+        SPAWN_ELECTRON,
+        SPAWN_PION,
+        SPAWN_NION
+    };
+
+    Simulator*      simulator;
+    const Viewport* viewport;
+    Type            spawnEntityType;
+
+    SpawnButtonListener(Simulator* simulator, const Viewport* viewport, Type spawnEntityType)
+        : simulator(simulator),
+          viewport(viewport),
+          spawnEntityType(spawnEntityType) 
+    {}
+
+    void onEvent(const Event& event) override
+    {
+        assert(event.type == Event::GUI_BUTTON_PRESSED);
+
+        printf("SpawnButtonListener\n");
+
+        float radius = randomFromInterval<float>(0.4, 1.2);
+        float volume = calculateSphereVolume(radius);
+
+        Vec2<float> pos{randomFromInterval<float>(2 * radius, viewport->getRelativeWidth()  - 2 * radius),
+                        randomFromInterval<float>(2 * radius, viewport->getRelativeHeight() - 2 * radius)};
+
+        Vec2<float> velocity{randomFromInterval<float>(-3e4, 3e4),
+                             randomFromInterval<float>(-3e4, 3e4)};
+
+        if (spawnEntityType == SPAWN_ELECTRON)
+        {
+            Electron* electron = new Electron{0.2f};
+            electron->setPos(pos);
+            electron->setVelocity(velocity);
+
+            simulator->entities.pushBack(electron);
+        }
+        else
+        {
+            Atom* atom = new Atom{radius};
+            atom->setMass(volume * ATOM_DENSITY);
+            atom->setPos(pos);
+            atom->setVelocity(velocity);
+
+            if (spawnEntityType == SPAWN_PION)
+            {
+                atom->setCharge(-ELECTRON_CHARGE);
+            }
+            else if (spawnEntityType == SPAWN_NION)
+            {
+                atom->setCharge(ELECTRON_CHARGE);
+            }
+
+            simulator->entities.pushBack(atom);
+        }
+    }
+};
+
 #endif // IDEAL_GAS_GUI_LOGIC_H

@@ -29,6 +29,14 @@ IdealGasApp::IdealGasApp(int32_t argc, char* argv[])
       m_ButtonRightElectrodeDecrease(m_Renderer, BUTTON_RIGHT_DECREASE_POS, BUTTON_CHANGE_FIELD_WIDTH,
                                     BUTTON_CHANGE_FIELD_HEIGHT, COLOR_BLUE),
 
+      m_ButtonSpawnAtom(m_Renderer, BUTTON_SPAWN_ATOM_POS, BUTTON_SPAWN_WIDTH,
+                        BUTTON_SPAWN_HEIGHT, COLOR_BLUE),
+      m_ButtonSpawnElectron(m_Renderer, BUTTON_SPAWN_ELECTRON_POS, BUTTON_SPAWN_WIDTH,
+                        BUTTON_SPAWN_HEIGHT, COLOR_BLUE),
+      m_ButtonSpawnPIon(m_Renderer, BUTTON_SPAWN_PION_POS, BUTTON_SPAWN_WIDTH,
+                        BUTTON_SPAWN_HEIGHT, COLOR_BLUE),
+      m_ButtonSpawnNIon(m_Renderer, BUTTON_SPAWN_NION_POS, BUTTON_SPAWN_WIDTH,
+                        BUTTON_SPAWN_HEIGHT, COLOR_BLUE),
 
       m_AtomsMonitor(m_Renderer, ATOMS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
       m_ElectronsMonitor(m_Renderer, ELECTRONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
@@ -39,7 +47,12 @@ IdealGasApp::IdealGasApp(int32_t argc, char* argv[])
       m_LabelRightElectrode(m_Renderer, LABEL_RIGHT_ELECTRODE_POS, m_Font, COLOR_WHITE),
       m_LabelLeftElectricField(m_Renderer, LABEL_LEFT_ELECTRIC_FIELD_POS, m_Font, COLOR_WHITE),
       m_LabelRightElectricField(m_Renderer, LABEL_RIGHT_ELECTRIC_FIELD_POS, m_Font, COLOR_WHITE),
-      m_LabelSpawnParticle(m_Renderer, LABEL_SPAWN_PARTICLE_POS, m_Font, COLOR_WHITE)
+      m_LabelSpawnParticle(m_Renderer, LABEL_SPAWN_PARTICLE_POS, m_Font, COLOR_WHITE),
+
+      m_SpawnAtomListener(&m_Simulator, &SIMULATOR_VIEWPORT, SpawnButtonListener::SPAWN_ATOM),
+      m_SpawnElectronListener(&m_Simulator, &SIMULATOR_VIEWPORT, SpawnButtonListener::SPAWN_ELECTRON),
+      m_SpawnPIonListener(&m_Simulator, &SIMULATOR_VIEWPORT, SpawnButtonListener::SPAWN_PION),
+      m_SpawnNIonListener(&m_Simulator, &SIMULATOR_VIEWPORT, SpawnButtonListener::SPAWN_NION)
 {
     initSimulator();
     initGUI();
@@ -192,17 +205,29 @@ void IdealGasApp::initGUI()
     m_ButtonLeftElectrodeIncrease.attachToSystemEventManager(m_SystemEventManager);
     m_ButtonRightElectrodeIncrease.setLabel(">", m_Font);
     m_ButtonRightElectrodeIncrease.attachToSystemEventManager(m_SystemEventManager);
-
     m_ButtonLeftElectrodeDecrease.setLabel("<", m_Font);
     m_ButtonLeftElectrodeDecrease.attachToSystemEventManager(m_SystemEventManager);
     m_ButtonRightElectrodeDecrease.setLabel("<", m_Font);
     m_ButtonRightElectrodeDecrease.attachToSystemEventManager(m_SystemEventManager);
 
+    m_ButtonSpawnAtom.setLabel("Atom", m_Font);
+    m_ButtonSpawnAtom.attachToSystemEventManager(m_SystemEventManager);
+    m_ButtonSpawnElectron.setLabel("Electron", m_Font);
+    m_ButtonSpawnElectron.attachToSystemEventManager(m_SystemEventManager);
+    m_ButtonSpawnPIon.setLabel("Positive ion", m_Font);
+    m_ButtonSpawnPIon.attachToSystemEventManager(m_SystemEventManager);
+    m_ButtonSpawnNIon.setLabel("Negative ion", m_Font);
+    m_ButtonSpawnNIon.attachToSystemEventManager(m_SystemEventManager);
+
     m_GuiManager.addComponent(&m_ButtonLeftElectrodeIncrease);
     m_GuiManager.addComponent(&m_ButtonRightElectrodeIncrease);
-
     m_GuiManager.addComponent(&m_ButtonLeftElectrodeDecrease);
     m_GuiManager.addComponent(&m_ButtonRightElectrodeDecrease);
+
+    m_GuiManager.addComponent(&m_ButtonSpawnAtom);
+    m_GuiManager.addComponent(&m_ButtonSpawnElectron);
+    m_GuiManager.addComponent(&m_ButtonSpawnPIon);
+    m_GuiManager.addComponent(&m_ButtonSpawnNIon);
 
     /* Monitors */
     m_AtomsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_NEUTRAL, ENTITIES_MONITOR_TEXT_CLR);
@@ -231,7 +256,7 @@ void IdealGasApp::initGUI()
     m_LabelRightElectrode.updateText("Right electrode:");
     m_LabelLeftElectricField.updateText("0");
     m_LabelRightElectricField.updateText("0");
-    m_LabelSpawnParticle.updateText("Spawn particle:");
+    m_LabelSpawnParticle.updateText("Spawn particle");
 
     m_GuiManager.addComponent(&m_LabelLeftElectrode);
     m_GuiManager.addComponent(&m_LabelRightElectrode);
@@ -264,6 +289,11 @@ void IdealGasApp::initEventListeners()
     m_RightElectrodeDecreaseListener.type  = ElectrodeButtonListener::DECREASE_ELECTRIC_FIELD;
     m_ButtonRightElectrodeDecrease.attachListener({Event::GUI_BUTTON_PRESSED}, 
                                                    &m_RightElectrodeDecreaseListener);
+
+    m_ButtonSpawnAtom.attachListener({Event::GUI_BUTTON_PRESSED},     &m_SpawnAtomListener);
+    m_ButtonSpawnElectron.attachListener({Event::GUI_BUTTON_PRESSED}, &m_SpawnElectronListener);
+    m_ButtonSpawnPIon.attachListener({Event::GUI_BUTTON_PRESSED},     &m_SpawnPIonListener);
+    m_ButtonSpawnNIon.attachListener({Event::GUI_BUTTON_PRESSED},     &m_SpawnNIonListener);
 }
 
 void updateFpsTitle(Window& window, uint32_t frameTime)
