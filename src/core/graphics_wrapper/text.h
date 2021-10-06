@@ -31,21 +31,22 @@ class Text
 public:
     ~Text();
 
-    void load(Renderer& renderer, const char* str, Font font, Color color = COLOR_BLACK);
+    void load(Renderer& renderer, const char* str, const Font& font, Color color);
     void destroy();
 
-    const char* getStr() const;
     const Font& getFont() const;
     Color getColor() const;
+
+    const char* getStr() const;
     size_t getWidth() const;
     size_t getHeight() const;
 
     void render(Renderer& renderer, const Vec2<int32_t>& pos) const;
 
 private:
-    const char*  m_Str     = nullptr;
     Font         m_Font    = {nullptr, 0};
-    Color        m_Color   = 0;
+    const char*  m_Str     = nullptr;
+    Color        m_Color   = COLOR_BLACK;
 
     size_t       m_Width   = 0;
     size_t       m_Height  = 0;

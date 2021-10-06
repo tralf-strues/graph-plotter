@@ -64,7 +64,6 @@ void GUI_Button::setLabel(Renderer& renderer, const char* label, const Font& fon
     }
 
     m_Label = new Text;
-
     m_Label->load(renderer, label, font, color);
 }
 

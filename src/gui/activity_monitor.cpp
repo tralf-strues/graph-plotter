@@ -62,7 +62,7 @@ void GUI_ActivityMonitor::setValueRange(float minY, float maxY)
     m_GraphViewport.axesMax.y = maxY;
 }
 
-void GUI_ActivityMonitor::setTitle(Renderer& renderer, Font font, const char* title)
+void GUI_ActivityMonitor::setTitle(Renderer& renderer, const Font& font, const char* title)
 {
     removeTitle();
     m_Title.load(renderer, title, font, m_TextColor);
@@ -90,7 +90,7 @@ void GUI_ActivityMonitor::removeTitle()
     }
 }
 
-void GUI_ActivityMonitor::updateLabels(Renderer& renderer, Font font)
+void GUI_ActivityMonitor::updateLabels(Renderer& renderer, const Font& font)
 {
     m_LabelMin.destroy();
     m_LabelMax.destroy();

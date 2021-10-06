@@ -12,6 +12,29 @@
 void updateFpsTitle(Window& window, uint32_t frameTime);
 void generateParticles(Simulator& simulator, size_t count, PhysEntity::Type type);
 
+IdealGasApp::IdealGasApp(int32_t argc, char* argv[])
+    : Application(argc, argv),
+      m_Window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE),
+      m_Renderer(m_Window),
+      m_Font(FONT_FILENAME, FONT_SIZE),
+      m_Running(false),
+
+      m_ButtonLeftElectrodeIncrease(Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN),
+
+      m_AtomsMonitor(ATOMS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_ElectronsMonitor(ELECTRONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_PIonsMonitor(PIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_NIonsMonitor(NIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+
+      m_LabelLeftElectrode(LABEL_LEFT_ELECTRODE_POS, m_Font, COLOR_WHITE),
+      m_LabelRightElectrode(LABEL_RIGHT_ELECTRODE_POS, m_Font, COLOR_WHITE),
+      m_LabelSpawnParticle(LABEL_SPAWN_PARTICLE_POS, m_Font, COLOR_WHITE)
+{
+    initSimulator();
+    initGUI();
+    initEventListeners();
+}
+
 int main(int32_t argc, char* argv[])
 {
     initGraphics();
@@ -41,16 +64,12 @@ void IdealGasApp::run()
         /* Update fps title */
         frameTime = SDL_GetTicks() - frameStartTime;
         updateFpsTitle(m_Window, frameTime);
-
-        // FIXME:
-        // SDL_Delay(50);
     }
 }
 
 void IdealGasApp::updateAll()
 {
     m_Simulator.simulate(DELTA_TIME);
-    // m_Simulator.simulate(frameTime * TIME_SCALE); FIXME:
 
     int32_t atoms        = 0;
     int32_t electrons    = 0;
@@ -123,23 +142,6 @@ void IdealGasApp::renderAll()
     m_Renderer.present();
 }
 
-IdealGasApp::IdealGasApp(int32_t argc, char* argv[])
-    : Application(argc, argv),
-      m_Window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE),
-      m_Renderer(m_Window),
-      m_Font(FONT_FILENAME, FONT_SIZE),
-      m_Running(false),
-      m_ButtonLeftElectrodeIncrease(Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN),
-      m_AtomsMonitor(ATOMS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
-      m_ElectronsMonitor(ELECTRONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
-      m_PIonsMonitor(PIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
-      m_NIonsMonitor(NIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES)
-{
-    initSimulator();
-    initGUI();
-    initEventListeners();
-}
-
 void IdealGasApp::initSimulator()
 {
     generateParticles(m_Simulator, ELECTRONS_COUNT, PhysEntity::ELECTRON);
@@ -180,6 +182,8 @@ void IdealGasApp::initGUI()
     m_ButtonLeftElectrodeIncrease.setLabel(m_Renderer, "Hello!", m_Font);
     m_ButtonLeftElectrodeIncrease.attachToSystemEventManager(m_SystemEventManager);
 
+    m_GuiManager.addComponent(&m_ButtonLeftElectrodeIncrease);
+
     /* Monitors */
     m_AtomsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_NEUTRAL, ENTITIES_MONITOR_TEXT_CLR);
     m_AtomsMonitor.setTitle(m_Renderer, m_Font, "Atoms");
@@ -197,12 +201,19 @@ void IdealGasApp::initGUI()
     m_NIonsMonitor.setTitle(m_Renderer, m_Font, "Negative ions");
     m_NIonsMonitor.updateLabels(m_Renderer, m_Font);
 
-    m_GuiManager.addComponent(&m_ButtonLeftElectrodeIncrease);
-
     m_GuiManager.addComponent(&m_AtomsMonitor);
     m_GuiManager.addComponent(&m_ElectronsMonitor);
     m_GuiManager.addComponent(&m_PIonsMonitor);
     m_GuiManager.addComponent(&m_NIonsMonitor);
+
+    /* Text labels */
+    m_LabelLeftElectrode.updateText(m_Renderer, "Left electrode:");
+    m_LabelRightElectrode.updateText(m_Renderer, "Right electrode:");
+    m_LabelSpawnParticle.updateText(m_Renderer, "Spawn particle:");
+
+    m_GuiManager.addComponent(&m_LabelLeftElectrode);
+    m_GuiManager.addComponent(&m_LabelRightElectrode);
+    m_GuiManager.addComponent(&m_LabelSpawnParticle);
 }
 
 void IdealGasApp::initEventListeners()
@@ -210,7 +221,6 @@ void IdealGasApp::initEventListeners()
     m_Quit.running = &m_Running;
     m_SystemEventManager.attachListener({Event::WINDOW_CLOSE, Event::KEYBOARD_PRESSED}, &m_Quit);
 
-    // FIXME:
     m_LeftElectrodeIncreaseListener.label = nullptr;
     m_LeftElectrodeIncreaseListener.type  = ElectrodeButtonListener::INCREASE_ELECTRIC_FIELD;
     m_ButtonLeftElectrodeIncrease.attachListener({Event::GUI_BUTTON_PRESSED}, 

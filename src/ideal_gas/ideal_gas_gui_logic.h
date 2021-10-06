@@ -9,8 +9,9 @@
 #ifndef IDEAL_GAS_GUI_LOGIC_H
 #define IDEAL_GAS_GUI_LOGIC_H
 
-#include "../gui/button.h"
 #include "../gui/activity_monitor.h"
+#include "../gui/button.h"
+#include "../gui/text_label.h"
 #include "simulator.h"
 
 struct QuitListener : public IListener

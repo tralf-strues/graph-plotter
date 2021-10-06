@@ -24,34 +24,9 @@ TTF_Font* Font::getNativeFont() const
     return m_NativeFont;
 }
 
-size_t Font::getSize() const
+size_t Font::getSize() const 
 {
     return m_FontSize;
-}
-
-const char* Text::getStr() const
-{
-    return m_Str;
-}
-
-const Font& Text::getFont() const
-{
-    return m_Font;
-}
-
-Color Text::getColor() const
-{
-    return m_Color;
-}
-
-size_t Text::getWidth() const
-{
-    return m_Width;
-}
-
-size_t Text::getHeight() const
-{
-    return m_Height;
 }
 
 Text::~Text()
@@ -59,20 +34,26 @@ Text::~Text()
     destroy();
 }
 
-void Text::load(Renderer& renderer, const char* str, Font font, Color color)
+const Font& Text::getFont()   const { return m_Font;   }
+const char* Text::getStr()    const { return m_Str;    }
+Color       Text::getColor()  const { return m_Color;  }
+size_t      Text::getWidth()  const { return m_Width;  }
+size_t      Text::getHeight() const { return m_Height; }
+
+void Text::load(Renderer& renderer, const char* str, const Font& font, Color color)
 {
     assert(str);
 
-    m_Str   = str;
+    destroy();
+
     m_Font  = font;
     m_Color = color;
-
-    SDL_Color sysColor = getSystemColor(color);
+    m_Str   = str;
+    SDL_Color sysColor = getSystemColor(m_Color);
 
     SDL_Surface* loadedSurface = TTF_RenderText_Blended(m_Font.getNativeFont(), 
                                                         m_Str, 
-                                                        getSystemColor(color));
-
+                                                        getSystemColor(m_Color));
     assert(loadedSurface);
 
     m_Texture = SDL_CreateTextureFromSurface(renderer.getNativeRenderer(), loadedSurface);
@@ -90,13 +71,6 @@ void Text::destroy()
     {
         SDL_DestroyTexture(m_Texture);
     }
-
-    m_Str     = nullptr;
-    m_Font    = {nullptr, 0};
-    m_Color   = 0;
-    m_Width   = 0;
-    m_Height  = 0;
-    m_Texture = 0;
 }
 
 void Text::render(Renderer& renderer, const Vec2<int32_t>& pos) const

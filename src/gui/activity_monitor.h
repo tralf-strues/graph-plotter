@@ -43,11 +43,11 @@ public:
 
     void setValueRange(float minY, float maxY);
 
-    void setTitle(Renderer& renderer, Font font, const char* title);
+    void setTitle(Renderer& renderer, const Font& font, const char* title);
     const Text* getTitle() const;
     void removeTitle();
 
-    void updateLabels(Renderer& renderer, Font font);
+    void updateLabels(Renderer& renderer, const Font& font);
 
     void addSample(float sample);
 

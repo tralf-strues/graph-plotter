@@ -500,7 +500,7 @@ bool chemicalReactionAtomAtom(List<PhysEntity*>& entities, Collision& collision)
                 float angle = randomFromInterval<float>(0, 2 * M_PI);
                 newAtom->setVelocity(Vec2<float>{cosf(angle), sinf(angle)});
                 newAtom->setPos(firstAtom->getPos() +
-                                2.0f * newAtom->getVelocity() * firstAtom->getSize());
+                                3.0f * newAtom->getVelocity() * firstAtom->getSize());
 
                 newAtom->setVelocity(brokenAtomVelocity * newAtom->getVelocity());
 

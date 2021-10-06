@@ -30,14 +30,13 @@ static const Color         BACKGROUND_COLOR           = 0x000c1a'FF;
 
 //----------------------------------Simulation----------------------------------
 static const float         DELTA_TIME                 = 1e-6;
-static const float         TIME_SCALE                 = 1e-7; ///< simulation time passed after 1 real millisecond
 
-static const size_t        ELECTRONS_COUNT            = 20;
+static const size_t        ELECTRONS_COUNT            = 25;
 static const size_t        ATOMS_COUNT                = 25;
 //------------------------------------------------------------------------------
 
 //--------------------------------GUI components--------------------------------
-static const Viewport      SIMULATOR_VIEWPORT         = Viewport{{0, 0}, {55, 24}, {{20, 20},  1100, 480}};
+static const Viewport      SIMULATOR_VIEWPORT         = Viewport{{0, 0}, {55, 24}, {{20, 20},  1060, 480}};
 
 static const size_t        ENTITIES_MONITOR_SAMPLES   = 1000;
 
@@ -83,6 +82,10 @@ static const Viewport NIONS_MONITOR_VIEWPORT = Viewport{ENTITIES_MONITOR_AXES_MI
                                                           ENTITIES_MONITOR_POS.y}, 
                                                          ENTITIES_MONITOR_WIDTH,
                                                          ENTITIES_MONITOR_HEIGHT}};
+
+static const Vec2<int32_t> LABEL_LEFT_ELECTRODE_POS  = {1100, 20};
+static const Vec2<int32_t> LABEL_RIGHT_ELECTRODE_POS = {1100, 50};
+static const Vec2<int32_t> LABEL_SPAWN_PARTICLE_POS  = {1100, 100};
 //------------------------------------------------------------------------------
 
 struct ButtonListener;
@@ -110,6 +113,10 @@ private:
     GUI_ActivityMonitor     m_ElectronsMonitor;
     GUI_ActivityMonitor     m_PIonsMonitor;
     GUI_ActivityMonitor     m_NIonsMonitor;
+
+    GUI_TextLabel           m_LabelLeftElectrode;
+    GUI_TextLabel           m_LabelRightElectrode;
+    GUI_TextLabel           m_LabelSpawnParticle;
 
     QuitListener            m_Quit;
 
