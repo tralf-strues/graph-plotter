@@ -23,10 +23,10 @@ void GUI_Manager::removeComponent(GUI_Component* component)
     }
 }
 
-void GUI_Manager::renderComponents(Renderer& renderer)
+void GUI_Manager::renderComponents()
 {
     for (auto component : m_Components)
     {
-        component->render(renderer);
+        component->render();
     }
 }

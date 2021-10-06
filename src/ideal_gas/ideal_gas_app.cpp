@@ -19,16 +19,27 @@ IdealGasApp::IdealGasApp(int32_t argc, char* argv[])
       m_Font(FONT_FILENAME, FONT_SIZE),
       m_Running(false),
 
-      m_ButtonLeftElectrodeIncrease(Vec2<int32_t>{700, 10}, 60, 30, COLOR_GREEN),
+      m_ButtonLeftElectrodeIncrease(m_Renderer, BUTTON_LEFT_INCREASE_POS, BUTTON_CHANGE_FIELD_WIDTH,
+                                    BUTTON_CHANGE_FIELD_HEIGHT, COLOR_BLUE),
+      m_ButtonRightElectrodeIncrease(m_Renderer, BUTTON_RIGHT_INCREASE_POS, BUTTON_CHANGE_FIELD_WIDTH,
+                                    BUTTON_CHANGE_FIELD_HEIGHT, COLOR_BLUE),
 
-      m_AtomsMonitor(ATOMS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
-      m_ElectronsMonitor(ELECTRONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
-      m_PIonsMonitor(PIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
-      m_NIonsMonitor(NIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_ButtonLeftElectrodeDecrease(m_Renderer, BUTTON_LEFT_DECREASE_POS, BUTTON_CHANGE_FIELD_WIDTH,
+                                    BUTTON_CHANGE_FIELD_HEIGHT, COLOR_BLUE),
+      m_ButtonRightElectrodeDecrease(m_Renderer, BUTTON_RIGHT_DECREASE_POS, BUTTON_CHANGE_FIELD_WIDTH,
+                                    BUTTON_CHANGE_FIELD_HEIGHT, COLOR_BLUE),
 
-      m_LabelLeftElectrode(LABEL_LEFT_ELECTRODE_POS, m_Font, COLOR_WHITE),
-      m_LabelRightElectrode(LABEL_RIGHT_ELECTRODE_POS, m_Font, COLOR_WHITE),
-      m_LabelSpawnParticle(LABEL_SPAWN_PARTICLE_POS, m_Font, COLOR_WHITE)
+
+      m_AtomsMonitor(m_Renderer, ATOMS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_ElectronsMonitor(m_Renderer, ELECTRONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_PIonsMonitor(m_Renderer, PIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+      m_NIonsMonitor(m_Renderer, NIONS_MONITOR_VIEWPORT, ENTITIES_MONITOR_SAMPLES),
+
+      m_LabelLeftElectrode(m_Renderer, LABEL_LEFT_ELECTRODE_POS, m_Font, COLOR_WHITE),
+      m_LabelRightElectrode(m_Renderer, LABEL_RIGHT_ELECTRODE_POS, m_Font, COLOR_WHITE),
+      m_LabelLeftElectricField(m_Renderer, LABEL_LEFT_ELECTRIC_FIELD_POS, m_Font, COLOR_WHITE),
+      m_LabelRightElectricField(m_Renderer, LABEL_RIGHT_ELECTRIC_FIELD_POS, m_Font, COLOR_WHITE),
+      m_LabelSpawnParticle(m_Renderer, LABEL_SPAWN_PARTICLE_POS, m_Font, COLOR_WHITE)
 {
     initSimulator();
     initGUI();
@@ -111,16 +122,16 @@ void IdealGasApp::updateAll()
         float rangeMax = static_cast<int32_t>(maxValue * 1.5f);
 
         m_AtomsMonitor.setValueRange(0, rangeMax);
-        m_AtomsMonitor.updateLabels(m_Renderer, m_Font);
+        m_AtomsMonitor.updateLabels(m_Font);
         
         m_ElectronsMonitor.setValueRange(0, rangeMax);
-        m_ElectronsMonitor.updateLabels(m_Renderer, m_Font);
+        m_ElectronsMonitor.updateLabels(m_Font);
 
         m_PIonsMonitor.setValueRange(0, rangeMax);
-        m_PIonsMonitor.updateLabels(m_Renderer, m_Font);
+        m_PIonsMonitor.updateLabels(m_Font);
 
         m_NIonsMonitor.setValueRange(0, rangeMax);
-        m_NIonsMonitor.updateLabels(m_Renderer, m_Font);
+        m_NIonsMonitor.updateLabels(m_Font);
     }
 
     m_AtomsMonitor.addSample(atoms);
@@ -138,7 +149,7 @@ void IdealGasApp::renderAll()
     m_Simulator.updateGraphics(m_Renderer, SIMULATOR_VIEWPORT);
     m_Renderer.resetClipRegion();
 
-    m_GuiManager.renderComponents(m_Renderer);
+    m_GuiManager.renderComponents();
     m_Renderer.present();
 }
 
@@ -158,12 +169,10 @@ void IdealGasApp::initSimulator()
     Wall* wallLeft = new Wall();
     wallLeft->setPos(Vec2<float>{SIMULATOR_VIEWPORT.axesMin.x, SIMULATOR_VIEWPORT.axesMin.y});
     wallLeft->setDirection(Vec2<float>{0, 1});
-    wallLeft->setElectricField(5e3);
 
     Wall* wallRight = new Wall();
     wallRight->setPos(Vec2<float>{SIMULATOR_VIEWPORT.axesMax.x, SIMULATOR_VIEWPORT.axesMin.y});
     wallRight->setDirection(Vec2<float>{0, 1});
-    wallRight->setElectricField(-5e3);
 
     m_Simulator.entities.pushBack(wallTop);
     m_Simulator.entities.pushBack(wallBottom);
@@ -179,27 +188,38 @@ void IdealGasApp::initSimulator()
 void IdealGasApp::initGUI()
 {
     /* Buttons */
-    m_ButtonLeftElectrodeIncrease.setLabel(m_Renderer, "Hello!", m_Font);
+    m_ButtonLeftElectrodeIncrease.setLabel(">", m_Font);
     m_ButtonLeftElectrodeIncrease.attachToSystemEventManager(m_SystemEventManager);
+    m_ButtonRightElectrodeIncrease.setLabel(">", m_Font);
+    m_ButtonRightElectrodeIncrease.attachToSystemEventManager(m_SystemEventManager);
+
+    m_ButtonLeftElectrodeDecrease.setLabel("<", m_Font);
+    m_ButtonLeftElectrodeDecrease.attachToSystemEventManager(m_SystemEventManager);
+    m_ButtonRightElectrodeDecrease.setLabel("<", m_Font);
+    m_ButtonRightElectrodeDecrease.attachToSystemEventManager(m_SystemEventManager);
 
     m_GuiManager.addComponent(&m_ButtonLeftElectrodeIncrease);
+    m_GuiManager.addComponent(&m_ButtonRightElectrodeIncrease);
+
+    m_GuiManager.addComponent(&m_ButtonLeftElectrodeDecrease);
+    m_GuiManager.addComponent(&m_ButtonRightElectrodeDecrease);
 
     /* Monitors */
     m_AtomsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_NEUTRAL, ENTITIES_MONITOR_TEXT_CLR);
-    m_AtomsMonitor.setTitle(m_Renderer, m_Font, "Atoms");
-    m_AtomsMonitor.updateLabels(m_Renderer, m_Font);
+    m_AtomsMonitor.setTitle("Atoms", m_Font);
+    m_AtomsMonitor.updateLabels(m_Font);
 
     m_ElectronsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ELECTRON, ENTITIES_MONITOR_TEXT_CLR);
-    m_ElectronsMonitor.setTitle(m_Renderer, m_Font, "Electrons");
-    m_ElectronsMonitor.updateLabels(m_Renderer, m_Font);
+    m_ElectronsMonitor.setTitle("Electrons", m_Font);
+    m_ElectronsMonitor.updateLabels(m_Font);
 
     m_PIonsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_POSITIVE, ENTITIES_MONITOR_TEXT_CLR);
-    m_PIonsMonitor.setTitle(m_Renderer, m_Font, "Positive ions");
-    m_PIonsMonitor.updateLabels(m_Renderer, m_Font);
+    m_PIonsMonitor.setTitle("Positive ions", m_Font);
+    m_PIonsMonitor.updateLabels(m_Font);
 
     m_NIonsMonitor.setColors(ENTITIES_MONITOR_FRAME_CLR, COLOR_ATOM_NEGATIVE, ENTITIES_MONITOR_TEXT_CLR);
-    m_NIonsMonitor.setTitle(m_Renderer, m_Font, "Negative ions");
-    m_NIonsMonitor.updateLabels(m_Renderer, m_Font);
+    m_NIonsMonitor.setTitle("Negative ions", m_Font);
+    m_NIonsMonitor.updateLabels(m_Font);
 
     m_GuiManager.addComponent(&m_AtomsMonitor);
     m_GuiManager.addComponent(&m_ElectronsMonitor);
@@ -207,12 +227,16 @@ void IdealGasApp::initGUI()
     m_GuiManager.addComponent(&m_NIonsMonitor);
 
     /* Text labels */
-    m_LabelLeftElectrode.updateText(m_Renderer, "Left electrode:");
-    m_LabelRightElectrode.updateText(m_Renderer, "Right electrode:");
-    m_LabelSpawnParticle.updateText(m_Renderer, "Spawn particle:");
+    m_LabelLeftElectrode.updateText("Left electrode:");
+    m_LabelRightElectrode.updateText("Right electrode:");
+    m_LabelLeftElectricField.updateText("0");
+    m_LabelRightElectricField.updateText("0");
+    m_LabelSpawnParticle.updateText("Spawn particle:");
 
     m_GuiManager.addComponent(&m_LabelLeftElectrode);
     m_GuiManager.addComponent(&m_LabelRightElectrode);
+    m_GuiManager.addComponent(&m_LabelLeftElectricField);
+    m_GuiManager.addComponent(&m_LabelRightElectricField);
     m_GuiManager.addComponent(&m_LabelSpawnParticle);
 }
 
@@ -221,19 +245,25 @@ void IdealGasApp::initEventListeners()
     m_Quit.running = &m_Running;
     m_SystemEventManager.attachListener({Event::WINDOW_CLOSE, Event::KEYBOARD_PRESSED}, &m_Quit);
 
-    m_LeftElectrodeIncreaseListener.label = nullptr;
+    m_LeftElectrodeIncreaseListener.label = &m_LabelLeftElectricField;
     m_LeftElectrodeIncreaseListener.type  = ElectrodeButtonListener::INCREASE_ELECTRIC_FIELD;
     m_ButtonLeftElectrodeIncrease.attachListener({Event::GUI_BUTTON_PRESSED}, 
                                                   &m_LeftElectrodeIncreaseListener);
 
-    m_RightElectrodeIncreaseListener.label = nullptr;
+    m_RightElectrodeIncreaseListener.label = &m_LabelRightElectricField;
     m_RightElectrodeIncreaseListener.type  = ElectrodeButtonListener::INCREASE_ELECTRIC_FIELD;
+    m_ButtonRightElectrodeIncrease.attachListener({Event::GUI_BUTTON_PRESSED}, 
+                                                  &m_RightElectrodeIncreaseListener);
 
-    m_LeftElectrodeDecreaseListener.label  = nullptr;
+    m_LeftElectrodeDecreaseListener.label  = &m_LabelLeftElectricField;
     m_LeftElectrodeDecreaseListener.type   = ElectrodeButtonListener::DECREASE_ELECTRIC_FIELD;
+    m_ButtonLeftElectrodeDecrease.attachListener({Event::GUI_BUTTON_PRESSED}, 
+                                                  &m_LeftElectrodeDecreaseListener);
 
-    m_RightElectrodeDecreaseListener.label = nullptr;
+    m_RightElectrodeDecreaseListener.label = &m_LabelRightElectricField;
     m_RightElectrodeDecreaseListener.type  = ElectrodeButtonListener::DECREASE_ELECTRIC_FIELD;
+    m_ButtonRightElectrodeDecrease.attachListener({Event::GUI_BUTTON_PRESSED}, 
+                                                   &m_RightElectrodeDecreaseListener);
 }
 
 void updateFpsTitle(Window& window, uint32_t frameTime)

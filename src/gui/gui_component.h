@@ -14,15 +14,17 @@
 class GUI_Component
 {
 public:
-    GUI_Component(const Vec2<int32_t>& pos);
+    GUI_Component(Renderer& renderer, const Vec2<int32_t>& pos)
+        : m_Renderer(renderer), m_Pos(pos) {}
 
-    const Vec2<int32_t>& getPos() const;
-    void setPos(const Vec2<int32_t>& pos);
+    const Vec2<int32_t>& getPos() const   { return m_Pos; }
+    void setPos(const Vec2<int32_t>& pos) { m_Pos = pos;  }
 
-    virtual void render(Renderer& renderer) = 0;
+    virtual void render() = 0;
 
 protected:
     Vec2<int32_t> m_Pos;
+    Renderer&     m_Renderer;
 };
 
 class SystemEventManagerListener : protected IListener

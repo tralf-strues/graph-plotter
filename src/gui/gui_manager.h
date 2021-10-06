@@ -17,7 +17,7 @@ public:
     void addComponent(GUI_Component* component);
     void removeComponent(GUI_Component* component);
 
-    void renderComponents(Renderer& renderer);
+    void renderComponents();
 
 private:
     List<GUI_Component*> m_Components;

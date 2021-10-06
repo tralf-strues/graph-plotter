@@ -24,9 +24,9 @@ struct EventButtonPressed : public Event
 class GUI_Button : public GUI_Component, public SystemEventManagerListener, public Notifier
 {
 public:
-    GUI_Button(const Vec2<int32_t>& pos,
-           size_t width, size_t height,
-           Color color = COLOR_BLACK);
+    GUI_Button(Renderer& renderer, const Vec2<int32_t>& pos,
+               size_t width, size_t height,
+               Color color = COLOR_BLACK);
 
     size_t getWidth() const;
     void setWidth(size_t width);
@@ -38,13 +38,13 @@ public:
     void setColor(Color color);
 
     const Text* getLabel() const;
-    void setLabel(Renderer& renderer, const char* label, const Font& font, Color color = COLOR_WHITE);
+    void setLabel(const char* label, const Font& font, Color color = COLOR_WHITE);
 
     /* SystemEventManagerListener */
     void attachToSystemEventManager(SystemEventManager& manager) override;
 
     /* GUI_Component */
-    void render(Renderer& renderer) override;
+    void render() override;
 
 protected:
     size_t m_Width;

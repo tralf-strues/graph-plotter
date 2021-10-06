@@ -19,7 +19,8 @@ static const int32_t GUI_ACTIVITY_MONITOR_LABELS_MARGIN_X = 5;
 class GUI_ActivityMonitor : public GUI_Component
 {
 public:
-    GUI_ActivityMonitor(const Viewport& viewport,
+    GUI_ActivityMonitor(Renderer& renderer,
+                        const Viewport& viewport,
                         size_t samplesCount,
                         Color frameColor = COLOR_BLACK,
                         Color lineColor  = COLOR_BLACK,
@@ -43,16 +44,16 @@ public:
 
     void setValueRange(float minY, float maxY);
 
-    void setTitle(Renderer& renderer, const Font& font, const char* title);
+    void setTitle(const char* title, const Font& font);
     const Text* getTitle() const;
     void removeTitle();
 
-    void updateLabels(Renderer& renderer, const Font& font);
+    void updateLabels(const Font& font);
 
     void addSample(float sample);
 
     /* GUI_Component */
-    void render(Renderer& renderer) override;
+    void render() override;
 
 private:
     size_t      m_SamplesCount = 0;

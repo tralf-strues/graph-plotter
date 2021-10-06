@@ -83,9 +83,20 @@ static const Viewport NIONS_MONITOR_VIEWPORT = Viewport{ENTITIES_MONITOR_AXES_MI
                                                          ENTITIES_MONITOR_WIDTH,
                                                          ENTITIES_MONITOR_HEIGHT}};
 
-static const Vec2<int32_t> LABEL_LEFT_ELECTRODE_POS  = {1100, 20};
-static const Vec2<int32_t> LABEL_RIGHT_ELECTRODE_POS = {1100, 50};
-static const Vec2<int32_t> LABEL_SPAWN_PARTICLE_POS  = {1100, 100};
+static const Vec2<int32_t> LABEL_LEFT_ELECTRODE_POS       = {1120, 20};
+static const Vec2<int32_t> LABEL_RIGHT_ELECTRODE_POS      = {1120, 50};
+static const Vec2<int32_t> LABEL_LEFT_ELECTRIC_FIELD_POS  = {1255, 20};
+static const Vec2<int32_t> LABEL_RIGHT_ELECTRIC_FIELD_POS = {1255, 50};
+static const Vec2<int32_t> LABEL_SPAWN_PARTICLE_POS       = {1120, 100};
+
+static const int32_t       BUTTON_CHANGE_FIELD_WIDTH      = 20;
+static const int32_t       BUTTON_CHANGE_FIELD_HEIGHT     = 20;
+
+static const Vec2<int32_t> BUTTON_LEFT_INCREASE_POS       = {1340, 20};
+static const Vec2<int32_t> BUTTON_RIGHT_INCREASE_POS      = {1340, 50};
+
+static const Vec2<int32_t> BUTTON_LEFT_DECREASE_POS       = {1310, 20};
+static const Vec2<int32_t> BUTTON_RIGHT_DECREASE_POS      = {1310, 50};
 //------------------------------------------------------------------------------
 
 struct ButtonListener;
@@ -107,7 +118,11 @@ private:
     Simulator               m_Simulator;
 
     GUI_Manager             m_GuiManager;
+
     GUI_Button              m_ButtonLeftElectrodeIncrease;
+    GUI_Button              m_ButtonRightElectrodeIncrease;
+    GUI_Button              m_ButtonLeftElectrodeDecrease;
+    GUI_Button              m_ButtonRightElectrodeDecrease;
 
     GUI_ActivityMonitor     m_AtomsMonitor;
     GUI_ActivityMonitor     m_ElectronsMonitor;
@@ -116,6 +131,8 @@ private:
 
     GUI_TextLabel           m_LabelLeftElectrode;
     GUI_TextLabel           m_LabelRightElectrode;
+    GUI_TextLabel           m_LabelLeftElectricField;
+    GUI_TextLabel           m_LabelRightElectricField;
     GUI_TextLabel           m_LabelSpawnParticle;
 
     QuitListener            m_Quit;

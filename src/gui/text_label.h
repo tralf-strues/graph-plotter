@@ -14,18 +14,17 @@
 class GUI_TextLabel : public GUI_Component
 {
 public:
-    GUI_TextLabel(const Vec2<int32_t>& pos, const Font& font, Color color);
+    GUI_TextLabel(Renderer& renderer, const Vec2<int32_t>& pos, const Font& font, Color color);
 
     const Text& getText() const;
 
-    void updateText(Renderer& renderer, const char* str);
+    void updateText(const char* str);
 
     /* GUI_Component */
-    void render(Renderer& renderer) override;
+    void render() override;
 
 private:
     Text  m_Text;
-
     Font  m_Font;
     Color m_Color;
 };

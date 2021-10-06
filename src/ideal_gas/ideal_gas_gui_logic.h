@@ -14,6 +14,8 @@
 #include "../gui/text_label.h"
 #include "simulator.h"
 
+static const float ELECTRIC_FIELD_CHANGE_STEP = 500;
+
 struct QuitListener : public IListener
 {
     bool* running;
@@ -52,16 +54,37 @@ struct ElectrodeButtonListener : public IListener
         DECREASE_ELECTRIC_FIELD,
     };
 
-    Type  type;
-    Text* label;
-    Wall* electrode;
+    Type           type;
+    GUI_TextLabel* label;
+    Wall*          electrode;
 
     void onEvent(const Event& event) override
     {
         assert(event.type == Event::GUI_BUTTON_PRESSED);
 
-        const EventButtonPressed& buttonEvent = (const EventButtonPressed&) event;
-        printf("ElectrodeButton pressed!\n");
+        float electricField = electrode->getElectricField();
+
+        switch (type)
+        {
+            case INCREASE_ELECTRIC_FIELD: 
+            {
+                electrode->setElectricField(electricField + ELECTRIC_FIELD_CHANGE_STEP);
+                break;
+            }
+            
+            case DECREASE_ELECTRIC_FIELD:
+            {
+                electrode->setElectricField(electricField - ELECTRIC_FIELD_CHANGE_STEP);
+                break;
+            }
+
+            default: { assert("Invalid behavior type!"); break; }
+        };
+
+        static char labelText[32];
+        snprintf(labelText, sizeof(labelText), "%g", electrode->getElectricField());
+
+        label->updateText(labelText);
     }
 };
 

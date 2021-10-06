@@ -14,8 +14,8 @@ EventButtonPressed::EventButtonPressed(GUI_Button* button)
     assert(button);
 }
 
-GUI_Button::GUI_Button(const Vec2<int32_t>& pos, size_t width, size_t height, Color color)
-    : GUI_Component(pos), m_Width(width), m_Height(height), m_Color(color), m_Label(nullptr)
+GUI_Button::GUI_Button(Renderer& renderer, const Vec2<int32_t>& pos, size_t width, size_t height, Color color)
+    : GUI_Component(renderer, pos), m_Width(width), m_Height(height), m_Color(color), m_Label(nullptr)
 {}
 
 size_t GUI_Button::getWidth() const
@@ -53,7 +53,7 @@ const Text* GUI_Button::getLabel() const
     return m_Label;
 }
 
-void GUI_Button::setLabel(Renderer& renderer, const char* label, const Font& font, Color color)
+void GUI_Button::setLabel(const char* label, const Font& font, Color color)
 {
     assert(label);
     assert(font.getNativeFont());
@@ -64,7 +64,7 @@ void GUI_Button::setLabel(Renderer& renderer, const char* label, const Font& fon
     }
 
     m_Label = new Text;
-    m_Label->load(renderer, label, font, color);
+    m_Label->load(m_Renderer, label, font, color);
 }
 
 void GUI_Button::onEvent(const Event& event)
@@ -86,18 +86,18 @@ void GUI_Button::attachToSystemEventManager(SystemEventManager& manager)
     manager.attachListener({Event::MOUSE_BUTTON_PRESSED}, this);
 }
 
-void GUI_Button::render(Renderer& renderer)
+void GUI_Button::render()
 {
     Rectangle rect{m_Pos, static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height)};
 
-    renderer.setColor(m_Color);
-    renderFilledRect(renderer, rect);
+    m_Renderer.setColor(m_Color);
+    renderFilledRect(m_Renderer, rect);
 
     if (m_Label != nullptr)
     {
         Vec2<int32_t> margin{(m_Width  - m_Label->getWidth())  / 2,
                              (m_Height - m_Label->getHeight()) / 2};
 
-        m_Label->render(renderer, m_Pos + margin);
+        m_Label->render(m_Renderer, m_Pos + margin);
     }
 }

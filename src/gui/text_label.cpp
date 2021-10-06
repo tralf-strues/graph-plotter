@@ -8,8 +8,8 @@
 
 #include "text_label.h"
 
-GUI_TextLabel::GUI_TextLabel(const Vec2<int32_t>& pos, const Font& font, Color color)
-    : GUI_Component(pos),
+GUI_TextLabel::GUI_TextLabel(Renderer& renderer, const Vec2<int32_t>& pos, const Font& font, Color color)
+    : GUI_Component(renderer, pos),
       m_Font(font),
       m_Color(color)
 {
@@ -20,14 +20,14 @@ const Text& GUI_TextLabel::getText() const
     return m_Text;
 }
 
-void GUI_TextLabel::updateText(Renderer& renderer, const char* str)
+void GUI_TextLabel::updateText(const char* str)
 {
     assert(str);
 
-    m_Text.load(renderer, str, m_Font, m_Color);
+    m_Text.load(m_Renderer, str, m_Font, m_Color);
 }
 
-void GUI_TextLabel::render(Renderer& renderer)
+void GUI_TextLabel::render()
 {
-    m_Text.render(renderer, m_Pos);
+    m_Text.render(m_Renderer, m_Pos);
 }

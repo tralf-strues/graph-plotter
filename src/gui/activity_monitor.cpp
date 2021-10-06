@@ -8,12 +8,13 @@
 
 #include "activity_monitor.h"
 
-GUI_ActivityMonitor::GUI_ActivityMonitor(const Viewport& viewport,
+GUI_ActivityMonitor::GUI_ActivityMonitor(Renderer& renderer,
+                                         const Viewport& viewport,
                                          size_t samplesCount,
                                          Color frameColor,
                                          Color lineColor,
                                          Color textColor)
-    : GUI_Component(viewport.windowArea.pos), 
+    : GUI_Component(renderer, viewport.windowArea.pos), 
       m_SamplesCount(samplesCount), 
       m_Samples(m_SamplesCount),
       m_FrameColor(frameColor),
@@ -62,10 +63,10 @@ void GUI_ActivityMonitor::setValueRange(float minY, float maxY)
     m_GraphViewport.axesMax.y = maxY;
 }
 
-void GUI_ActivityMonitor::setTitle(Renderer& renderer, const Font& font, const char* title)
+void GUI_ActivityMonitor::setTitle(const char* title, const Font& font)
 {
     removeTitle();
-    m_Title.load(renderer, title, font, m_TextColor);
+    m_Title.load(m_Renderer, title, font, m_TextColor);
 
     m_TitleRenderRect.pos.x = m_GraphViewport.windowArea.pos.x +
                               (m_GraphViewport.windowArea.width - m_Title.getWidth()) / 2;
@@ -90,7 +91,7 @@ void GUI_ActivityMonitor::removeTitle()
     }
 }
 
-void GUI_ActivityMonitor::updateLabels(Renderer& renderer, const Font& font)
+void GUI_ActivityMonitor::updateLabels(const Font& font)
 {
     m_LabelMin.destroy();
     m_LabelMax.destroy();
@@ -98,10 +99,10 @@ void GUI_ActivityMonitor::updateLabels(Renderer& renderer, const Font& font)
     static char labelStr[GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE];
 
     snprintf(labelStr, GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE, "%g", m_GraphViewport.axesMin.y);
-    m_LabelMin.load(renderer, labelStr, font, m_TextColor);
+    m_LabelMin.load(m_Renderer, labelStr, font, m_TextColor);
 
     snprintf(labelStr, GUI_ACTIVITY_MONITOR_MAX_LABEL_SIZE, "%g", m_GraphViewport.axesMax.y);
-    m_LabelMax.load(renderer, labelStr, font, m_TextColor);
+    m_LabelMax.load(m_Renderer, labelStr, font, m_TextColor);
 }
 
 void GUI_ActivityMonitor::addSample(float sample)
@@ -114,7 +115,7 @@ void GUI_ActivityMonitor::addSample(float sample)
     m_Samples.pushBack(sample);
 }
 
-void GUI_ActivityMonitor::render(Renderer& renderer)
+void GUI_ActivityMonitor::render()
 {
     float xStep = m_GraphViewport.getRelativeWidth() / (m_SamplesCount - 1);
     Vec2<int32_t> prevPoint = m_GraphViewport.toPixels(Vec2<float>{0, *m_Samples.begin()});;
@@ -122,18 +123,18 @@ void GUI_ActivityMonitor::render(Renderer& renderer)
     ListIterator<float> it = m_Samples.begin();
     ++it;
 
-    renderer.setColor(m_LineColor);
+    m_Renderer.setColor(m_LineColor);
     for (size_t sample = 1; sample <= m_SamplesCount && it != m_Samples.end(); ++sample, ++it)
     {
         Vec2<int32_t> nextPoint = m_GraphViewport.toPixels(Vec2<float>{xStep * sample, *(it)});
-        renderLine(renderer, prevPoint, nextPoint);
+        renderLine(m_Renderer, prevPoint, nextPoint);
 
         prevPoint = nextPoint;
     }
 
     if (m_LabelMax.getStr() != nullptr)
     {
-        m_LabelMax.render(renderer, Vec2<int32_t>{m_GraphViewport.windowArea.pos.x +
+        m_LabelMax.render(m_Renderer, Vec2<int32_t>{m_GraphViewport.windowArea.pos.x +
                                                   m_GraphViewport.windowArea.width +
                                                   GUI_ACTIVITY_MONITOR_LABELS_MARGIN_X,
                                                   m_GraphViewport.windowArea.pos.y});
@@ -141,7 +142,7 @@ void GUI_ActivityMonitor::render(Renderer& renderer)
 
     if (m_LabelMin.getStr() != nullptr)
     {
-        m_LabelMin.render(renderer, Vec2<int32_t>{m_GraphViewport.windowArea.pos.x +
+        m_LabelMin.render(m_Renderer, Vec2<int32_t>{m_GraphViewport.windowArea.pos.x +
                                                   m_GraphViewport.windowArea.width +
                                                   GUI_ACTIVITY_MONITOR_LABELS_MARGIN_X,
                                                   m_GraphViewport.windowArea.pos.y +
@@ -151,9 +152,9 @@ void GUI_ActivityMonitor::render(Renderer& renderer)
 
     if (m_Title.getStr() != nullptr)
     {
-        m_Title.render(renderer, m_TitleRenderRect.pos);
+        m_Title.render(m_Renderer, m_TitleRenderRect.pos);
     }
 
-    renderer.setColor(m_FrameColor);
-    renderRect(renderer, m_GraphViewport.windowArea);
+    m_Renderer.setColor(m_FrameColor);
+    renderRect(m_Renderer, m_GraphViewport.windowArea);
 }
