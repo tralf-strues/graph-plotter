@@ -7,12 +7,11 @@
 //------------------------------------------------------------------------------
 
 #include <math.h>
-#include <float.h>
 #include "float_compare.h"
 
-int32_t cmpFloat(float first, float second)
+int32_t cmpFloat(float first, float second, float epsilon)
 {
-    if (fabsf(first - second) < FLT_EPSILON)
+    if (fabsf(first - second) < epsilon)
     {
         return 0;
     }

@@ -16,6 +16,8 @@ typedef bool (*FCollisionDetect) (EntitiesIterator first, EntitiesIterator secon
 typedef void (*FCollisionRespond) (Collision& collision);
 typedef bool (*FChemicalReaction) (List<PhysEntity*>& entities, Collision& collision);
 
+const float EPSILON = 1e-2;
+
 struct EntityPairInteraction
 {
     FDistantInteract  distantInteract;
@@ -199,7 +201,7 @@ bool collisionDetectElectronElectron(EntitiesIterator firstEntity, EntitiesItera
     float sumRadiusSquare = firstElectron->getRadius() + secondElectron->getRadius();
     sumRadiusSquare *= sumRadiusSquare;
 
-    if (cmpFloat(distanceSquare, sumRadiusSquare) <= 0)
+    if (cmpFloat(distanceSquare, sumRadiusSquare, EPSILON) <= 0)
     {
         collision->firstEntity  = firstEntity;
         collision->secondEntity = secondEntity;
@@ -221,7 +223,7 @@ bool collisionDetectElectronWall(EntitiesIterator firstEntity, EntitiesIterator 
 
     float distance = length((point - lineFrom) - (dotProduct(point - lineFrom, along) * along));
 
-    if (cmpFloat(distance, electron->getRadius()) <= 0)
+    if (cmpFloat(distance, electron->getRadius(), EPSILON) <= 0)
     {
         collision->firstEntity  = firstEntity;
         collision->secondEntity = secondEntity;
@@ -244,7 +246,7 @@ bool collisionDetectWallAtom(EntitiesIterator firstEntity, EntitiesIterator seco
 
     float distance = length((point - lineFrom) - (dotProduct(point - lineFrom, along) * along));
 
-    if (cmpFloat(distance, atom->getSize() / 2) <= 0)
+    if (cmpFloat(distance, atom->getSize() / 2, EPSILON) <= 0)
     {
         collision->firstEntity  = firstEntity;
         collision->secondEntity = secondEntity;
@@ -273,10 +275,10 @@ bool collisionDetectAtomAtom(EntitiesIterator firstEntity, EntitiesIterator seco
     float firstBottom  = firstAtom->getPos().y  + firstAtom->getSize()  / 2;
     float secondBottom = secondAtom->getPos().y + secondAtom->getSize() / 2;
 
-    if (!(cmpFloat(secondLeft, firstRight) > 0 ||
-          cmpFloat(secondRight, firstLeft) < 0 || 
-          cmpFloat(secondTop, firstBottom) > 0 ||
-          cmpFloat(secondBottom, firstTop) < 0))
+    if (!(cmpFloat(secondLeft, firstRight, EPSILON) > 0 ||
+          cmpFloat(secondRight, firstLeft, EPSILON) < 0 || 
+          cmpFloat(secondTop, firstBottom, EPSILON) > 0 ||
+          cmpFloat(secondBottom, firstTop, EPSILON) < 0))
     {
         collision->firstEntity  = firstEntity;
         collision->secondEntity = secondEntity;
@@ -299,7 +301,7 @@ bool collisionDetectElectronAtom(EntitiesIterator firstEntity, EntitiesIterator 
     float sumRadiusSquare = electronRadius + atomRadius;
     sumRadiusSquare *= sumRadiusSquare;
 
-    if (cmpFloat(distanceSquare, sumRadiusSquare) <= 0)
+    if (cmpFloat(distanceSquare, sumRadiusSquare, EPSILON) <= 0)
     {
         collision->firstEntity  = firstEntity;
         collision->secondEntity = secondEntity;

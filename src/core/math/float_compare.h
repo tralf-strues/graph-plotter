@@ -10,7 +10,8 @@
 #define FLOAT_COMPARE_H
 
 #include "inttypes.h"
+#include <float.h>
 
-int32_t cmpFloat(float first, float second);
+int32_t cmpFloat(float first, float second, float epsilon = FLT_EPSILON);
 
 #endif // FLOAT_COMPARE_H

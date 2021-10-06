@@ -113,8 +113,6 @@ struct SpawnButtonListener : public IListener
     {
         assert(event.type == Event::GUI_BUTTON_PRESSED);
 
-        printf("SpawnButtonListener\n");
-
         float radius = randomFromInterval<float>(0.4, 1.2);
         float volume = calculateSphereVolume(radius);
 
