@@ -1,20 +1,20 @@
 //------------------------------------------------------------------------------
 //! @author Nikita Mochalov (github.com/tralf-strues)
-//! @file primitive3d.cpp
+//! @file object3d.cpp
 //! @date 2021-10-01
 //! 
 //! @copyright Copyright (c) 2021
 //------------------------------------------------------------------------------
 
 #include "../core/math/_core_math.h"
-#include "primitive3d.h"
+#include "object3d.h"
 
-//----------------------------------Primitive3d---------------------------------
-Primitive3d::Primitive3d(const Material* material) : material(material) {}
+//-----------------------------------Object3d-----------------------------------
+Object3d::Object3d(const Material* material) : material(material) {}
 //------------------------------------------------------------------------------
 
 //------------------------------------Sphere------------------------------------
-Sphere::Sphere(const Material* material, float radius) : Primitive3d(material), radius(radius) {}
+Sphere::Sphere(const Material* material, float radius) : Object3d(material), radius(radius) {}
 
 void Sphere::toWorldSpace()
 {
@@ -78,7 +78,7 @@ bool Sphere::intersect(const Ray& ray, Hit* hit)
 //------------------------------------------------------------------------------
 
 //-----------------------------------Triangle-----------------------------------
-Triangle::Triangle(const Material* material) : Primitive3d(material) {}
+Triangle::Triangle(const Material* material) : Object3d(material) {}
 
 void Triangle::toWorldSpace()
 {

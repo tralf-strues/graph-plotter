@@ -12,18 +12,19 @@
 #include "../core/math/_core_math.h"
 #include "../core/containers/_core_containers.h"
 #include "light.h"
-#include "primitive3d.h"
+#include "object3d.h"
+#include "mesh.h"
 #include "camera.h"
 
 struct Scene
 {
     Scene(Camera& camera) : camera(camera) {}
 
-    Camera&               camera;
-    DynamicArray<Light*>  lightSources;
-    Vec3<float>           ambientColor; ///< Global ambient used in Blinn-Phong shading
-    List<Primitive3d*>    primitives;
-    // List<Mesh*>        meshes;
+    Camera&              camera;
+    DynamicArray<Light*> lightSources;
+    Vec3<float>          ambientColor; ///< Global ambient used in Blinn-Phong shading
+    List<Object3d*>      objects;
+    List<Mesh*>          meshes;
 
     void updateWorldSpaceValues();
     void updateCameraSpaceValues();
