@@ -17,11 +17,11 @@
 
 struct RayTracer
 {
-    RayTracer(Scene* scene = nullptr, Texture* targetTexture = nullptr, ZBuffer* zbuffer = nullptr);
+    RayTracer(Scene* scene = nullptr, BufferedTexture* targetTexture = nullptr, ZBuffer* zbuffer = nullptr);
 
-    Scene*   scene;  // FIXME: make const (add const iterators)
-    Texture* targetTexture;
-    ZBuffer* zbuffer;
+    Scene*           scene;  // FIXME: make const (add const iterators)
+    BufferedTexture* targetTexture;
+    ZBuffer*         zbuffer;
 
     void renderScene();
 };

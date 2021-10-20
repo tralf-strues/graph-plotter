@@ -88,9 +88,9 @@ int main()
     scene.ambientColor = AMBIENT_COLOR;
 
     /* ================ Ray tracer ================ */
-    Texture texture(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    BufferedTexture bufferedTexture(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     ZBuffer zbuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
-    RayTracer rayTracer = {&scene, &texture, &zbuffer};
+    RayTracer rayTracer = {&scene, &bufferedTexture, &zbuffer};
 
     /* ================ Main loop ================ */
     SDL_Event event     = {};
@@ -148,9 +148,9 @@ int main()
 
         zbuffer.reset();
         rayTracer.renderScene();
-        texture.update();
+        bufferedTexture.updateTexture();
 
-        renderer.renderTexture(texture, {0, 0});
+        renderer.renderTexture(bufferedTexture.getTexture(), {0, 0});
         renderer.present();
 
         /* ================ Update fps title ================ */

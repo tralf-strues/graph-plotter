@@ -16,12 +16,12 @@ bool capNormalized(Vec3<float>& color);
 Color convertToRgba(Vec3<float> rgb);
 Vec3<float> calculateColor(Scene& scene, const Hit& hit);
 
-RayTracer::RayTracer(Scene* scene, Texture* targetTexture, ZBuffer* zbuffer) :
+RayTracer::RayTracer(Scene* scene, BufferedTexture* targetTexture, ZBuffer* zbuffer) :
                      scene(scene), targetTexture(targetTexture), zbuffer(zbuffer) {}
 
 void RayTracer::renderScene()
 {
-    targetTexture->clear(COLOR_BLACK);
+    targetTexture->clearBuffer(COLOR_BLACK);
 
     for (auto primitive : scene->objects)
     {
@@ -31,8 +31,8 @@ void RayTracer::renderScene()
 
 void renderPrimitive(RayTracer& rayTracer, Object3d& primitive)
 {
-    size_t width  = rayTracer.targetTexture->getWidth();
-    size_t height = rayTracer.targetTexture->getHeight();
+    size_t width  = rayTracer.targetTexture->getTexture().getWidth();
+    size_t height = rayTracer.targetTexture->getTexture().getHeight();
 
     float fwidth  = (float) width;
     float fheight = (float) height;
